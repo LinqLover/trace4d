@@ -28,7 +28,7 @@ jobs:
         with:
           name: exposé.pdf
           path: docs/exposé/exposé.pdf
-      - run: mkdir -p build && mv exposé/exposé.pdf build/
+      - run: mkdir -p build && mv docs/exposé/exposé.pdf build/
       - uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
