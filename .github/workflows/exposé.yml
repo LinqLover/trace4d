@@ -10,16 +10,20 @@ on:
 jobs:
   latex:
     runs-on: ubuntu-latest
-    container: ghcr.io/xu-cheng/texlive-full:latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install pandoc
-        run: apt-get install pandoc
-      - name: Install pandoc filters
-        run: pip install -r requirements.txt
-        working-directory: docs/exposé
-      - run: make
-        working-directory: docs/exposé
+      - uses: xu-cheng/texlive-action/full@v1
+        with:
+          run: |
+            # Install dependencies
+            apk add pandoc python3 py3-pip python3-dev build-base gcc linux-headers
+
+            cd docs/exposé
+
+            # Install pandoc filters
+            pip install -r requirements.txt
+
+            make
       - uses: actions/upload-artifact@master
         with:
           name: exposé.pdf

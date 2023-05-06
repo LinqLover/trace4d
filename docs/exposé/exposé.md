@@ -8,6 +8,10 @@ bibliography: exposé.bib
 classoption: twocolumn
 filters:
 - pandoc-fignos
+header-includes: |
+    \usepackage{hyperref}
+	\usepackage{cleveref}
+# cleveref must be loaded after hyperref
 ---
 
 # Background
