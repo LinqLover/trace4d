@@ -6,6 +6,7 @@ author: Christoph Thiede
 #date: 2023-05
 bibliography: exposé.bib
 classoption: twocolumn
+numbersections: true
 filters:
 - pandoc-fignos
 header-includes: |
