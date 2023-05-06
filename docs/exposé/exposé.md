@@ -79,7 +79,7 @@ We want to develop a prototype that provides programmers with an interactive 3D 
 - The visualization is *customizable*: programmers can control the layout and positioning of entities, filter the displayed entities and adjust their granularity/clustering (e.g., bundle objects into a single class entity or explode a class entity into individual objects).
 - The visualization is *interactive*: programmers can select entities of interest to view their activation times in the time slider or to browse their implementation in an IDE.
 
-![Wireframe of exploring the parsing process of a regular expression.](./figures/prototype.png){#fig:wireframe}
+![Wireframe of exploring the parsing process of a regular expression.](./figures/wireframe.png){#fig:wireframe}
 
 # Implementation
 
