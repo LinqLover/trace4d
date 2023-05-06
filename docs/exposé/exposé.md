@@ -25,7 +25,7 @@ Programmers use omniscient debugging not only for fault localization but also fo
 
 ## Program Visualization
 
-*Program visualization* is a broad field of approaches that use graphical representations of individual program execution instances to support the understanding of programs\ [@myers1986visual; @sorva2013review].
+*Program visualization* is a broad field of approaches that use graphical representations of individual program execution instances to support the understanding of programs\ [@myers1986visual; @teyseyre2009overview; @sorva2013review].
 Program visualization employs various visual variables such as text, shapes, iconography, layouts, or color to display the state or the behavior of programs.
 In particular, the term *algorithm animation* is mostly used in an educational context and focuses on interactive or moving visualizations of single algorithms\ [@hundhausen2002meta,@brown1984system; @levy2003jeliot; @velazquez2008srec; @seifert2022dbux].
 Some program visualizations are entailed to specific domains or algorithms while others attempt to provide general-purpose mechanisms for visualizing arbitrary control flows or interactions\ [@reiss2006visualizing; @cheng2008xdiva; @chis2014moldable; @devkota2022domain].
@@ -44,7 +44,7 @@ A common type of software map is a *2.5D treemap* that resembles planar 2D treem
 There are several other visual metaphors for representing treemaps, including landscapes\ [@atzberger2023visualization], tessellations\ [@balzer2005voronoi], and cities\ [@ardigo2021visualizing; @mortara2021visualization; @hoff2022utilizing; @limberger2023visual].
 
 Software maps can also be enriched with *dynamic* information from program traces such as the activity in entities\ [@waller2013synchrovis; @krause2021live] or the amount of communication between them\ [@fittkau2013live; @ciolkowski2017visualization; @dashuber2022trace].
-Some approaches also make the time of the underlying information accessible by animating software maps\ [@dugerdil2008execution; @langlier2008exploring] or providing means to navigate through them along the program execution\ [@fittkau2013live, sec. 8.4.5; @hori2019codehouse].
+Some approaches also make the time of the underlying information accessible by animating software maps\ [@walker1998visualizing; @greevy2006visualizing; @dugerdil2008execution; @langelier2008exploring] or providing means to navigate through them along the program execution\ [@fittkau2013live, sec. 8.4.5; @hori2019codehouse].
 
 Other approaches use the city metaphor to visualize a software's memory heap instead of its architecture\ [@weninger2020memory].
 Treemaps can also be combined with other types of visualizations such as graphs\ [@shengdong2005elastic].
@@ -59,12 +59,14 @@ The arrangement of the representations may be static or customizable by programm
 # Research Question
 
 Both program animation and software maps have proven to be useful visualizations for helping programmers explore programs.
-However, due to the visual variables used and the lack of intuitive metaphors, existing program animations are usually limited to simple algorithms or processes with a small number of entities.
-On the other hand, software maps mainly take a global and static perspective on software architectures which is not suitable for representing concrete processes or data.
+However, due to the limited space and the lack of intuitive metaphors, existing program animations are usually limited to simple algorithms or processes with a small number of entities.
+On the other hand, software maps mainly take a global and static or semi-static perspective on software architectures which is not suitable for representing concrete processes or data.
 
-To bridge this gap, in this seminar project of *Methods and Techniques for Visual Analytics*, we want to examine the following question:
+To bridge this gap, in this seminar project on *Methods and Techniques for Visual Analytics*, we want to examine the following question:
 
 > How can we improve the exploration of program traces through animated software cities that reveal the relevant entities from the program execution?
+
+Thus, we want to transfer the concepts of animated software maps for surveying large software systems from a static perspective to the in-depth exploration of subsystems in the context of concrete program traces.
 
 To answer this question, we want to build a novel prototype and use it to explore program traces from different scenarios.
 Depending on the time available, we will also consider conducting a qualitative study ($N \leq 5$) to get feedback and experience reports from users.
