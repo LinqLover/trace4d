@@ -21,14 +21,14 @@ header-includes: |
 
 *Omniscient debugging*, also referred to as *back-in-time debugging* or *time-travel debugging*, is a debugging technique that records the execution of a program and allows programmers to explore it independently of the original order of execution\ [@hofer2006design; @lewis2003debugging; @pothier2009back].
 The resulting *program trace* consists of the program's behavior (typically represented through a *call tree*\ [@lienhard2008practical]) and, optionally, its historical states\ [@lienhard2008practical; @thiede2023object].
-Programmers use omniscient debugging not only for fault localization but also for general *program exploration* as part of an *exploratory programming* process\ [@sandberg1988smalltalk; @rein2018exploration], e.g., to learn about the implementation of methods and the communication between objects in context, to refine their knowledge of an architecture, or to answer specific questions about the behavior of a system.
+Programmers use omniscient debugging not only for fault localization but also for general *program exploration* as part of an *exploratory programming* process\ [@sandberg1988smalltalk; @rein2018exploration], for example, to learn about the implementation of methods and the communication between objects in context, to refine their knowledge of an architecture, or to answer specific questions about the behavior of a system.
 
 ## Program Visualization
 
 *Program visualization* is a broad field of approaches that use graphical representations of individual program execution instances to support the understanding of programs\ [@myers1986visual; @teyseyre2009overview; @sorva2013review].
 Program visualization employs various visual variables such as text, shapes, iconography, layouts, or color to display the state or the behavior of programs.
 In particular, the term *algorithm animation* is mostly used in an educational context and focuses on interactive or moving visualizations of single algorithms\ [@hundhausen2002meta,@brown1984system; @levy2003jeliot; @velazquez2008srec; @seifert2022dbux].
-Some program visualizations are entailed to specific domains or algorithms while others attempt to provide general-purpose mechanisms for visualizing arbitrary control flows or interactions\ [@reiss2006visualizing; @cheng2008xdiva; @chis2014moldable; @devkota2022domain].
+Some program visualizations are entailed to specific domains or algorithms, while others attempt to provide general-purpose mechanisms for visualizing arbitrary control flows or interactions\ [@reiss2006visualizing; @cheng2008xdiva; @chis2014moldable; @devkota2022domain].
 
 For example, arbitrary program traces can be visualized by circular bundle views\ [@cornelissen2008execution], flame graphs\ [@trumper2012viewfusion], or treemaps of the call tree\ [@bockisch2015trace].
 Some approaches can also visualize running programs instead of completed program traces\ [@greevy2006visualizing; @fittkau2013live].
@@ -41,7 +41,7 @@ Typical visual variables of software maps include the labels, shape and extent, 
 The structure of software maps is usually derived from the static organization of a project into a package or file hierarchy, while the layout can be based on the dependencies or similarities\ [@atzberger2023visualization] between units.
 In addition, they can display further attributes of the software units such as metrics about their architectural quality or evolution\ [@borgo2015natural,@atzberger2022visualization].
 A common type of software map is a *2.5D treemap* that resembles planar 2D treemaps but is extended with a third dimension for the height of the cuboid entities that displays a metric such as the number of methods for each unit.
-There are several other visual metaphors for representing treemaps, including landscapes\ [@atzberger2023visualization], tessellations\ [@balzer2005voronoi], and cities\ [@ardigo2021visualizing; @mortara2021visualization; @hoff2022utilizing; @limberger2023visual].
+There are several visual metaphors for representing treemaps, including landscapes\ [@atzberger2023visualization], tessellations\ [@balzer2005voronoi], and cities\ [@ardigo2021visualizing; @mortara2021visualization; @hoff2022utilizing; @limberger2023visual].
 
 Software maps can also be enriched with *dynamic* information from program traces such as the activity in entities\ [@waller2013synchrovis; @krause2021live] or the amount of communication between them\ [@fittkau2013live; @ciolkowski2017visualization; @dashuber2022trace].
 Some approaches also make the time of the underlying information accessible by animating software maps\ [@walker1998visualizing; @greevy2006visualizing; @dugerdil2008execution; @langelier2008exploring] or providing means to navigate through them along the program execution\ [@fittkau2013live, sec. 8.4.5; @hori2019codehouse].
