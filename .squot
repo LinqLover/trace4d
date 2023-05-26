@@ -1,0 +1,4 @@
+OrderedDictionary {
+	'packages/BaselineOfTrace4D.package' : #SquotCypressCodeSerializer,
+	'packages/Trace4D.package' : #SquotCypressCodeSerializer
+}
