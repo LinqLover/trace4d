@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // docs/exposé
+        {
+            "label": "Compile exposé",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/docs/exposé"
+            }
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make clean",
+            "options": {
+                "cwd": "${workspaceFolder}/docs/exposé"
+            }
+        },
+
+        // frontend
+        {
+            "label": "vite server (frontend)",
+            "type": "npm",
+            "script": "dev",
+            "path": "packages/frontend",
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "base": "$tsc-watch",
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "VITE v",
+                        "endsPattern": "http://localhost:\\d+"
+                    },
+                }
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        }
+    ]
+}

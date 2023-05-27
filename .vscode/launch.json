@@ -1,0 +1,27 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome against localhost",
+			"url": "http://localhost:5173/",
+			"webRoot": "${workspaceFolder}/src/frontend",
+			"preLaunchTask": "vite server (frontend)"
+		},
+		// Does not work
+		/* {
+			"name": "vite server (frontend)",
+			"request": "launch",
+			"runtimeExecutable": "npx",
+			"runtimeArgs": ["vite"],
+			"type": "node",
+			"serverReadyAction": {
+				"action": "debugWithChrome",
+				"pattern": "Local:\\s+http://localhost:(\\d+)",
+				"uriFormat": "http://localhost:%s"
+			},
+			"cwd": "${workspaceFolder}/src/frontend"
+		} */
+	]
+}
