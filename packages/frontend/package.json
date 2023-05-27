@@ -1,6 +1,6 @@
 {
   "name": "trace4d-frontend",
-  "main": "index.html",
+  "main": "src/index.html",
   "license": "MIT",
   "dependencies": {
     "collect.js": "^4.36.1",
