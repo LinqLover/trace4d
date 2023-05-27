@@ -624,6 +624,8 @@ class TraceMap {
 
     this.renderer = new THREE.WebGLRenderer()
 
+    this.window = domElement.ownerDocument.defaultView || domElement.ownerDocument.parentWindow
+    this.window.traceMap = this
     domElement.appendChild(this.renderer.domElement)
     new ResizeObserver(() => this.updateViewport()).observe(domElement)
 
@@ -676,8 +678,8 @@ class TraceMap {
     this.focusEntity = null
 
     this.renderer.domElement.addEventListener('mousemove', event => {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+      mouse.x = (event.clientX / this.window.innerWidth) * 2 - 1
+      mouse.y = -(event.clientY / this.window.innerHeight) * 2 + 1
 
 	    raycaster.setFromCamera(mouse, this.camera)
 
@@ -732,8 +734,7 @@ class TraceMap {
       }
     }, false)
 
-    const window = this.renderer.domElement.ownerDocument.defaultView || domElement.ownerDocument.parentWindow
-    window.addEventListener('keydown', event => {
+    this.window.addEventListener('keydown', event => {
       if (event.key === 'Shift') {
         this.mapControls.enabled = false
         this.dragControls.enabled = true
@@ -745,7 +746,7 @@ class TraceMap {
         this.updateCursor(event)
       }
     }, false)
-    window.addEventListener('keyup', event => {
+    this.window.addEventListener('keyup', event => {
       if (event.key === 'Shift') {
         this.mapControls.enabled = true
         this.dragControls.enabled = false
