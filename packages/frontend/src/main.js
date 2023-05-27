@@ -16,6 +16,14 @@ if (!WebGL.isWebGLAvailable()) {
 }
 
 
+const MouseButtonFlags = {
+  LEFT: 1,
+  MIDDLE: 2,
+  RIGHT: 4,
+  BACK: 8,
+  FORWARD: 16
+};
+
 class Entity {
   parent = null
   focusStates = []
@@ -491,7 +499,7 @@ class TraceMap {
       this.focusEntity = this.mouseOverEntities[this.mouseOverEntities.length - 1]
       if (this.focusEntity !== oldFocusEntity) {
         oldFocusEntity?.onHoverEnd?.(event)
-        if (!this.dragEntity) {
+        if (!(event.buttons & MouseButtonFlags.LEFT)) {
           this.focusEntity?.onHoverStart?.(event)
         }
       }
@@ -511,14 +519,14 @@ class TraceMap {
       isPlainClick = true
     }, false)
     this.renderer.domElement.addEventListener('mousemove', event => {
-      isPlainClick = isPlainClick && mouseBeforeClick.distanceTo(mouse) < 0.1
+      isPlainClick = isPlainClick && mouseBeforeClick.distanceTo(mouse) < 0.01
     }, false)
     this.renderer.domElement.addEventListener('click', event => {
       if (!isPlainClick) return
       isPlainClick = null
       mouseBeforeClick = null
 
-      if (this.focusEntity?.wantsClick?.(event)) {
+      if (!this.dragEntity && this.focusEntity?.wantsClick?.(event)) {
         this.focusEntity.onClick?.(event)
       }
     }, false)
