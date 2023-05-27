@@ -648,7 +648,7 @@ async function init() {
   traceMap.buildMap(document.getElementById('container'))
 
   let traceUrl = new URLSearchParams(window.location.search).get('trace')
-  traceUrl ??= '/traces/regexParse.json'
+  traceUrl ??= 'traces/regexParse.json'
   await traceMap.loadTraceFromServerFile(traceUrl)
 }
 
