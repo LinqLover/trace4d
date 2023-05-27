@@ -1,0 +1,17 @@
+{
+  "name": "trace4d-frontend",
+  "main": "index.html",
+  "license": "MIT",
+  "dependencies": {
+    "collect.js": "^4.36.1",
+    "three": "^0.152.2",
+    "threex.dynamictexture": "http://github.com/jeromeetienne/threex.dynamictexture#2332400"
+  },
+  "devDependencies": {
+    "vite": "^4.3.9"
+  },
+  "scripts": {
+    "dev": "vite --port 5173",
+    "build": "vite build"
+  }
+}
