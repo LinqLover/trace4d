@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir public
           mv dist/* public/
-          mv traces/ public/
+          mv src/traces/ public/
         working-directory: packages/frontend
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
