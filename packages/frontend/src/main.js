@@ -590,6 +590,7 @@ class TraceMap {
 
   async loadTraceFromServerFile(serverFile) {
     const response = await fetch(serverFile)
+    if (!response.ok) throw new Error(`Failed to load trace: ${response.status} ${response.statusText}`)
     const trace = await response.json()
     return this.loadTrace(trace)
   }
