@@ -185,10 +185,14 @@ class Entity {
 }
 
 class OrganizationEntity extends Entity {
-  constructor(name) {
+  constructor(organization) {
     super()
-    this.name = name
+    this.organization = organization
     this.children = []
+  }
+
+  get name() {
+    return this.organization.name
   }
 
   addChild(child) {
@@ -303,8 +307,8 @@ class PackageEntity extends OrganizationEntity {
   static hoverColor = 0x300000
   static dragColor = 0x400000
 
-  constructor(name) {
-    super(name)
+  constructor($package) {
+    super($package)
   }
 }
 
@@ -313,8 +317,8 @@ class ClassCategoryEntity extends OrganizationEntity {
   static hoverColor = 0x300800
   static dragColor = 0x402000
 
-  constructor(name) {
-    super(name)
+  constructor(category) {
+    super(category)
   }
 }
 
@@ -323,8 +327,8 @@ class ClassEntity extends OrganizationEntity {
   static hoverColor = 0x303000
   static dragColor = 0x404000
 
-  constructor(name) {
-    super(name)
+  constructor($class) {
+    super($class)
   }
 }
 
@@ -333,17 +337,214 @@ class ObjectEntity extends Entity {
   static hoverColor = 0x003000
   static dragColor = 0x004000
 
-  constructor(name) {
+  constructor(object) {
     super()
+    this.object = object
+  }
+
+  get name() {
+    return this.object.name
+  }
+}
+
+class Trace {
+  constructor(objects, classes, rootFrame) {
+    this.objects = objects
+    this.classes = classes
+    this.rootFrame = rootFrame
+  }
+}
+
+class TraceObject {
+  name
+  class
+  fields
+  fieldHistories
+}
+
+class TraceClass {
+  name
+  category
+}
+
+class TraceClassCategory {
+  constructor(name, $package) {
+    this.name = name
+    this.package = $package
+  }
+}
+
+class TracePackage {
+  constructor(name) {
     this.name = name
   }
 }
 
-class TraceBuilder {
-  objectEntities = {}
-  classEntities = {}
-  classCategoryEntities = {}
-  packageEntities = {}
+class TraceFieldHistory {
+  constructor(times, values) {
+    this.times = times
+    this.values = values
+  }
+}
+
+class TraceFrame {
+  constructor(receiver, message, $arguments, answer, startTime, endTime, children) {
+    this.receiver = receiver
+    this.message = message
+    this.arguments = $arguments
+    this.answer = answer
+    this.startTime = startTime
+    this.endTime = endTime
+    this.children = children
+  }
+}
+
+class TraceReader {
+  constructor(traceData) {
+    this.traceData = traceData
+  }
+
+  objects = {}
+  classes = {}
+  classCategories = {}
+  packages = {}
+
+  static readTrace(traceData) {
+    return new this(traceData).getTrace()
+  }
+
+  static async readTraceFromLocalFile(localFile) {
+    const fileReader = new FileReader()
+    fileReader.readAsText(localFile)
+    const result = await new Promise((resolve, reject) => {
+      fileReader.onload = () => resolve(fileReader.result)
+      fileReader.onerror = () => reject(fileReader.error)
+    })
+    const traceData = JSON.parse(result)
+    return this.readTrace(traceData)
+  }
+
+  static async readTraceFromServerFile(serverFile) {
+    const response = await fetch(serverFile)
+    if (!response.ok) throw new Error(`Failed to load trace: ${response.status} ${response.statusText}`)
+    const traceData = await response.json()
+    return this.readTrace(traceData)
+  }
+
+  getTrace() {
+    const objects = this.getObjects(this.traceData.objects)
+    const classes = this.getClasses(this.traceData.classes)
+    const rootFrame = this.getFrame(this.traceData.trace)
+    return new Trace(objects, classes, rootFrame)
+  }
+
+  getObjects(objectDatas) {
+    return collect(objectDatas).map((objectData, objectID) =>
+      this.getObject(objectID, objectData)
+    ).values().all()
+  }
+
+  getObject(objectID, objectData = undefined) {
+    let object = this.objects[objectID]
+    if (object == null) {
+      object = new TraceObject()
+      this.objects[objectID] = object
+    }
+
+    if (objectData === undefined) return object
+
+    object.name = objectData.name
+    object.class = this.getClass(objectData.class)
+    object.fields = collect(objectData.fields).map((fieldData) =>
+      this.getStringOrObject(fieldData)
+    ).all()
+    object.fieldHistories = this.getFieldHistories(objectData.historicFields)
+
+    return object
+  }
+
+  getClass(className, classData = undefined) {
+    let $class = this.classes[className]
+    if ($class == null) {
+      $class = new TraceClass()
+      this.classes[className] = $class
+    }
+
+    if (classData === undefined) return $class
+
+    $class.name = className
+    $class.category = this.getClassCategory(classData.category, classData.package)
+
+    return $class
+  }
+
+  getClassCategory(categoryName, packageName) {
+    let category = this.classCategories[categoryName]
+    if (category != null) return category
+
+    const $package = this.getPackage(packageName)
+    category = new TraceClassCategory(categoryName, $package)
+    this.classCategories[categoryName] = category
+    return category
+  }
+
+  getPackage(packageName) {
+    let $package = this.packages[packageName]
+    if ($package != null) return $package
+
+    $package = new TracePackage(packageName)
+    this.packages[packageName] = $package
+    return $package
+  }
+
+  getClasses(classesData) {
+    return collect(classesData).map((classData, className) =>
+      this.getClass(className, classData)
+    ).all()
+  }
+
+  getFieldHistories(fieldHistoryDatas) {
+    return collect(fieldHistoryDatas).map((fieldHistoryData, fieldName) =>
+      this.getFieldHistory(fieldHistoryData)
+    ).all()
+  }
+
+  getFieldHistory(fieldHistoryData) {
+    if (fieldHistoryData == null) return null
+
+    const times = fieldHistoryData.times
+    const values = fieldHistoryData.values.map(valueData => this.getStringOrObject(valueData))
+    return new TraceFieldHistory(times, values)
+  }
+
+  getStringOrObject(stringOrID) {
+    if (stringOrID[0] !== '@') {
+      if (stringOrID[0] === '\\') {
+        return stringOrID.substring(1)
+      }
+      return stringOrID
+    }
+
+    return this.getObject(stringOrID)
+  }
+
+  getFrame(frameData) {
+    const receiver = this.getObject(frameData.receiver)
+    const message = frameData.message
+    const $arguments = frameData.arguments.map(argumentData => this.getStringOrObject(argumentData))
+    const answer = frameData.answer != null ? this.getStringOrObject(frameData.answer) : null
+    const startTime = frameData.startTime
+    const endTime = frameData.endTime
+    const children = frameData.children.map(childFrameData => this.getFrame(childFrameData))
+    return new TraceFrame(receiver, message, $arguments, answer, startTime, endTime, children)
+  }
+}
+
+class HierarchicalEntityBuilder {
+  objectEntities = new Map()
+  classEntities = new Map()
+  classCategoryEntities = new Map()
+  packageEntities = new Map()
   traceEntity = null
 
   constructor(trace) {
@@ -351,11 +552,11 @@ class TraceBuilder {
   }
 
   build() {
-    collect(this.trace.classes).each((classData, className) => {
-      this.getClass(className, classData)
+    collect(this.trace.classes).each($class => {
+      this.getClass($class)
     })
-    collect(this.trace.objects).each((objectData, objectName) => {
-      this.getObject(objectName, objectData)
+    collect(this.trace.objects).each(object => {
+      this.getObject(object)
     })
 
     const traceEntity = this.getTraceEntity()
@@ -363,43 +564,43 @@ class TraceBuilder {
     return traceEntity
   }
 
-  getObject(objectName, objectData) {
-    let objectEntity = this.objectEntities[objectName]
+  getObject(object) {
+    let objectEntity = this.objectEntities.get(object)
     if (objectEntity) return objectEntity
 
-    objectEntity = new ObjectEntity(objectData.name)
-    this.getClass(objectData.class).addChild(objectEntity)
-    this.objectEntities[objectName] = objectEntity
+    objectEntity = new ObjectEntity(object)
+    this.getClass(object.class).addChild(objectEntity)
+    this.objectEntities.set(object, objectEntity)
     return objectEntity
   }
 
-  getClass(className, classData) {
-    let classEntity = this.classEntities[className]
+  getClass($class) {
+    let classEntity = this.classEntities.get($class)
     if (classEntity) return classEntity
 
-    classEntity = new ClassEntity(className)
-    this.getClassCategory(classData.category, classData.package).addChild(classEntity)
-    this.classEntities[className] = classEntity
+    classEntity = new ClassEntity($class)
+    this.getClassCategory($class.category).addChild(classEntity)
+    this.classEntities.set($class, classEntity)
     return classEntity
   }
 
-  getClassCategory(categoryName, packageName) {
-    let classCategoryEntity = this.classCategoryEntities[categoryName]
+  getClassCategory(category) {
+    let classCategoryEntity = this.classCategoryEntities.get(category)
     if (classCategoryEntity) return classCategoryEntity
 
-    classCategoryEntity = new ClassCategoryEntity(categoryName)
-    this.getPackage(packageName).addChild(classCategoryEntity)
-    this.classCategoryEntities[categoryName] = classCategoryEntity
+    classCategoryEntity = new ClassCategoryEntity(category)
+    this.getPackage(category.package).addChild(classCategoryEntity)
+    this.classCategoryEntities.set(category, classCategoryEntity)
     return classCategoryEntity
   }
 
-  getPackage(packageName) {
-    let packageEntity = this.packageEntities[packageName]
+  getPackage($package) {
+    let packageEntity = this.packageEntities.get($package)
     if (packageEntity) return packageEntity
 
-    packageEntity = new PackageEntity(packageName)
+    packageEntity = new PackageEntity($package)
     this.getTraceEntity().addChild(packageEntity)
-    this.packageEntities[packageName] = packageEntity
+    this.packageEntities.set($package, packageEntity)
     return packageEntity
   }
 
@@ -597,24 +798,16 @@ class TraceMap {
   }
 
   async loadTraceFromServerFile(serverFile) {
-    const response = await fetch(serverFile)
-    if (!response.ok) throw new Error(`Failed to load trace: ${response.status} ${response.statusText}`)
-    const trace = await response.json()
-    return this.loadTrace(trace)
+    return this.loadTrace(await TraceReader.readTraceFromServerFile(serverFile))
   }
 
   async loadTraceFromLocalFile(localFile) {
-    const fileReader = new FileReader()
-    fileReader.readAsText(localFile)
-    const trace = await new Promise((resolve, reject) => {
-      fileReader.onload = () => resolve(JSON.parse(fileReader.result))
-      fileReader.onerror = () => reject(fileReader.error)
-    })
-    return this.loadTrace(trace)
+    return this.loadTrace(await TraceReader.readTraceFromLocalFile(localFile))
   }
 
   loadTrace(trace) {
-    const traceEntity = new TraceBuilder(trace).build()
+    this.trace = trace
+    const traceEntity = new HierarchicalEntityBuilder(this.trace).build()
     this.buildTrace(traceEntity)
   }
 
