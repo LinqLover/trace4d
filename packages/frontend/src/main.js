@@ -139,6 +139,8 @@ class Entity {
   }
 
   onClick(event) {
+    window.selectedEntity = this
+    console.log(this.object ?? this.organization ?? this)
     alert(this.name)
   }
 
