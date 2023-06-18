@@ -4,6 +4,7 @@
   "license": "MIT",
   "dependencies": {
     "collect.js": "^4.36.1",
+    "stats.js": "^0.17.0",
     "three": "^0.152.2",
     "threex.dynamictexture": "http://github.com/jeromeetienne/threex.dynamictexture#2332400"
   },

@@ -1,4 +1,5 @@
 import collect from 'collect.js'
+import Stats from 'stats.js'
 import * as THREE from 'three'
 import { DragControls } from 'three/addons/controls/DragControls.js'
 import { MapControls } from 'three/addons/controls/MapControls.js'
@@ -632,6 +633,10 @@ class HierarchicalEntityBuilder {
 }
 
 class TraceMap {
+  constructor(options = {}) {
+    this.options = options
+  }
+
   buildMap(domElement) {
     this.scene = new THREE.Scene()
 
@@ -654,9 +659,19 @@ class TraceMap {
   }
 
   buildControls() {
+    if ((this.options.countFPS ?? false) !== false) {
+      this.buildFPSCounter()
+    }
+
     this.buildMapControls()
     this.buildDragControls()
     this.buildMouseHandler()
+  }
+
+  buildFPSCounter() {
+    this.stats = new Stats()
+    this.stats.showPanel(0) // FPS
+    this.window.document.body.appendChild(this.stats.dom)
   }
 
   buildMapControls() {
@@ -866,11 +881,21 @@ class TraceMap {
 
 async function init() {
   const traceMap = new TraceMap()
-  traceMap.buildMap(document.getElementById('container'))
 
-  let traceUrl = new URLSearchParams(window.location.search).get('trace')
-  traceUrl ??= 'traces/regexParse.json'
-  await traceMap.loadTraceFromServerFile(traceUrl)
+  const defaultTraceUrl = 'traces/regexParse.json'
+  const defaultStyle = 'flatFDG'
+
+  const params = new URLSearchParams(window.location.search)
+  const traceUrl = params.get('trace') ?? defaultTraceUrl
+  const style = params.get('style') ?? defaultStyle
+
+  const options = Object.fromEntries(params.entries())
+  delete options.trace
+  delete options.style
+  Object.assign(traceMap.options, options)
+
+  traceMap.buildMap(document.getElementById('container'))
+  await traceMap.loadTraceFromServerFile(traceUrl, style)
 }
 
 await init()
