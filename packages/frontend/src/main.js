@@ -87,7 +87,7 @@ class Entity {
      * dynamic texture width based on text length
      * vertical text alignment
      */
-    const text = this.name
+    const text = this.name.length > 100 ? this.name.substring(0, 100) + '...' : this.name
 
     this.materials = collect({
       'normal': this.constructor.color,
