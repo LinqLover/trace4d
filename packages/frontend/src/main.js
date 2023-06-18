@@ -323,7 +323,7 @@ class OrganizationEntity extends Entity {
     childObjects.forEach((child, i) => {
       child.position.set(
         ((i % gridCountX) - (gridCountX / 2 - .5)) * (cellWidth + marginX),
-        child.geometry.parameters.height,
+        child.geometry.parameters.height / 2,
         (Math.floor(i / gridCountX) - (gridCountZ / 2 - .5)) * (cellDepth + marginZ)
       )
     })
@@ -398,7 +398,7 @@ class OrganizationEntity extends Entity {
         this.simulation.tick(100)
 
         this.children.forEach(child => {
-          child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height, child.d3Node.y)
+          child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height / 2, child.d3Node.y)
         })
 
         // Update DragControls to override forced position of dragged node
