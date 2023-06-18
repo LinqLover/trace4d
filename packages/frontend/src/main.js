@@ -28,6 +28,7 @@ const MouseButtonFlags = {
 class Entity {
   parent = null
   focusStates = []
+  connections = []
 
   get object3d() {
     return this.cuboid
@@ -105,7 +106,18 @@ class Entity {
     this.updateFocusState()
   }
 
-  setFocusState(state) {
+  addConnection(otherEntity, strength) {
+    return this.parent.addChildConnection(this, otherEntity, strength)
+  }
+
+  moveTo(x, y, z) {
+    this.object3d.position.set(x, y, z)
+
+    this.moved()
+  }
+  setFocusState(state, bool = true) {
+    if (!bool) return this.unsetFocusState(state)
+
     if (this.focusStates.includes(state)) return
     this.focusStates.push(state)
     this.updateFocusState()
@@ -125,6 +137,10 @@ class Entity {
     } else {
       this.object3d.material = this.materials['normal']
     }
+
+    this.connections.forEach(connection => {
+      connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
+    })
   }
 
   wantsClick(event) {
@@ -160,11 +176,20 @@ class Entity {
   }
 
   onDrag(event) {
-    this.setFocusState('drag')
+    if (!this.constrainDrag(event)) return
 
+    this.moved()
+
+    if (this.d3Node) {
+      this.d3Node.x = /* this.d3Node.fx = */ this.object3d.position.x
+      this.d3Node.y = /* this.d3Node.fy = */ this.object3d.position.z
+    }
+  }
+
+  constrainDrag(event) {
     if (!this.object3d.positionBeforeDrag) {
       console.warn('no positionBeforeDrag', this)
-      return
+      return true
     }
 
     this.object3d.position.y = this.object3d.positionBeforeDrag.y
@@ -180,7 +205,7 @@ class Entity {
     if (hasCollision) {
       this.object3d.position.copy(this.object3d.positionBeforeDrag)
       // TODO: move as close as possible to the other object
-      return
+      return false
     }
 
     const absWidth = (this.parent.width - this.width) / 2
@@ -189,6 +214,13 @@ class Entity {
     this.object3d.position.z = Math.max(-absDepth, Math.min(absDepth, this.object3d.position.z))
 
     this.object3d.positionBeforeDrag = this.object3d.position.clone()
+    return true
+  }
+
+  moved() {
+    this.connections.forEach(connection => {
+      connection.updatePosition()
+    })
   }
 }
 
@@ -229,6 +261,8 @@ class OrganizationEntity extends Entity {
 
     this.buildLabel(traceMap)
 
+    this.buildChildConnections(traceMap)
+
     traceMap.dragControls.getObjects().push(this.cuboid)
     this.cuboid.entity = this
     return this.cuboid
@@ -239,6 +273,20 @@ class OrganizationEntity extends Entity {
     if (childObjects.length == 0) return
 
     this.object3d.add(...childObjects)
+  }
+
+  buildChildConnections(traceMap) {
+    this.childConnections.forEach(connection => {
+      this.object3d.add(connection.build())
+    })
+  }
+
+  addChildConnection(source, target, strength) {
+    const connection = new Connection(source, target, strength)
+    source.connections.push(connection)
+    target.connections.push(connection)
+    this.childConnections.push(connection)
+    return connection
   }
 
   adoptSize(width, depth) {
@@ -287,8 +335,7 @@ class TraceEntity extends OrganizationEntity {
     this.plane = new THREE.Mesh(planeGeometry, this.constructor.planeMaterial)
     this.plane.entity = this
 
-    this.buildChildren(traceMap)
-    this.layoutChildren()
+    this.buildChildConnections(traceMap)
 
     return this.plane
   }
@@ -364,6 +411,69 @@ class ObjectEntity extends Entity {
       }
     }
     return description
+  }
+}
+
+class Connection {
+  focusStates = []
+
+  static color = 0xffffff
+  static opacity = .5
+  static hoverOpacity = 1
+
+  constructor(source, target, strength) {
+    this.source = source
+    this.target = target
+    this.strength = strength
+  }
+
+  build() {
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+      this.source.object3d.position,
+      this.target.object3d.position
+    ])
+
+    const lineMaterial = new THREE.LineBasicMaterial({
+      transparent: true,
+      linewidth: this.strength
+    })
+    this.line = new THREE.Line(lineGeometry, lineMaterial)
+    this.updateFocusState()
+
+    return this.line
+  }
+
+  updatePosition() {
+    const lineGeometry = this.line.geometry
+    lineGeometry.attributes.position.array[0] = this.source.object3d.position.x
+    lineGeometry.attributes.position.array[1] = this.source.object3d.position.y
+    lineGeometry.attributes.position.array[2] = this.source.object3d.position.z
+    lineGeometry.attributes.position.array[3] = this.target.object3d.position.x
+    lineGeometry.attributes.position.array[4] = this.target.object3d.position.y
+    lineGeometry.attributes.position.array[5] = this.target.object3d.position.z
+    lineGeometry.attributes.position.needsUpdate = true
+  }
+
+  setFocusState(state, bool) {
+    if (!bool) return this.unsetFocusState(state)
+
+    if (this.focusStates.includes(state)) return
+    this.focusStates.push(state)
+    this.updateFocusState()
+  }
+
+  unsetFocusState(state) {
+    if (!this.focusStates.includes(state)) return
+    this.focusStates.splice(this.focusStates.indexOf(state), 1)
+    this.updateFocusState()
+  }
+
+  updateFocusState() {
+    if (this.focusStates.includes('hoverEntity')) {
+      this.line.material.opacity = this.constructor.hoverOpacity
+    } else {
+      this.line.material.opacity = this.constructor.opacity
+    }
   }
 }
 
