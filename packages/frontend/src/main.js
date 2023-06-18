@@ -154,6 +154,10 @@ class Entity {
     return true
   }
 
+  wantsDrag(event) {
+    return true
+  }
+
   onHoverStart(event) {
     this.setFocusState('hover')
   }
@@ -174,6 +178,7 @@ class Entity {
   }
 
   onDragStart(event) {
+    this.setFocusState('drag')
     this.object3d.positionBeforeDrag = this.object3d.position.clone()
 
     this.root.onChildStartDrag?.(this)
@@ -395,6 +400,19 @@ class OrganizationEntity extends Entity {
           child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height, child.d3Node.y)
         })
 
+        // Update DragControls to override forced position of dragged node
+        // HACKED: simulate drag (onpointermove) if currently dragging
+        if (traceMap.lastMouseMoveEvent != null) {
+          Promise.resolve().then(() => {
+            // TODO: updateCursor() is reached but cursor is not updated
+            traceMap.renderer.domElement.dispatchEvent(traceMap.lastMouseMoveEvent)
+          })
+        }
+        if (traceMap.lastPointerMoveEvent != null) {
+          Promise.resolve().then(() => {
+            traceMap.renderer.domElement.dispatchEvent(traceMap.lastPointerMoveEvent)
+          })
+        }
 
         // update size
         const margin = 10
@@ -464,6 +482,10 @@ class TraceEntity extends OrganizationEntity {
   }
 
   wantsClick(event) {
+    return false
+  }
+
+  wantsDrag(event) {
     return false
   }
 
@@ -1116,14 +1138,18 @@ traceMap.reloadTrace()
   buildDragControls() {
     this.dragControls = new DragControls([], this.camera, this.renderer.domElement)
     this.dragControls.addEventListener('hoveron', (event) => {
+      if (!event.object.entity?.wantsDrag?.(event)) return
       event.object.entity?.onDragStart?.(event)
     })
     this.dragControls.addEventListener('hoveroff', (event) => {
       this.dragEntity = null
+      if (!event.object.entity?.wantsDrag?.(event)) return
       event.object.entity?.onDragEnd?.(event)
     })
     this.dragControls.addEventListener('drag', (event) => {
+      if (!event.object.entity?.wantsDrag?.(event)) return
       this.dragEntity = event.object.entity
+      this.lastDragEvent = event
       event.object.entity?.onDrag?.(event)
       this.render()
     })
@@ -1136,7 +1162,14 @@ traceMap.reloadTrace()
     this.mouseOverEntities = []
     this.focusEntity = null
 
+    this.renderer.domElement.addEventListener('pointermove', event => {
+      // required for updating DragControls, see references
+      this.lastPointerMoveEvent = event
+    })
     this.renderer.domElement.addEventListener('mousemove', event => {
+      // required for updating mouseOverEntities, see references
+      this.lastMouseMoveEvent = event
+
       mouse.x = (event.clientX / this.window.innerWidth) * 2 - 1
       mouse.y = -(event.clientY / this.window.innerHeight) * 2 + 1
 
@@ -1198,6 +1231,8 @@ traceMap.reloadTrace()
         this.mapControls.enabled = false
         this.dragControls.enabled = true
 
+        if (this.dragEntity !== null) return
+        if (!this.focusEntity?.wantsDrag?.(event)) return
         this.dragEntity = this.focusEntity
         this.dragEntity?.onDragStart?.(event)
 
