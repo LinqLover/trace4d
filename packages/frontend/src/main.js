@@ -1,4 +1,7 @@
 import collect from 'collect.js'
+import * as d3Force from 'd3-force'
+import * as d3Random from 'd3-random'
+const d3 = { ...d3Force, ...d3Random }
 import Stats from 'stats.js'
 import * as THREE from 'three'
 import { DragControls } from 'three/addons/controls/DragControls.js'
@@ -34,6 +37,10 @@ class Entity {
     return this.cuboid
   }
 
+  get root() {
+    return this.parent?.root ?? this
+  }
+
   get width() {
     return this.object3d.geometry.parameters.width
   }
@@ -46,7 +53,7 @@ class Entity {
     // do nothing
   }
 
-  build(traceMap) {
+  build(traceMap, layoutFunction) {
     this.buildObject3d(traceMap)
 
     this.buildLabel(traceMap)
@@ -168,6 +175,8 @@ class Entity {
 
   onDragStart(event) {
     this.object3d.positionBeforeDrag = this.object3d.position.clone()
+
+    this.root.onChildStartDrag?.(this)
   }
 
   onDragEnd(event) {
@@ -225,10 +234,12 @@ class Entity {
 }
 
 class OrganizationEntity extends Entity {
+  children = []
+  childConnections = []
+
   constructor(organization) {
     super()
     this.organization = organization
-    this.children = []
   }
 
   get name() {
@@ -253,11 +264,11 @@ class OrganizationEntity extends Entity {
   static color = 0x008000
   static hoverColor = 0xff0000
 
-  build(traceMap) {
+  build(traceMap, layoutFunction) {
     this.buildObject3d(traceMap)
 
-    this.buildChildren(traceMap)
-    this.layoutChildren()
+    this.buildChildren(traceMap, layoutFunction)
+    layoutFunction?.(this)
 
     this.buildLabel(traceMap)
 
@@ -268,8 +279,8 @@ class OrganizationEntity extends Entity {
     return this.cuboid
   }
 
-  buildChildren(traceMap) {
-    const childObjects = this.children.map(child => child.build(traceMap))
+  buildChildren(traceMap, layoutFunction) {
+    const childObjects = this.children.map(child => child.build(traceMap, layoutFunction))
     if (childObjects.length == 0) return
 
     this.object3d.add(...childObjects)
@@ -293,7 +304,7 @@ class OrganizationEntity extends Entity {
     this.cuboid.geometry = new THREE.BoxGeometry(width, 10, depth)
   }
 
-  layoutChildren() {
+  layoutChildrenOnGrid() {
     const childObjects = this.object3d.children
 
     // simple grid layout (width and depth)
@@ -316,6 +327,111 @@ class OrganizationEntity extends Entity {
       gridCountZ * (cellDepth + marginZ) - marginZ * .5
     )
   }
+
+  layoutFDG(traceMap, computeForces) {
+    const centripetalForce = 0.001
+    const individualForceWeight = 0.1
+    const collisionIterations = 10
+
+    const nodes = this.children.map((child, index) => {
+      return child.d3Node = {
+        index,
+        entity: child,
+        x: child.object3d.position.x,
+        y: child.object3d.position.z,
+        radius: new THREE.Box3().setFromObject(child.object3d).getSize(new THREE.Vector3()).setY(0).length() / 2
+      }
+    })
+
+    const forces = []
+    computeForces(this.children, (source, target, strength) => {
+      forces.push({
+        source: source.d3Node,
+        target: target.d3Node,
+        strength: strength * individualForceWeight
+      })
+    })
+
+
+    // first layout pass: no collision yet
+    this.simulation = d3.forceSimulation(nodes)
+    this.simulation
+      // strive to center
+      .force('x', d3.forceX().strength(centripetalForce))
+      .force('y', d3.forceY().strength(centripetalForce))
+
+      // individual forces
+      .force('link', d3.forceLink(forces)
+        .id(node => node.index)
+        .strength(force => force.strength))
+
+      // repulsion
+      .force('charge', d3.forceManyBody().strength(-.2))
+
+    this.simulation
+      .alpha(1)
+      .alphaDecay(0)
+      //.tick(ticks[0])
+
+    // second pass: fix collisions
+    this.simulation
+      .force('collide', d3.forceCollide()
+        .strength(1)
+        .radius(node => node.radius)
+        .iterations(collisionIterations))
+    this.simulation
+      .alpha(1)
+      .alphaDecay(0.0001)
+      //.tick(1000)
+      .on('tick', () => {
+        // Is this a beautiful control flow? Probably not. Is JavaScript a beautiful language? Absolutely not.
+
+        // Accelerate simulation.
+        // Con: Dropped nodes move too fast. TODO: reset ticks after dropping?
+        // TODO: dynamic speed to maintain enough FPS. might not need animation at all for small traces.
+        this.simulation.tick(100)
+
+        this.children.forEach(child => {
+          child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height, child.d3Node.y)
+        })
+
+
+        // update size
+        const margin = 10
+        const width = Math.max(collect(nodes).map(node => node.x).max(), -collect(nodes).map(node => node.x).min()) * 2
+        const depth = Math.max(collect(nodes).map(node => node.y).max(), -collect(nodes).map(node => node.y).min()) * 2
+        this.adoptSize(width + margin, depth + margin)
+
+        traceMap.render()
+      })
+      .restart()
+
+
+    // center nodes
+    const dx = (collect(nodes).map(node => node.x).min() + collect(nodes).map(node => node.x).max()) / 2
+    const dy = (collect(nodes).map(node => node.y).min() + collect(nodes).map(node => node.y).max()) / 2
+    nodes.forEach(node => {
+      node.x -= dx
+      node.y -= dy
+    })
+
+    // apply positions
+    this.children.forEach(child => {
+      child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height, child.d3Node.y)
+    })
+
+    const size = new THREE.Box3().setFromObject(this.object3d).getSize(new THREE.Vector3())
+    const margin = 10
+    this.adoptSize(size.x + margin, size.z + margin)
+  }
+
+  onChildStartDrag() {
+    if (!this.simulation) return
+
+    // reheat
+    this.simulation.alpha(1)
+    this.simulation.restart()
+  }
 }
 
 class TraceEntity extends OrganizationEntity {
@@ -329,11 +445,14 @@ class TraceEntity extends OrganizationEntity {
     return this.plane.geometry.parameters.height // because of rotation
   }
 
-  build(traceMap) {
+  build(traceMap, layoutFunction) {
     const planeGeometry = new THREE.PlaneGeometry(100, 100)
     planeGeometry.rotateX(-Math.PI / 2)
     this.plane = new THREE.Mesh(planeGeometry, this.constructor.planeMaterial)
     this.plane.entity = this
+
+    this.buildChildren(traceMap, layoutFunction)
+    layoutFunction?.(this)
 
     this.buildChildConnections(traceMap)
 
@@ -670,61 +789,77 @@ class TraceReader {
   }
 }
 
-class HierarchicalEntityBuilder {
+class EntityBuilder {
+  static forStyle(style = undefined) {
+    if (style == undefined) return this.forStyle('flatFDG')
+
+    switch (style) {
+      case 'hierarchical': return HierarchicalEntityBuilder
+      case 'flatFDG': return FlatFDGEntityBuilder
+    }
+    throw new Error(`Unknown style: ${style}`)
+  }
+
+  static newForStyle(style, trace = undefined) {
+    return new (this.forStyle(style))(trace)
+  }
+
+  constructor(trace) {
+    this.trace = trace
+  }
+}
+
+class HierarchicalEntityBuilder extends EntityBuilder {
   objectEntities = new Map()
   classEntities = new Map()
   classCategoryEntities = new Map()
   packageEntities = new Map()
   traceEntity = null
 
-  constructor(trace) {
-    this.trace = trace
-  }
-
-  build() {
+  build(traceMap) {
     collect(this.trace.classes).each($class => {
-      this.getClass($class)
+      this.getClassEntity($class)
     })
     collect(this.trace.objects).each(object => {
-      this.getObject(object)
+      this.getObjectEntity(object)
     })
 
     const traceEntity = this.getTraceEntity()
     traceEntity.sortAllChildren()
-    return traceEntity
+    return traceEntity.build(traceMap, entity => entity.layoutChildrenOnGrid())
   }
 
-  getObject(object) {
+  getObjectEntity(object) {
     let objectEntity = this.objectEntities.get(object)
     if (objectEntity) return objectEntity
 
     objectEntity = new ObjectEntity(object)
-    this.getClass(object.class).addChild(objectEntity)
+    this.getClassEntity(object.class).addChild(objectEntity)
     this.objectEntities.set(object, objectEntity)
     return objectEntity
   }
 
-  getClass($class) {
+  getClassEntity($class) {
     let classEntity = this.classEntities.get($class)
     if (classEntity) return classEntity
 
     classEntity = new ClassEntity($class)
-    this.getClassCategory($class.category).addChild(classEntity)
+    this.getClassCategoryEntity($class.category).addChild(classEntity)
     this.classEntities.set($class, classEntity)
     return classEntity
   }
 
-  getClassCategory(category) {
+  getClassCategoryEntity(category) {
     let classCategoryEntity = this.classCategoryEntities.get(category)
     if (classCategoryEntity) return classCategoryEntity
 
     classCategoryEntity = new ClassCategoryEntity(category)
-    this.getPackage(category.package).addChild(classCategoryEntity)
+    this.getPackageEntity(category.package).addChild(classCategoryEntity)
     this.classCategoryEntities.set(category, classCategoryEntity)
     return classCategoryEntity
   }
 
-  getPackage($package) {
+  getPackageEntity($package) {
     let packageEntity = this.packageEntities.get($package)
     if (packageEntity) return packageEntity
 
@@ -742,10 +877,173 @@ class HierarchicalEntityBuilder {
   }
 }
 
+class FlatFDGEntityBuilder extends EntityBuilder {
+  excludedObjectNames = []
+  excludedClassNames = [
+    'Boolean', 'True', 'False',
+    'UndefinedObject',
+    'SmallInteger', 'LargePositiveInteger', 'LargeNegativeInteger', 'SmallFloat64',
+    'FullBlockClosure', 'CompiledBlock', 'CompiledMethod', 'CompiledMethodTrailer',
+    'Association',
+    'Array', 'OrderedCollection',
+    'Point', 'Rectangle'
+  ]
+  excludeClasses = true
+  /** all values may be a factor, a function, or undefined */
+  forceWeights = {
+	  'references': 1,
+	  'organization': {
+      /** will be applied to all organization forces */
+      'force': .005,
+      'sameClass': 2,
+      'sameHierarchy': 1,
+      'sameCategory': .01,
+      'samePackage': .001
+	  },
+	  'communication': 0.0001
+	}
+
+  build(traceMap) {
+    const objectEntities = this.trace.objects.filter(object => this.shouldShowObject(object)).map(object => new ObjectEntity(object))
+    const traceEntity = new TraceEntity()
+    objectEntities.forEach(objectEntity => traceEntity.addChild(objectEntity))
+    traceEntity.sortAllChildren()
+    this.addConnections(objectEntities)
+
+    const plane = traceEntity.build(traceMap, entity => entity.layoutChildrenOnGrid())
+
+    traceEntity.layoutFDG(traceMap, this.computeForces.bind(this))
+
+    return plane
+  }
+
+  shouldShowObject(object) {
+    if (this.excludedClassNames.includes(object.class.name)) return false
+    if (this.excludedObjectNames.includes(object.name)) return false
+    if (this.excludeClasses && object.class.name.endsWith(' class')) return false
+
+    return true
+  }
+
+  addConnections(objectEntities) {
+    objectEntities.forEach((objectEntity, index) => {
+      objectEntities.forEach((otherObjectEntity, otherIndex) => {
+        if (index >= otherIndex) return // only traverse upper triangle
+
+        const force = collect(objectEntity.object.fields)
+          .filter(field => field === otherObjectEntity.object)
+          .count()
+          + collect(otherObjectEntity.object.fields)
+            .filter(field => field === objectEntity.object)
+            .count()
+        if (!(force > 0)) return
+
+        objectEntity.addConnection(otherObjectEntity, force)
+      })
+    })
+  }
+
+  computeForces(objectEntities, addForce) {
+    const force = (forceWeight, $default) => forceWeight === undefined
+      ? force($default)
+      : forceWeight instanceof Function
+        ? (value) => forceWeight(value ?? 1)
+        : (value) => (value ?? 1) * forceWeight
+
+    // references
+    if (this.forceWeights['references']) {
+      const referenceForce = force(this.forceWeights['references'])
+      objectEntities.forEach(objectEntity => {
+        const object = objectEntity.object
+        objectEntities.forEach(otherObjectEntity => {
+          const otherObject = otherObjectEntity.object
+          const referenceCount = collect(object.fields).filter(field => field === otherObject).count()
+          if (referenceCount > 0) {
+            addForce(objectEntity, otherObjectEntity, referenceForce(referenceCount))
+          }
+        })
+      })
+    }
+
+    // organization
+    if (this.forceWeights['organization']) {
+      const organizationForce = force(this.forceWeights['organization']['force'], 1)
+      const sameClassForce = force(this.forceWeights['organization']['sameClass'])
+      const sameHierarchyForce = force(this.forceWeights['organization']['sameHierarchy'])
+      const sameCategoryForce = force(this.forceWeights['organization']['sameCategory'])
+      const samePackageForce = force(this.forceWeights['organization']['samePackage'])
+
+      objectEntities.forEach(objectEntity => {
+        const object = objectEntity.object
+        objectEntities.forEach(otherObjectEntity => {
+          const otherObject = otherObjectEntity.object
+          let force = 0
+
+          if (sameClassForce) {
+            if (object.class === otherObject.class) {
+              force += sameClassForce()
+            }
+          }
+
+          if (sameCategoryForce) {
+            if (object.class.category === otherObject.class.category) {
+              force += sameCategoryForce()
+            }
+          }
+
+          if (sameHierarchyForce) {
+            if (object.class.category === otherObject.class.category) { // optimization
+              const isRegexAST = /^Rxs[A-Z]/.test(object.class.name)
+              const otherIsRegexAST = /^Rxs[A-Z]/.test(otherObject.class.name)
+              if (isRegexAST && otherIsRegexAST) {
+                force += sameHierarchyForce()
+              }
+
+              const isRegexNFA = /^Rxm[A-Z]/.test(object.class.name)
+              const otherIsRegexNFA = /^Rxm[A-Z]/.test(otherObject.class.name)
+              if (isRegexNFA && otherIsRegexNFA) {
+                force += sameHierarchyForce()
+              }
+            }
+          }
+
+          if (samePackageForce) {
+            if (object.class.category.package === otherObject.class.category.package) {
+              force += samePackageForce()
+            }
+          }
+
+          if (force > 0) {
+            addForce(objectEntity, otherObjectEntity, organizationForce(force))
+          }
+        })
+      })
+    }
+
+    // communication
+    if (this.forceWeights['communication']) {
+      const communicationForce = force(this.forceWeights['communication'])
+      const visitFrame = (frame) => {
+        const senderEntity = objectEntities.find(objectEntity => objectEntity.object === frame.receiver)
+        frame.children.forEach(childFrame => {
+          const receiverEntity = objectEntities.find(objectEntity => objectEntity.object === childFrame.receiver)
+          if (senderEntity != null && receiverEntity != null) {
+            addForce(senderEntity, receiverEntity, communicationForce())
+          }
+          visitFrame(childFrame)
+        })
+      }
+      visitFrame(this.trace.rootFrame)
+    }
+  }
+}
+
 class TraceMap {
   constructor(options = {}) {
     this.options = options
   }
+
+  defaultStyle = 'flatFDG'
 
   buildMap(domElement) {
     this.scene = new THREE.Scene()
@@ -905,6 +1203,7 @@ class TraceMap {
   }
 
   buildTrace(traceEntity) {
+    // add lights
     const pointLight1 = new THREE.PointLight(0x888888) // White light
     pointLight1.position.set(200, 100, 200)
     const pointLight2 = new THREE.PointLight(0x888888) // White light
@@ -936,23 +1235,32 @@ class TraceMap {
     //const directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight, 5 )
     this.scene.add( pointLightHelper1, pointLightHelper2, pointLightHelper3, pointLightHelper4/* , directionalLightHelper  */)
 
-
-    this.scene.add(traceEntity.build(this))
+    this.scene.add(traceEntity)
 
     this.render()
   }
 
-  async loadTraceFromServerFile(serverFile) {
-    return this.loadTrace(await TraceReader.readTraceFromServerFile(serverFile))
+  //#region loading
+  async loadTraceFromServerFile(serverFile, style) {
+    return this.loadTrace(await TraceReader.readTraceFromServerFile(serverFile), style)
   }
 
-  async loadTraceFromLocalFile(localFile) {
-    return this.loadTrace(await TraceReader.readTraceFromLocalFile(localFile))
+  async loadTraceFromLocalFile(localFile, style) {
+    return this.loadTrace(await TraceReader.readTraceFromLocalFile(localFile), style)
   }
 
-  loadTrace(trace) {
+  loadTrace(trace, style = undefined) {
     this.trace = trace
-    const traceEntity = new HierarchicalEntityBuilder(this.trace).build()
+
+    style ??= this.defaultStyle
+    this.entityBuilder = EntityBuilder.newForStyle(style, this.trace)
+
+    this.reloadTrace()
+  }
+
+  reloadTrace() {
+    const traceEntity = this.entityBuilder.build(this)
+
     this.buildTrace(traceEntity)
   }
 
