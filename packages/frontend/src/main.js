@@ -141,7 +141,12 @@ class Entity {
   onClick(event) {
     window.selectedEntity = this
     console.log(this.object ?? this.organization ?? this)
-    alert(this.name)
+
+    alert(this.description)
+  }
+
+  get description() {
+    return `${this.name}`
   }
 
   onDragStart(event) {
@@ -346,6 +351,18 @@ class ObjectEntity extends Entity {
 
   get name() {
     return this.object.name
+  }
+
+  get description() {
+    let description = super.description
+    if (this.object) {
+      description += `\n${this.object.class.category.name}`
+      if (this.object.fields) {
+        description += `\n`
+        description += `\n${collect(this.object.fields).map((value, name) => `${name}: ${value instanceof TraceObject ? value.name : value}`).join('\n')}`
+      }
+    }
+    return description
   }
 }
 
