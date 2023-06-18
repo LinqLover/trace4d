@@ -1061,9 +1061,26 @@ class TraceMap {
     domElement.appendChild(this.renderer.domElement)
     new ResizeObserver(() => this.updateViewport()).observe(domElement)
 
+    this.buildConsoleInterface()
     this.buildControls()
 
     this.render()
+  }
+
+  buildConsoleInterface() {
+    ;[FlatFDGEntityBuilder].forEach($class => {
+      this.window[$class.name] = $class
+    })
+    console.log("%ctrace4d", 'color: #0000ff; font-size: larger; font-weight: bold')
+    console.log("%cAdjust the map like this:", 'color: #0000ff')
+    console.log(`
+traceMap.entityBuilder.forceWeights.references = 0.5
+traceMap.entityBuilder.forceWeights.organization.sameClass = 0.1
+traceMap.entityBuilder.excludedObjectNames.push("''")
+traceMap.entityBuilder.excludedClassNames.push('ByteString')
+traceMap.entityBuilder.excludeClasses = false
+traceMap.reloadTrace()
+`) // , "color: #0000ff"  // WORKAROUND: formatted newlines are not copyable in Chrome Dev Tools
   }
 
   buildControls() {
@@ -1203,6 +1220,11 @@ class TraceMap {
   }
 
   buildTrace(traceEntity) {
+    // remove previous trace
+    while (this.scene.children.length > 0) {
+      this.scene.remove(this.scene.children[0])
+    }
+
     // add lights
     const pointLight1 = new THREE.PointLight(0x888888) // White light
     pointLight1.position.set(200, 100, 200)
