@@ -1288,6 +1288,8 @@ traceMap.reloadTrace()
 
   render() {
     this.renderer.render(this.scene, this.camera)
+
+    this.stats?.update()
   }
 
   updateCursor(event) {
