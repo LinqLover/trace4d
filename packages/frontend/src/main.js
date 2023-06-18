@@ -311,6 +311,7 @@ class OrganizationEntity extends Entity {
 
   layoutChildrenOnGrid() {
     const childObjects = this.object3d.children
+    if (childObjects.length == 0) return
 
     // simple grid layout (width and depth)
     const gridCountX = Math.ceil(Math.sqrt(childObjects.length))
