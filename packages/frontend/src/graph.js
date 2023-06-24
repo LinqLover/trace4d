@@ -310,8 +310,12 @@ export class OrganizationEntity extends Entity {
   //#endregion
 
   //#region layout
+  get height() {
+    return 10
+  }
+
   adoptSize(width, depth) {
-    this.cuboid.geometry = new THREE.BoxGeometry(width, 10, depth)
+    this.cuboid.geometry = new THREE.BoxGeometry(width, this.height, depth)
   }
 
   layoutChildrenOnGrid() {
@@ -325,10 +329,11 @@ export class OrganizationEntity extends Entity {
     const cellDepth = collect(childObjects).map(child => child.geometry.parameters.depth).max()
     const marginX = /* cellWidth * 1.5 */ 10
     const marginZ = /* cellDepth * 1.5 */ 10
+    const y = this.height / 2
     childObjects.forEach((child, i) => {
       child.position.set(
         ((i % gridCountX) - (gridCountX / 2 - .5)) * (cellWidth + marginX),
-        child.geometry.parameters.height / 2,
+        y + child.geometry.parameters.height / 2,
         (Math.floor(i / gridCountX) - (gridCountZ / 2 - .5)) * (cellDepth + marginZ)
       )
     })
@@ -402,8 +407,9 @@ export class OrganizationEntity extends Entity {
         // TODO: dynamic speed to maintain enough FPS. might not need animation at all for small traces.
         this.simulation.tick(100)
 
+        const y = this.height / 2
         this.children.forEach(child => {
-          child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height / 2, child.d3Node.y)
+          child.moveTo(child.d3Node.x, y + child.object3d.geometry.parameters.height / 2, child.d3Node.y)
         })
 
         // Update DragControls to override forced position of dragged node
@@ -494,6 +500,10 @@ export class TraceEntity extends OrganizationEntity {
   //#endregion
 
   //#region layout
+  get height() {
+    return 0
+  }
+
   adoptSize(width, depth) {
     this.plane.geometry = new THREE.PlaneGeometry(width, depth).rotateX(-Math.PI / 2)
   }
