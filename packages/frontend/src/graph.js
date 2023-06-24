@@ -8,6 +8,8 @@ import * as THREEx from '../node_modules/threex.dynamictexture/threex.dynamictex
 
 import Box3Extension from './utils/box3dextension.js'
 
+import { TraceObject } from './trace.js'
+
 
 export class Entity {
   parent = null
