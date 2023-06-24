@@ -194,7 +194,7 @@ export class Entity {
   constrainDrag(event) {
     if (!this.object3d.positionBeforeDrag) {
       console.warn('no positionBeforeDrag', this)
-      return true
+      return false
     }
 
     this.object3d.position.y = this.object3d.positionBeforeDrag.y
@@ -213,6 +213,7 @@ export class Entity {
       return false
     }
 
+    // constrain to parent
     const absWidth = (this.parent.width - this.width) / 2
     const absDepth = (this.parent.depth - this.depth) / 2
     this.object3d.position.x = Math.max(-absWidth, Math.min(absWidth, this.object3d.position.x))

@@ -371,10 +371,6 @@ traceMap.reloadTrace()
     this.renderer.domElement.addEventListener('pointermove', event => {
       // required for updating DragControls, see references
       this.lastPointerMoveEvent = event
-    })
-    this.renderer.domElement.addEventListener('mousemove', event => {
-      // required for updating mouseOverEntities, see references
-      this.lastMouseMoveEvent = event
 
       mouse.x = (event.clientX / this.window.innerWidth) * 2 - 1
       mouse.y = -(event.clientY / this.window.innerHeight) * 2 + 1
@@ -409,9 +405,19 @@ traceMap.reloadTrace()
         intersect.object.entity?.onHover?.(event) !== false
       })
 
+      if (this.dragControls.enabled && !this.dragEntity) {
+        // fix dragEntity (might be null when positioning cursor over entity before pressing shift)
+        this.dragEntity = this.focusEntity
+        this.dragEntity?.onDragStart?.(event)
+      }
+
       this.render()
       this.updateCursor()
-    }, false)
+    }, { capture: true })
+    this.renderer.domElement.parentElement.addEventListener('mousemove', event => {
+      // required for updating mouseOverEntities, see references
+      this.lastMouseMoveEvent = event
+    }, { capture: true })
 
     let mouseBeforeClick = null
     let isPlainClick = null
