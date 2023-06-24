@@ -53,22 +53,15 @@ export class Entity {
 
   buildObject3d(traceMap) {
     const cuboidGeometry = new THREE.BoxGeometry(10, 10, 10)
-    //const cuboidMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-    //const cuboidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 })
-    //const cuboidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00, shininess: 30, specular: 0xffffff })
-    //const cuboidMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 })
-    //const cuboidMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, roughness: 0.8, metalness: 0 })
-    const cuboidMaterial = new THREE.MeshPhysicalMaterial({ color: 0x00ff00, roughness: 0.8, metalness: 0, /* clearCoat: 0.5, clearCoatRoughness: 0.5 */ })
-    //const cuboidMaterial = new THREE.MeshStandardMaterial({ color: 'purple' })
-    /* // specular material
-    const cuboidMaterial = new THREE.MeshPhongMaterial({
-      color: this.constructor.color, // Green color
-      specular: 0xffffff, // White specular reflection
-      shininess: 1 // Controls the size of the specular highlight (higher values = smaller highlight)
-      , flatShading: false
+    const cuboidMaterial = new THREE.MeshStandardMaterial({
+      color: 0xbb0000,
+      roughness: 0.75,
+      metalness: 0,
+      flatShading: true
     })
- */
     this.cuboid = new THREE.Mesh(cuboidGeometry, cuboidMaterial)
+    this.cuboid.castShadow = true
+    this.cuboid.receiveShadow = true
   }
 
   buildLabel(traceMap) {
@@ -96,7 +89,13 @@ export class Entity {
         align: 'center',
         font: 'bolder 90px Comic Sans MS',
       })
-      const textMaterial = new THREE.MeshBasicMaterial({ map: dynamicTexture.texture, transparent: true })
+      const textMaterial = new THREE.MeshStandardMaterial({
+        roughness: 0.75,
+        metalness: 0,
+        flatShading: true,
+        map: dynamicTexture.texture,
+        transparent: true
+      })
       return [state, textMaterial]
     }).all()
     this.updateFocusState()
@@ -460,7 +459,9 @@ export class OrganizationEntity extends Entity {
 }
 
 export class TraceEntity extends OrganizationEntity {
-  static planeMaterial = new THREE.MeshBasicMaterial({ color: 0x222222 })
+  static planeMaterial = new THREE.MeshStandardMaterial({
+    color: 0x777777
+  })
 
   //#region accessors
   get object3d() {
@@ -478,6 +479,7 @@ export class TraceEntity extends OrganizationEntity {
     planeGeometry.rotateX(-Math.PI / 2)
     this.plane = new THREE.Mesh(planeGeometry, this.constructor.planeMaterial)
     this.plane.entity = this
+    this.plane.receiveShadow = true
 
     this.buildChildren(traceMap, layoutFunction)
     layoutFunction?.(this)
@@ -597,6 +599,8 @@ export class Connection {
       linewidth: this.strength
     })
     this.line = new THREE.Line(lineGeometry, lineMaterial)
+    this.line.castShadow = true
+    this.line.receiveShadow = true
     this.updateFocusState()
 
     return this.line

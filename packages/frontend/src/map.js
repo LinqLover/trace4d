@@ -278,7 +278,7 @@ export class TraceMap {
     this.camera = new THREE.PerspectiveCamera()
     // Bird's eye view
     this.camera.position.set(0, 50, 100)
-    // increase the far clipping plane to see the whole plane - TODO: make this dynamic
+    // increase the far clipping plane to see the whole plane - TODO: don't hardcode
     this.camera.far = 10000
 
     this.renderer = new THREE.WebGLRenderer()
@@ -290,6 +290,7 @@ export class TraceMap {
 
     this.buildConsoleInterface()
     this.buildControls()
+    this.buildScene()
 
     this.render()
   }
@@ -459,44 +460,46 @@ traceMap.reloadTrace()
     }, false)
   }
 
-  buildTrace(traceEntity) {
-    // remove previous trace
-    while (this.scene.children.length > 0) {
-      this.scene.remove(this.scene.children[0])
-    }
-
+  buildScene() {
     // add lights
-    const pointLight1 = new THREE.PointLight(0x888888) // White light
-    pointLight1.position.set(200, 100, 200)
-    const pointLight2 = new THREE.PointLight(0x008800) // White light
-    pointLight2.position.set(-200, 100, 200)
-    const pointLight3 = new THREE.PointLight(0x880000) // White light
-    pointLight3.position.set(200, 100, -200)
-    const pointLight4 = new THREE.PointLight(0x000088) // White light
-    pointLight4.position.set(-200, 100, -200)
-    this.scene.add(pointLight1, pointLight2, pointLight3, pointLight4)
+    const directionalLight1 = new THREE.DirectionalLight(0xffffee)
+    // TODO: don't hardcode sizes
+    directionalLight1.position.set(250, 300, 200)
+    directionalLight1.castShadow = true
+    directionalLight1.shadow.camera.left = -400
+    directionalLight1.shadow.camera.right = 400
+    directionalLight1.shadow.camera.top = 400
+    directionalLight1.shadow.camera.bottom = -400
+    //directionalLight1.shadow.bias = -0.0000001
+    directionalLight1.shadow.mapSize.width = 4096
+    directionalLight1.shadow.mapSize.height = 4096
+    this.scene.add(directionalLight1)
 
-    /* const ambientLight = new THREE.AmbientLight(0x0000ff, 0.1) // Soft white light
-    scene.add(ambientLight) */
+    const skyColor = 0x87ceeb
+    const groundColor = 0xF6D7B0
+    const hemisphereLight = new THREE.HemisphereLight(skyColor, groundColor, 0.7)
+    this.scene.add(hemisphereLight);
 
-    /* const directionalLight = new THREE.DirectionalLight(0xff0000, 0.5)
-    directionalLight.position.set(1, 1, 1) // Adjust the position according to your scene
-    scene.add(directionalLight) */
+    // add ground
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(100000, 100000),
+      new THREE.MeshStandardMaterial({ color: groundColor, roughness: 1, metalness: 0, flatShading: true })
+    )
+    ground.rotation.x = -Math.PI / 2
+    ground.position.y = -10
+    this.scene.add(ground)
 
-    // add debugging
-    // add coordinate axes
-    const axesHelper = new THREE.AxesHelper( 200 )
-    this.scene.add( axesHelper )
+    this.renderer.setClearColor(skyColor)
+    this.renderer.shadowMap.enabled = true
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-    // show the light sources in the scene
-    const sphereSize = 1
-    const pointLightHelper1 = new THREE.PointLightHelper( pointLight1, sphereSize )
-    const pointLightHelper2 = new THREE.PointLightHelper( pointLight2, sphereSize )
-    const pointLightHelper3 = new THREE.PointLightHelper( pointLight3, sphereSize )
-    const pointLightHelper4 = new THREE.PointLightHelper( pointLight4, sphereSize )
-    //const directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight, 5 )
-    this.scene.add( pointLightHelper1, pointLightHelper2, pointLightHelper3, pointLightHelper4/* , directionalLightHelper  */)
+    this.render()
+  }
 
+  buildTrace(traceEntity) {
+    if (this.traceEntity) this.scene.remove(this.traceEntity)
+
+    this.traceEntity = traceEntity
     this.scene.add(traceEntity)
 
     this.render()
