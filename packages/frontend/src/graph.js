@@ -472,6 +472,10 @@ export class TraceEntity extends OrganizationEntity {
     color: 0x777777
   })
 
+  constructor(trace) {
+    super(trace)
+  }
+
   //#region accessors
   get object3d() {
     return this.plane

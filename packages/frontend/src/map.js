@@ -98,7 +98,7 @@ export class HierarchicalEntityBuilder extends EntityBuilder {
   getTraceEntity() {
     if (this.traceEntity) return this.traceEntity
 
-    this.traceEntity = new TraceEntity()
+    this.traceEntity = new TraceEntity(this.trace)
     return this.traceEntity
   }
 }
@@ -131,7 +131,7 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
 
   build(traceMap) {
     const objectEntities = this.trace.objects.filter(object => this.shouldShowObject(object)).map(object => new ObjectEntity(object))
-    const traceEntity = new TraceEntity()
+    const traceEntity = new TraceEntity(this.trace)
     objectEntities.forEach(objectEntity => traceEntity.addChild(objectEntity))
     traceEntity.sortAllChildren()
     this.addConnections(objectEntities)
