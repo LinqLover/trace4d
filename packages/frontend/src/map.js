@@ -339,6 +339,7 @@ traceMap.reloadTrace()
     // Enforce the camera to be above the ground plane
     this.mapControls.maxPolarAngle = Math.PI / 2 - 0.1
     this.mapControls.addEventListener('change', () => this.render())
+    this.mapControls.listenToKeyEvents(this.window.document)
   }
 
   buildDragControls() {
