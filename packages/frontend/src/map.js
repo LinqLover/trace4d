@@ -488,7 +488,7 @@ traceMap.reloadTrace()
 
     // add ground
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(100000, 100000),
+      new THREE.CircleGeometry(100000, 64),
       new THREE.MeshStandardMaterial({ color: groundColor, roughness: 1, metalness: 0, flatShading: true })
     )
     ground.rotation.x = -Math.PI / 2
