@@ -6,7 +6,7 @@
 			"request": "launch",
 			"name": "Launch Chrome against localhost",
 			"url": "http://localhost:5173/",
-			"webRoot": "${workspaceFolder}/src/frontend",
+			"webRoot": "${workspaceFolder}/packages/frontend",
 			"preLaunchTask": "vite server (frontend)"
 		},
 		// Does not work
@@ -23,5 +23,14 @@
 			},
 			"cwd": "${workspaceFolder}/src/frontend"
 		} */
+		// third attempt
+		/* {
+			"name": "vite server (frontend, new)",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run", "dev", "--prefix", "packages/frontend"],
+		}, */ // error: ENOENT: no such file or directory, stat '/home/Christoph/.vscode-server/bin/695af097c7bd098fbf017ce3ac85e09bbc5dda06/bin/remote-cli/git'???
 	]
 }

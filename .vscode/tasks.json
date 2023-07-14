@@ -29,6 +29,11 @@
             "type": "npm",
             "script": "dev",
             "path": "packages/frontend",
+            // does not work any better
+            /* "type": "shell",
+            "command": "npm",
+            "args": ["run", "dev", "--prefix", "packages/frontend"], */
+            // TODO: sourcemaps are not working, related to https://github.com/vitejs/vite/issues/7767 or https://github.com/vitejs/vite/issues/12265?
             "isBackground": true,
             "problemMatcher": [
                 {
