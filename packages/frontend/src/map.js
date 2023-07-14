@@ -219,6 +219,7 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
 
           if (sameHierarchyForce) {
             if (object.class.category === otherObject.class.category) { // optimization
+              // TODO HACK: regex-specific! implement common superclasses force instead.
               const isRegexAST = /^Rxs[A-Z]/.test(object.class.name)
               const otherIsRegexAST = /^Rxs[A-Z]/.test(otherObject.class.name)
               if (isRegexAST && otherIsRegexAST) {
