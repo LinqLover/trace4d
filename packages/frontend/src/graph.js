@@ -15,10 +15,15 @@ export class Entity {
   parent = null
   focusStates = []
   connections = []
+  hoveredEntities = []
 
   //#region accessors
   get object3d() {
     return this.cuboid
+  }
+
+  get path() {
+    return (this.parent?.path ?? []).concat([this])
   }
 
   get root() {
@@ -33,6 +38,10 @@ export class Entity {
     return this.object3d.geometry.parameters.depth
   }
 
+  get height() {
+    return this.object3d.geometry.parameters.height
+  }
+
   get description() {
     return `${this.name}`
   }
@@ -43,68 +52,147 @@ export class Entity {
   //#endregion
 
   //#region building
-  build(traceMap, layoutFunction) {
-    this.buildObject3d(traceMap)
-
-    this.buildLabel(traceMap)
-
-    traceMap.dragControls.getObjects().push(this.cuboid)
+  build(traceMap, options = {}) {
+    this.buildObject3d(traceMap, options)
     this.cuboid.entity = this
+
+    if (!(options.deferLabels ?? false)) {
+      this.buildAllLabels()
+    }
+
+    if (this.wantsDrag()) {
+      traceMap.dragControls.getObjects().push(this.cuboid)
+    }
     return this.cuboid
   }
 
-  buildObject3d(traceMap) {
-    const cuboidGeometry = new THREE.BoxGeometry(10, 10, 10)
-    const cuboidMaterial = new THREE.MeshStandardMaterial({
-      color: 0xbb0000,
-      roughness: 0.75,
-      metalness: 0,
-      flatShading: true
-    })
-    this.cuboid = new THREE.Mesh(cuboidGeometry, cuboidMaterial)
-    this.cuboid.castShadow = true
-    this.cuboid.receiveShadow = true
+  buildAllLabels() {
+    this.buildLabel()
+    this.updateFocusState()
   }
 
-  buildLabel(traceMap) {
-    /** TODO: ideas for improvement:
-     * dynamic texture width based on text length
-     * vertical text alignment
-     */
-    const text = this.name.length > 100 ? this.name.substring(0, 100) + '...' : this.name
+  buildObject3d(traceMap, options = {}) {
+    const cuboidGeometry = this.buildCuboidGeometry(traceMap)
+    this.cuboid = new THREE.Mesh(cuboidGeometry)
+    this.cuboid.castShadow = true
+    this.cuboid.receiveShadow = true
 
-    this.materials = collect({
+    this.topMaterial = new THREE.MeshStandardMaterial({
+      roughness: 0.75,
+      metalness: 0,
+      flatShading: true,
+      transparent: true
+    })
+    this.sideMaterial = new THREE.MeshStandardMaterial({
+      roughness: 0.75,
+      metalness: 0,
+      flatShading: true,
+      transparent: true
+    })
+    this.cuboid.material = [this.sideMaterial, this.sideMaterial, this.topMaterial, this.sideMaterial, this.sideMaterial, this.sideMaterial]
+  }
+
+  buildCuboidGeometry(traceMap) {
+    return new THREE.BoxGeometry(30, 30, 10)
+  }
+
+  buildLabel() {
+    // TODO: could truncate with knowledge of concrete text width
+    const maxTextLength = 24
+    const text = this.name?.length > maxTextLength
+      ? this.name?.substring(0, maxTextLength - 1) + '…'
+      : this.name
+
+    console.assert(this.labelTextures == null, 'labelTextures already built', this)
+    this.labelTextures = collect({
       'normal': this.constructor.color,
       'hover': this.constructor.hoverColor,
       'drag': this.constructor.dragColor
     }).mapWithKeys((color, state) => {
-      const dynamicTexture = new THREEx.DynamicTexture(
-        512 * Math.max((text.length <= 0 ? 1 : 2), Math.min(2.5, this.object3d.geometry.parameters.width / this.object3d.geometry.parameters.height)),
-        512
-      )
-      dynamicTexture.texture.anisotropy = traceMap.renderer.capabilities.getMaxAnisotropy()
-      dynamicTexture.clear(`#${color.toString(16).padStart(6, '0')}`)
-      dynamicTexture.drawTextCooked({
-        text: text,
-        lineHeight: 0.15,
-        margin: 0.025,
-        align: 'center',
-        font: 'bolder 90px Comic Sans MS',
-      })
-      const textMaterial = new THREE.MeshStandardMaterial({
-        roughness: 0.75,
-        metalness: 0,
-        flatShading: true,
-        map: dynamicTexture.texture,
-        transparent: true
-      })
-      return [state, textMaterial]
+      return [state, [
+        this.buildLabelTexture(text, {
+          allSides: true,
+          align: 'center',
+          color: color
+        }),
+        this.buildLabelTexture(text, {
+          allSides: false,
+          align: 'center',
+          color: color,
+          ratioOrientation: 'side'
+        })
+      ]]
     }).all()
-    this.updateFocusState()
   }
 
-  addConnection(otherEntity, strength) {
-    return this.parent.addChildConnection(this, otherEntity, strength)
+  buildLabelTexture(text, options = {}) {
+    const resolution = options.resolution ?? 128
+    const ratioOrientation = options.ratioOrientation ?? 'top'
+    const ratio = ratioOrientation === 'top'
+      ? this.object3d.geometry.parameters.width / this.object3d.geometry.parameters.depth
+      : this.object3d.geometry.parameters.width / this.object3d.geometry.parameters.height
+    const dynamicWidth = resolution * ratio
+    const dynamicHeight = resolution
+
+    const canvas = document.createElement('canvas')
+    canvas.width = dynamicWidth * 2
+    canvas.height = dynamicHeight * 2
+    const context = canvas.getContext('2d')
+
+    const color = options.color ?? this.constructor.color
+    context.fillStyle = `#${color.toString(16).padStart(6, '0')}`
+    context.fillRect(0, 0, canvas.width, canvas.height)
+
+    if (text) {
+      const textColor = options.textColor ?? '#000000'
+      const fontScale = options.fontScale ?? 1
+      const allSides = options.allSides ?? false
+      const align = options.align ?? 'left'
+      const margin = options.margin ?? 0
+
+      context.fillStyle = textColor
+      context.font = `bolder ${360 * fontScale * resolution / 1024}px Comic Sans MS`
+      const textWidth = context.measureText(text).width
+
+      let offsetY = canvas.height * margin
+      offsetY += 90 * 3 * fontScale * resolution / 1024 // TODO: do not hardcode
+      let offsetX = canvas.width * margin
+      if (allSides) {
+        offsetX = offsetY
+      }
+      let maxUsableWidth = canvas.width
+      maxUsableWidth -= offsetX * 2
+      let maxUsableHeight = canvas.height
+      maxUsableHeight -= offsetY * 2
+      const actualTextWidth = Math.min(textWidth, maxUsableWidth)
+      const actualTextHeight = Math.min(textWidth, maxUsableHeight)
+      context.translate(offsetX, 0)
+
+      const maxSideIndex = allSides ? 4 : 1
+      for (let i = 0; i < maxSideIndex; i++) {
+        const vertical = i % 2
+        const x = align === 'center'
+          ? ((!vertical ? maxUsableWidth : maxUsableHeight) - (!vertical ? actualTextWidth : actualTextHeight)) / 2
+          : (!vertical ? offsetX : offsetY)
+        context.fillText(text, x, offsetY, !vertical ? maxUsableWidth : maxUsableHeight)
+        if (vertical) {
+          context.translate(dynamicHeight * 2 - offsetX, offsetY)
+        } else {
+          context.translate(dynamicWidth * 2 - offsetY, offsetX)
+        }
+        context.rotate(Math.PI / 2)
+      }
+    }
+
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.needsUpdate = true
+    return texture
+  }
+
+  addConnection(fieldName, otherEntity, strength) {
+    let fieldEntities = this.children.filter(child => child.name === fieldName)
+    if (!fieldEntities.length) fieldEntities = this
+    return this.parent.addChildConnection(fieldEntities, otherEntity, strength)
   }
 
   moveTo(x, y, z) {
@@ -131,16 +219,40 @@ export class Entity {
 
   updateFocusState() {
     if (this.focusStates.includes('drag')) {
-      this.object3d.material = this.materials['drag']
+      this.topMaterial.map = this.labelTextures['drag'][0]
+      this.sideMaterial.map = this.labelTextures['drag'][1]
     } else if (this.focusStates.includes('hover')) {
-      this.object3d.material = this.materials['hover']
+      this.topMaterial.map = this.labelTextures['hover'][0]
+      this.sideMaterial.map = this.labelTextures['hover'][1]
     } else {
-      this.object3d.material = this.materials['normal']
+      this.object3d.material.map = this.labelTextures['normal']
+      this.topMaterial.map = this.labelTextures['normal'][0]
+      this.sideMaterial.map = this.labelTextures['normal'][1]
     }
+    this.topMaterial.needsUpdate = true
+    this.sideMaterial.needsUpdate = true
 
     this.connections.forEach(connection => {
       connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
     })
+  }
+
+  addHoveredEntity(entity) {
+    this.hoveredEntities.push(entity)
+
+    if (this.hoveredEntities.length) {
+      this.setFocusState('hover')
+    }
+  }
+
+  removeHoveredEntity(entity) {
+    const index = this.hoveredEntities.indexOf(entity)
+    if (index === -1) return
+    this.hoveredEntities.splice(index, 1)
+
+    if (!this.hoveredEntities.length) {
+      this.unsetFocusState('hover')
+    }
   }
   //#endregion
 
@@ -154,11 +266,11 @@ export class Entity {
   }
 
   onHoverStart(event) {
-    this.setFocusState('hover')
+    this.addHoveredEntity(this)
   }
 
   onHoverEnd(event) {
-    this.unsetFocusState('hover')
+    this.removeHoveredEntity(this)
   }
 
   onClick(event) {
@@ -169,10 +281,7 @@ export class Entity {
   }
 
   onDragStart(event) {
-    this.setFocusState('drag')
     this.object3d.positionBeforeDrag = this.object3d.position.clone()
-
-    this.root.onChildStartDrag?.(this)
   }
 
   onDragEnd(event) {
@@ -181,6 +290,12 @@ export class Entity {
   }
 
   onDrag(event) {
+    {
+      // actual drag start
+      this.setFocusState('drag')
+      this.root.onChildStartDrag?.(this)
+    }
+
     if (!this.constrainDrag(event)) return
 
     this.moved()
@@ -192,6 +307,11 @@ export class Entity {
   }
 
   constrainDrag(event) {
+    if (!this.wantsDrag(event)) {
+      this.object3d.position.copy(this.object3d.positionBeforeDrag)
+      return false
+    }
+
     if (!this.object3d.positionBeforeDrag) {
       console.warn('no positionBeforeDrag', this)
       return false
@@ -267,27 +387,39 @@ export class OrganizationEntity extends Entity {
   //#endregion
 
   //#region building
-  build(traceMap, layoutFunction) {
-    this.buildObject3d(traceMap)
+  build(traceMap, options = {}) {
+    this.buildObject3d(traceMap, options)
+    this.cuboid.entity = this
 
-    this.buildChildren(traceMap, layoutFunction)
-    layoutFunction?.(this)
+    this.buildChildren(traceMap, { deferLabels: true, ...options })
+    this.layoutChildren()
 
-    this.buildLabel(traceMap)
+    if (!(options.deferLabels ?? false)) {
+      this.buildAllLabels()
+    }
 
     this.buildChildConnections(traceMap)
 
-    traceMap.dragControls.getObjects().push(this.cuboid)
-    this.cuboid.entity = this
+    if (this.wantsDrag()) {
+      traceMap.dragControls.getObjects().push(this.cuboid)
+    }
     return this.cuboid
   }
 
-  buildChildren(traceMap, layoutFunction) {
+  buildAllLabels() {
+    super.buildAllLabels()
+
+    this.children.forEach(child => {
+      child.buildAllLabels()
+    })
+  }
+
+  buildChildren(traceMap, options = {}) {
     let i = 0
     const n = this.children.length
     const childObjects = this.children.map(child => {
       if (i++ % 100 == 0) console.log(`${i} / ${n}`)
-      return child.build(traceMap, layoutFunction)
+      return child.build(traceMap, options)
     })
     if (childObjects.length == 0) return
 
@@ -302,7 +434,9 @@ export class OrganizationEntity extends Entity {
 
   addChildConnection(source, target, strength) {
     const connection = new Connection(source, target, strength)
-    source.connections.push(connection)
+    ;(Array.isArray(source) ? source : [source]).forEach(entity => {
+      entity.connections.push(connection)
+    })
     target.connections.push(connection)
     this.childConnections.push(connection)
     return connection
@@ -318,33 +452,214 @@ export class OrganizationEntity extends Entity {
     this.cuboid.geometry = new THREE.BoxGeometry(width, this.height, depth)
   }
 
-  layoutChildrenOnGrid() {
-    const childObjects = this.object3d.children
-    if (childObjects.length == 0) return
-
-    // simple grid layout (width and depth)
-    const gridCountX = Math.ceil(Math.sqrt(childObjects.length))
-    const gridCountZ = Math.ceil(childObjects.length / gridCountX)
-    const cellWidth = collect(childObjects).map(child => child.geometry.parameters.width).max()
-    const cellDepth = collect(childObjects).map(child => child.geometry.parameters.depth).max()
-    const marginX = /* cellWidth * 1.5 */ 10
-    const marginZ = /* cellDepth * 1.5 */ 10
-    const y = this.height / 2
-    childObjects.forEach((child, i) => {
-      child.position.set(
-        ((i % gridCountX) - (gridCountX / 2 - .5)) * (cellWidth + marginX),
-        y + child.geometry.parameters.height / 2,
-        (Math.floor(i / gridCountX) - (gridCountZ / 2 - .5)) * (cellDepth + marginZ)
-      )
+  layoutChildren() {
+    this.layoutChildrenOnGrid({
+      resizeMode: 'shrinkWrap',
+      offset: 10 * .5 ** (this.path.length - 1),
+      margin: {
+        absolute: 10
+        /* relative: 1.5 */
+      }
     })
-
-    this.adoptSize(
-      gridCountX * (cellWidth + marginX) - marginX * .5,
-      gridCountZ * (cellDepth + marginZ) - marginZ * .5
-    )
   }
 
-  layoutFDG(traceMap, computeForces) {
+  // TODO: maybe extract each layout method as a method object in the future. would also make generic queries easier.
+  layoutChildrenOnGrid(options = {}) {
+    const childObjects = options.childObjects ?? this.object3d.children
+    if (childObjects.length == 0) return
+
+    const groupBy = options.groupBy
+    if (groupBy != null) {
+      const { groupBy: _, groupExtract, ...groupOptions } = options
+      return collect(childObjects)
+        .groupBy((object3d) => object3d.entity?.[groupBy])
+        .map((groupChildObjects, key) => this.layoutChildrenOnGrid({
+          childObjects: groupChildObjects.all(),
+          ...(groupExtract ? { [groupExtract]: key } : {}),
+          ...groupOptions
+        }))
+        .all()
+    }
+
+
+    // read options
+    const resizeMode = options.resizeMode ?? 'spaceFill'
+    const side = options.side ?? 'top'
+    const idealCellRatio = options.idealCellRatio ?? 1
+    const childExtentW = options.childExtentW
+    const query = options.query ?? null
+    const dryRun = options.dryRun ?? false
+
+    const offset = typeof options.offset === 'number' ? options.offset : 0
+    const offsetU = options.offset?.u ?? offset
+    const offsetV = options.offset?.v ?? offset
+    const offsetLeft = options.offset?.left ?? offsetU
+    const offsetTop = options.offset?.top ?? offsetV
+    const offsetRight = options.offset?.right ?? offsetU
+    const offsetBottom = options.offset?.bottom ?? offsetV
+
+    const marginAbsolute = options.margin?.absolute ?? 0
+    const marginAbsoluteU = options.margin?.absoluteU ?? marginAbsolute
+    const marginAbsoluteV = options.margin?.absoluteV ?? marginAbsolute
+    const marginRelative = options.margin?.relative ?? 0
+    const marginRelativeU = options.margin?.relativeU ?? marginRelative
+    const marginRelativeV = options.margin?.relativeV ?? marginRelative
+
+    const baseObject3d = this.object3d
+
+    // compute layout
+    // TODO: Honor v/w for non-square objects? On the other hand, this would lead to asymmetric layouts for different sides.
+    const gridCountU = Math.ceil(Math.sqrt(childObjects.length) / idealCellRatio)
+    const gridCountV = Math.ceil(childObjects.length / gridCountU)
+
+    if (query === 'gridCountU') {
+      return gridCountU
+    } else if (query === 'gridCountV') {
+      return gridCountV
+    }
+
+    let originOffset = new THREE.Vector3(offsetLeft, 0, offsetTop)
+    let cornerOffset = new THREE.Vector3(offsetRight, 0, offsetBottom)
+    // apply reverse rotation, as offsets are given in target orientation
+    let oneVector = new THREE.Vector3(1, 1, 1)
+    rotate(null, oneVector)
+    originOffset.divide(oneVector)
+    cornerOffset.divide(oneVector)
+    const originOffsetU = originOffset.x
+    const originOffsetV = originOffset.z
+    const cornerOffsetU = cornerOffset.x
+    const cornerOffsetV = cornerOffset.z
+
+    const extentW = this[getGeometryKey('w')] ?? getGeometryParameter(this.object3d, 'w')
+    const globalW = extentW / 2
+
+    const { marginU, marginV, cellExtentU, cellExtentV } = {
+      shrinkWrap: () => {
+        const cellExtentU = collect(childObjects).map(child => getGeometryParameter(child, 'u')).max()
+        const cellExtentV = collect(childObjects).map(child => getGeometryParameter(child, 'v')).max()
+
+        const marginU = marginAbsoluteU + cellExtentU * marginRelativeU
+        const marginV = marginAbsoluteV + cellExtentV * marginRelativeV
+        return { marginU, marginV, cellExtentU, cellExtentV }
+      },
+      spaceFill: () => {
+        const marginU = marginAbsoluteU
+        const marginV = marginAbsoluteV
+
+        const fullExtentU = this[getGeometryKey('u')] ?? getGeometryParameter(this.object3d, 'u')
+        const fullExtentV = (this[getGeometryKey('v')] ?? getGeometryParameter(this.object3d, 'v'))
+        const extentU = fullExtentU - originOffsetU - cornerOffsetU
+        const extentV = fullExtentV - originOffsetV - cornerOffsetV
+
+        const cellExtentU = (extentU - marginU * (gridCountU - 1)) / gridCountU
+        const cellExtentV = (extentV - marginV * (gridCountV - 1)) / gridCountV
+
+        return { marginU, marginV, cellExtentU, cellExtentV, originOffsetU, originOffsetV, cornerOffsetU, cornerOffsetV }
+      }
+    }[resizeMode]()
+
+    if (dryRun) {
+      return
+    }
+
+
+    // apply layout
+    childObjects.forEach((child, i) => {
+      const indexU = i % gridCountU
+      const indexV = Math.floor(i / gridCountU)
+      const u = originOffsetU / 2 + (indexU - (gridCountU / 2 - .5)) * (cellExtentU + marginU)
+      const v = originOffsetV / 2 + (indexV - (gridCountV / 2 - .5)) * (cellExtentV + marginV)
+      const w = (globalW + (childExtentW ?? getGeometryParameter(child, 'w')) / 2)
+      const [x, y, z] = [u, w, v]
+      child.position.set(x, y, z)
+
+      if (resizeMode === 'spaceFill') {
+        child.entity?.adoptSize(cellExtentU, cellExtentV)
+      }
+
+      if (side === 'top') return
+      const dir = child.position.clone()
+      child.translateX(-dir.x)
+      child.translateY(-dir.y)
+      child.translateZ(-dir.z)
+      rotate(child, dir)
+      child.translateX(dir.x)
+      child.translateY(dir.y)
+      child.translateZ(dir.z)
+    })
+
+    if (resizeMode === 'shrinkWrap') {
+      this.adoptSize(
+        cellExtentU * gridCountU + marginU * (gridCountU - 1) + originOffsetU + cornerOffsetU,
+        cellExtentV * gridCountV + marginV * (gridCountV - 1) + originOffsetV + cornerOffsetV
+      )
+    }
+
+
+    function getGeometryKey(dimension) {
+      return ['width', 'depth', 'height'][
+        'uvw'.indexOf(dimension)
+      ]
+    }
+    function getGeometryParameter(object3d, dimension) {
+      return object3d.geometry.parameters[getGeometryKey(dimension)]
+    }
+
+    /** Rotate arguments around the geometry of the receiver, scaling them as necessary. Arguments are assumed to be in the receiver's top side. */
+    function rotate(object3d, vector) {
+      // First step: rotate around x axis
+      object3d?.rotateX(Math.PI * (
+        { top: 0, bottom: 1 }[side] ?? .5
+      ))
+      if (side === 'top' || side === 'bottom') {
+        return
+      }
+
+      const baseGeometry = baseObject3d.geometry
+
+      // Scale top -> front
+      const xRatio = baseGeometry.parameters.height / baseGeometry.parameters.depth
+      vector.y /= xRatio
+      vector.z *= xRatio
+      if (object3d != null) {
+        object3d.geometry = new THREE.BoxGeometry(
+          object3d.geometry.parameters.width,
+          object3d.geometry.parameters.height,
+          object3d.geometry.parameters.depth * xRatio
+        )
+
+        // Second step: rotate around z axis
+        object3d.rotateZ(Math.PI * (
+          { back: 1, right: .5, left: -.5 }[side] ?? 0
+        ))
+      }
+      if (!(side === 'left' || side === 'right')) {
+        return
+      }
+
+      // Scale front -> left/right
+      const zRatio = baseGeometry.parameters.depth / baseGeometry.parameters.width
+      vector.x *= zRatio
+      vector.y /= zRatio
+      if (object3d != null) {
+        object3d.geometry = new THREE.BoxGeometry(
+          object3d.geometry.parameters.width * zRatio,
+          object3d.geometry.parameters.height,
+          object3d.geometry.parameters.depth
+        )
+      }
+    }
+  }
+
+  layoutChildrenOnGridQuery(query, options = {}) {
+    return this.layoutChildrenOnGrid({
+      query,
+      dryRun: true,
+      ...options
+    })
+  }
+
+  layoutFDG(traceMap, computeForces, options = {}) {
     const centripetalForce = 0.001
     const individualForceWeight = 0.1
     const collisionIterations = 10
@@ -427,10 +742,10 @@ export class OrganizationEntity extends Entity {
         }
 
         // update size
-        const margin = 10
+        const offset = options.offset ?? 20
         const width = Math.max(collect(d3Nodes).map(d3Node => d3Node.x).max(), -collect(d3Nodes).map(d3Node => d3Node.x).min()) * 2
         const depth = Math.max(collect(d3Nodes).map(d3Node => d3Node.y).max(), -collect(d3Nodes).map(d3Node => d3Node.y).min()) * 2
-        this.adoptSize(width + margin, depth + margin)
+        this.adoptSize(width + offset, depth + offset)
 
         traceMap.render()
       })
@@ -464,6 +779,14 @@ export class OrganizationEntity extends Entity {
     this.simulation.alpha(1)
     this.simulation.restart()
   }
+
+  moved() {
+    super.moved()
+
+    this.children.forEach(child => {
+      child.moved()
+    })
+  }
   //#endregion
 }
 
@@ -487,19 +810,27 @@ export class TraceEntity extends OrganizationEntity {
   //#endregion
 
   //#region building
-  build(traceMap, layoutFunction) {
+  build(traceMap, options = {}) {
     const planeGeometry = new THREE.PlaneGeometry(100, 100)
     planeGeometry.rotateX(-Math.PI / 2)
     this.plane = new THREE.Mesh(planeGeometry, this.constructor.planeMaterial)
     this.plane.entity = this
     this.plane.receiveShadow = true
 
-    this.buildChildren(traceMap, layoutFunction)
-    layoutFunction?.(this)
+    this.buildChildren(traceMap, { deferLabels: true, ...options })
+    this.layoutChildren()
+
+    if (!(options.deferLabels ?? false)) {
+      this.buildAllLabels()
+    }
 
     this.buildChildConnections(traceMap)
 
     return this.plane
+  }
+
+  buildLabel() {
+    // No label.
   }
   //#endregion
 
@@ -512,6 +843,11 @@ export class TraceEntity extends OrganizationEntity {
     this.plane.geometry = new THREE.PlaneGeometry(width, depth).rotateX(-Math.PI / 2)
   }
   //#endregion
+
+  //#region dynamic state
+  updateFocusState() {
+    // No focus state.
+  }
 
   //#region interaction
   wantsClick(event) {
@@ -562,19 +898,33 @@ export class ClassEntity extends OrganizationEntity {
   }
 }
 
-export class ObjectEntity extends Entity {
+export class ObjectEntity extends OrganizationEntity {
   static color = 0x002000
   static hoverColor = 0x003000
   static dragColor = 0x004000
 
+  static headerHeight = 3.5
+  static fieldHeight = 3
+  static gridLayoutOptions = {
+    resizeMode: 'spaceFill',
+    groupBy: 'side',
+    groupExtract: 'side',
+    margin: {
+      absolute: 0
+    },
+    offset: {
+      top: this.headerHeight
+    },
+    idealCellRatio: 2
+  }
+
   constructor(object) {
-    super()
-    this.object = object
+    super(object)
   }
 
   //#region accessors
-  get name() {
-    return this.object.name
+  get object() {
+    return this.organization
   }
 
   get description() {
@@ -588,13 +938,210 @@ export class ObjectEntity extends Entity {
     }
     return description
   }
+
+  get height() {
+    function soleOrDefault(collection, $default = null) {
+      if (collection.isEmpty()) {
+        return $default
+      }
+      if (collection.count() !== 1) {
+        throw new Error('collection does not contain exactly one element')
+      }
+      return collection.first()
+    }
+
+    const numberOfRows = soleOrDefault(collect(this.layoutChildrenOnGridQuery(
+      'gridCountV',
+      {
+        childObjects: collect(this.object.fields).keys().all(),
+        ...this.constructor.gridLayoutOptions
+      }
+    )).values().unique(), 0)
+
+    return this.constructor.headerHeight + this.constructor.fieldHeight * numberOfRows
+  }
+  //#endregion
+
+  //#region building
+  buildCuboidGeometry(traceMap) {
+    return new THREE.BoxGeometry(10, this.height, 10)
+  }
+
+  addConnection(fieldName, otherEntity, strength) {
+    const connection = super.addConnection(fieldName, otherEntity, strength)
+    if (connection.source === this) {
+      connection.sourceAbsoluteY = this.constructor.headerHeight / 2
+    }
+    connection.targetAbsoluteY = this.constructor.headerHeight / 2
+    return connection
+  }
+  //#endregion
+
+  //#region layout
+  layoutChildren() {
+    this.layoutChildrenOnGrid(this.constructor.gridLayoutOptions)
+  }
+  //#endregion
+}
+
+export class FieldEntity extends Entity {
+  static color = 0x004000
+  static hoverColor = 0x006000
+  static dragColor = 0x008000
+
+  static cuboidGeometry = new THREE.BoxGeometry(10, .1, 2.5)
+  static sideMaterials = undefined
+
+  constructor(name, value) {
+    super()
+    this.name = name
+    this.value = value
+  }
+
+  /** A twin entity that holds all shared resources. If this is not null, the receiver will only work as a shallow copy of the primary with regard to these resources. Memory optimization. */
+  primary = null
+  /** Twin entities that have a common hovering state. */
+  twins = []
+
+  //#region accessors
+  get description() {
+    return `${this.name}: ${
+      this.value instanceof TraceObject
+        ? this.value.name
+        : this.value
+    }`
+  }
+  //#endregion
+
+  //#region building
+  buildObject3d(traceMap, options = {}) {
+    const cuboidGeometry = this.constructor.cuboidGeometry
+    this.cuboid = new THREE.Mesh(cuboidGeometry)
+
+    if (this.primary) {
+      this.cuboid.material = this.primary.cuboid.material
+    } else {
+      if (!(options.deferLabels ?? false)) {
+        this.buildAllLabels()
+      }
+
+      this.topMaterial = new THREE.MeshStandardMaterial({
+        roughness: 0.75,
+        metalness: 0,
+        flatShading: true,
+        transparent: true
+      })
+      if (this.constructor.sideMaterials === undefined) {
+        this.constructor.sideMaterials = collect({
+          'normal': this.constructor.color,
+          'hover': this.constructor.hoverColor,
+          'drag': this.constructor.dragColor
+        }).mapWithKeys((color, state) => {
+          const material = new THREE.MeshStandardMaterial({
+            roughness: 0.75,
+            metalness: 0,
+            flatShading: true,
+            transparent: true
+          })
+          const texture = this.buildLabelTexture(null, {
+            color: color
+          })
+          material.map = texture
+          material.needsUpdate = true
+          return [state, material]
+        })
+      }
+
+      const sideMaterial = this.constructor.sideMaterials.get('normal')
+      this.cuboid.material = [sideMaterial, sideMaterial, this.topMaterial, sideMaterial, sideMaterial, sideMaterial]
+    }
+
+    this.cuboid.castShadow = true
+    this.cuboid.receiveShadow = true
+  }
+
+  buildLabel() {
+    if (this.primary) return
+
+    const maxTextLength = 24
+    const fullText = `${this.name}: ${this.value instanceof TraceObject ? this.value.name : this.value}`
+    const text = fullText.length > maxTextLength
+      ? fullText.substring(0, maxTextLength - 1) + '…'
+      : fullText
+
+    console.assert(this.labelTextures === undefined, 'label already built', this)
+    this.labelTextures = collect({
+      'normal': this.constructor.color,
+      'hover': this.constructor.hoverColor,
+      'drag': this.constructor.dragColor
+    }).mapWithKeys((color, state) => {
+      return [state, this.buildLabelTexture(text, {
+        align: 'left',
+        color: color,
+        fontScale: 2.5,
+        margin: 0.01,
+        ratioOrientation: 'top'
+      })]
+    }).all()
+  }
+  //#endregion
+
+  //#region layout
+  adoptSize(width, depth) {
+    this.cuboid.geometry = new THREE.BoxGeometry(width, this.height, depth)
+  }
+  //#endregion
+
+  //#region dynamic state
+  updateFocusState() {
+    if (!this.primary) {
+      let sideMaterial
+      if (this.focusStates.includes('drag')) {
+        this.topMaterial.map = this.labelTextures['drag']
+        sideMaterial = this.constructor.sideMaterials.get('drag')
+      } else if (this.focusStates.includes('hover')) {
+        this.topMaterial.map = this.labelTextures['hover']
+        sideMaterial = this.constructor.sideMaterials.get('hover')
+      } else {
+        this.object3d.material.map = this.labelTextures['normal']
+        this.topMaterial.map = this.labelTextures['normal']
+        sideMaterial = this.constructor.sideMaterials.get('normal')
+      }
+      this.topMaterial.needsUpdate = true
+      this.cuboid.material = [sideMaterial, sideMaterial, this.topMaterial, sideMaterial, sideMaterial, sideMaterial]
+    }
+
+    this.connections.forEach(connection => {
+      connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
+    })
+  }
+  //#endregion
+
+  //#region interaction
+  wantsDrag(event) {
+    return false
+  }
+
+  onHoverStart(event) {
+    super.onHoverStart(event)
+
+    this.parent?.addHoveredEntity(this)
+    this.twins.forEach(twin => twin.addHoveredEntity(twin))
+  }
+
+  onHoverEnd(event) {
+    super.onHoverEnd(event)
+
+    this.parent?.removeHoveredEntity(this)
+    this.twins.forEach(twin => twin.removeHoveredEntity(twin))
+  }
   //#endregion
 }
 
 export class Connection {
   focusStates = []
 
-  static color = 0xffffff
+  static color = 0xbbbbbb
   static opacity = .5
   static hoverOpacity = 1
 
@@ -606,8 +1153,9 @@ export class Connection {
 
   //#region building
   build() {
+    const anySource = Array.isArray(this.source) ? this.source[0] : this.source
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-      this.source.object3d.position,
+      anySource.object3d.position,
       this.target.object3d.position
     ])
 
@@ -618,20 +1166,70 @@ export class Connection {
     this.line = new THREE.Line(lineGeometry, lineMaterial)
     this.line.castShadow = true
     this.line.receiveShadow = true
+
+    const coneGeometry = new THREE.ConeGeometry(this.strength, 2)
+    coneGeometry.rotateX(Math.PI / 2);
+    const coneMaterial = new THREE.MeshBasicMaterial({
+      transparent: true,
+      color: this.constructor.color
+    })
+
+    this.chevronCones = []
+    const maxChevronCount = 10
+    for (let i = 0; i < maxChevronCount; i++) {
+      const cone = new THREE.Mesh(
+        coneGeometry,
+        coneMaterial
+      )
+      // FOR LATER: make shadow transparent (https://github.com/mrdoob/three.js/issues/10600)
+      cone.castShadow = true
+      cone.receiveShadow = true
+      this.chevronCones.push(cone)
+      this.line.add(cone)
+    }
+
     this.updateFocusState()
+    this.updatePosition()
 
     return this.line
   }
 
   updatePosition() {
+    const closestSource = Array.isArray(this.source)
+      ? // find closest source to target
+        collect(this.source).sortBy(source => {
+          const sourcePosition = this.line.worldToLocal(source.object3d.getWorldPosition(new THREE.Vector3()))
+          return sourcePosition.distanceTo(this.target.object3d.position)
+        }).first()
+      : this.source
+    let sourcePosition = this.line.worldToLocal(closestSource.object3d.getWorldPosition(new THREE.Vector3()))
+    if (this.sourceAbsoluteY != null) {
+      sourcePosition.y = this.sourceAbsoluteY
+    }
+    let targetPosition = this.target.object3d.position
+    if (this.targetAbsoluteY != null) {
+      targetPosition = targetPosition.clone()
+      targetPosition.y = this.targetAbsoluteY
+    }
+
     const lineGeometry = this.line.geometry
-    lineGeometry.attributes.position.array[0] = this.source.object3d.position.x
-    lineGeometry.attributes.position.array[1] = this.source.object3d.position.y
-    lineGeometry.attributes.position.array[2] = this.source.object3d.position.z
-    lineGeometry.attributes.position.array[3] = this.target.object3d.position.x
-    lineGeometry.attributes.position.array[4] = this.target.object3d.position.y
-    lineGeometry.attributes.position.array[5] = this.target.object3d.position.z
+    lineGeometry.attributes.position.array[0] = sourcePosition.x
+    lineGeometry.attributes.position.array[1] = sourcePosition.y
+    lineGeometry.attributes.position.array[2] = sourcePosition.z
+    lineGeometry.attributes.position.array[3] = targetPosition.x
+    lineGeometry.attributes.position.array[4] = targetPosition.y
+    lineGeometry.attributes.position.array[5] = targetPosition.z
     lineGeometry.attributes.position.needsUpdate = true
+
+    const length = targetPosition.distanceTo(sourcePosition)
+    const dynamicChevronCount = Math.min(length / 8, this.chevronCones.length)
+    this.chevronCones.forEach((cone, i) => {
+      cone.visible = i < dynamicChevronCount
+      if (!cone.visible) return
+      cone.position.copy(sourcePosition)
+      cone.position.lerp(targetPosition, (i + 1) / (dynamicChevronCount + 1))
+      cone.lookAt(targetPosition)
+    })
   }
   //#endregion
 
@@ -653,8 +1251,10 @@ export class Connection {
   updateFocusState() {
     if (this.focusStates.includes('hoverEntity')) {
       this.line.material.opacity = this.constructor.hoverOpacity
+      this.chevronCones.forEach(head => head.material.opacity = this.constructor.hoverOpacity)
     } else {
       this.line.material.opacity = this.constructor.opacity
+      this.chevronCones.forEach(head => head.material.opacity = this.constructor.opacity)
     }
   }
   //#endregion

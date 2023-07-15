@@ -3,7 +3,7 @@ import { DragControls } from 'three/addons/controls/DragControls.js'
 import { MapControls } from 'three/addons/controls/MapControls.js'
 import Stats from 'stats.js'
 
-import { ClassCategoryEntity, ClassEntity, ObjectEntity, PackageEntity, TraceEntity } from './graph.js'
+import { ClassCategoryEntity, ClassEntity, FieldEntity, ObjectEntity, PackageEntity, TraceEntity } from './graph.js'
 import { TraceReader } from './trace.js'
 
 
@@ -33,9 +33,38 @@ export class EntityBuilder {
   constructor(trace) {
     this.trace = trace
   }
+
+  buildAllFieldEntities(object, parentEntity) {
+    let fields = collect(object.fields)
+    const maxFields = 20
+    fields = fields.take(maxFields)
+    return fields.map((field, name) => {
+      return this.buildFieldEntities(name, field, parentEntity)
+    })
+  }
+
+  buildFieldEntities(name, field, parentEntity) {
+    let primary = null
+    const fieldEntities = ['front', 'left', 'back', 'right'].map(direction => {
+      const fieldEntity = new FieldEntity(name, field)
+      fieldEntity.side = direction
+      if (primary === null) {
+        primary = fieldEntity
+      } else {
+        fieldEntity.primary = primary
+      }
+      parentEntity.addChild(fieldEntity)
+      return fieldEntity
+    })
+    fieldEntities.forEach(fieldEntity => {
+      fieldEntity.twins = fieldEntities.filter(otherFieldEntity => otherFieldEntity !== fieldEntity)
+    })
+    return fieldEntities
+  }
 }
 
 export class HierarchicalEntityBuilder extends EntityBuilder {
+  allFieldEntities = new Map()
   objectEntities = new Map()
   classEntities = new Map()
   classCategoryEntities = new Map()
@@ -48,11 +77,26 @@ export class HierarchicalEntityBuilder extends EntityBuilder {
     })
     collect(this.trace.objects).each(object => {
       this.getObjectEntity(object)
+
+      const maxFields = 20
+      collect(object.fields).take(maxFields).each((field, name) => {
+        this.getFieldEntities(name, field, object)
+      })
     })
 
     const traceEntity = this.getTraceEntity()
     traceEntity.sortAllChildren()
-    return traceEntity.build(traceMap, entity => entity.layoutChildrenOnGrid())
+    return traceEntity.build(traceMap)
+  }
+
+  getFieldEntities(name, field, object) {
+    let fieldEntities = this.allFieldEntities.get(field)
+    if (fieldEntities) return fieldEntities
+
+    const objectEntity = this.getObjectEntity(object)
+    this.buildFieldEntities(name, field, objectEntity)
+    this.allFieldEntities.set(field, fieldEntities)
+    return fieldEntities
   }
 
   getObjectEntity(object) {
@@ -130,13 +174,15 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
 	}
 
   build(traceMap) {
-    const objectEntities = this.trace.objects.filter(object => this.shouldShowObject(object)).map(object => new ObjectEntity(object))
+    const objectEntities = this.trace.objects
+      .filter(object => this.shouldShowObject(object))
+      .map(object => this.buildObjectEntity(object))
     const traceEntity = new TraceEntity(this.trace)
     objectEntities.forEach(objectEntity => traceEntity.addChild(objectEntity))
     traceEntity.sortAllChildren()
     this.addConnections(objectEntities)
 
-    const plane = traceEntity.build(traceMap, entity => entity.layoutChildrenOnGrid())
+    const plane = traceEntity.build(traceMap)
 
     traceEntity.layoutFDG(traceMap, this.computeForces.bind(this))
 
@@ -151,20 +197,20 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
     return true
   }
 
+  buildObjectEntity(object) {
+    const entity = new ObjectEntity(object)
+    this.buildAllFieldEntities(object, entity)
+    return entity
+  }
+
   addConnections(objectEntities) {
     objectEntities.forEach((objectEntity, index) => {
       objectEntities.forEach((otherObjectEntity, otherIndex) => {
-        if (index >= otherIndex) return // only traverse upper triangle
-
-        const force = collect(objectEntity.object.fields)
-          .filter(field => field === otherObjectEntity.object)
-          .count()
-          + collect(otherObjectEntity.object.fields)
-            .filter(field => field === objectEntity.object)
-            .count()
-        if (!(force > 0)) return
-
-        objectEntity.addConnection(otherObjectEntity, force)
+        collect(objectEntity.object.fields).each((field, name) => {
+          if (field === otherObjectEntity.object) {
+            objectEntity.addConnection(name, otherObjectEntity, 1)
+          }
+        })
       })
     })
   }
@@ -346,16 +392,13 @@ traceMap.reloadTrace()
   buildDragControls() {
     this.dragControls = new DragControls([], this.camera, this.renderer.domElement)
     this.dragControls.addEventListener('hoveron', (event) => {
-      if (!event.object.entity?.wantsDrag?.(event)) return
       event.object.entity?.onDragStart?.(event)
     })
     this.dragControls.addEventListener('hoveroff', (event) => {
       this.dragEntity = null
-      if (!event.object.entity?.wantsDrag?.(event)) return
       event.object.entity?.onDragEnd?.(event)
     })
     this.dragControls.addEventListener('drag', (event) => {
-      if (!event.object.entity?.wantsDrag?.(event)) return
       this.dragEntity = event.object.entity
       this.lastDragEvent = event
       event.object.entity?.onDrag?.(event)
