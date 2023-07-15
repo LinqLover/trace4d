@@ -61,7 +61,7 @@ export class Entity {
     }
 
     if (this.wantsDrag()) {
-      traceMap.dragControls.getObjects().push(this.cuboid)
+      traceMap.registerDraggable(this.cuboid)
     }
     return this.cuboid
   }
@@ -401,7 +401,7 @@ export class OrganizationEntity extends Entity {
     this.buildChildConnections(traceMap)
 
     if (this.wantsDrag()) {
-      traceMap.dragControls.getObjects().push(this.cuboid)
+      traceMap.registerDraggable(this.cuboid)
     }
     return this.cuboid
   }

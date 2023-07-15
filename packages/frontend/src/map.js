@@ -390,6 +390,7 @@ traceMap.reloadTrace()
   }
 
   buildDragControls() {
+    // BUG: Should not be able to drag children of draggable, but DragControls always passes recursive=true to raycaster.
     this.dragControls = new DragControls([], this.camera, this.renderer.domElement)
     this.dragControls.addEventListener('hoveron', (event) => {
       event.object.entity?.onDragStart?.(event)
@@ -405,6 +406,17 @@ traceMap.reloadTrace()
       this.render()
     })
     this.dragControls.enabled = false
+  }
+
+  registerDraggable(object3d) {
+    this.dragControls.getObjects().push(object3d)
+  }
+
+  unregisterDraggable(object3d) {
+    const index = this.dragControls.getObjects().indexOf(object3d)
+    if (index >= 0) {
+      this.dragControls.getObjects().splice(index, 1)
+    }
   }
 
   buildMouseHandler() {
