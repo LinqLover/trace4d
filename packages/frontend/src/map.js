@@ -2,6 +2,7 @@ import collect from 'collect.js'
 import { DragControls } from 'three/addons/controls/DragControls.js'
 import { MapControls } from 'three/addons/controls/MapControls.js'
 import Stats from 'stats.js'
+import * as THREE from 'three'
 
 import { ClassCategoryEntity, ClassEntity, FieldEntity, ObjectEntity, PackageEntity, TraceEntity } from './graph.js'
 import { TraceReader } from './trace.js'

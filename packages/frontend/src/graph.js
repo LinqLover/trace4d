@@ -3,8 +3,6 @@ import * as d3Force from 'd3-force'
 import * as d3Random from 'd3-random'
 const d3 = { ...d3Force, ...d3Random }
 import * as THREE from 'three'
-window.THREE = THREE; // threex.dynamictexture.js expects this
-import * as THREEx from '../node_modules/threex.dynamictexture/threex.dynamictexture.js'
 
 import Box3Extension from './utils/box3dextension.js'
 

@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import customCjsToEsmPlugin from './customCjsToEsmPlugin'
 
 export default defineConfig({
   root: 'src',
@@ -15,6 +14,4 @@ export default defineConfig({
       'top-level-await': true
     },
   },
-
-  plugins: [customCjsToEsmPlugin()],
 })

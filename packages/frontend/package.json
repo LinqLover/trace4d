@@ -7,8 +7,7 @@
     "d3-force": "^3.0.0",
     "d3-random": "^3.0.1",
     "stats.js": "^0.17.0",
-    "three": "^0.152.2",
-    "threex.dynamictexture": "http://github.com/jeromeetienne/threex.dynamictexture#2332400"
+    "three": "^0.152.2"
   },
   "devDependencies": {
     "vite": "^4.3.9"
