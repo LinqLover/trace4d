@@ -5,6 +5,7 @@ import Stats from 'stats.js'
 import * as THREE from 'three'
 
 import { ClassCategoryEntity, ClassEntity, FieldEntity, ObjectEntity, PackageEntity, TraceEntity } from './graph.js'
+import { Player } from './player.js'
 import { TraceReader } from './trace.js'
 
 
@@ -592,6 +593,7 @@ traceMap.reloadTrace()
     const traceObject3d = this.entityBuilder.build(this)
 
     this.buildTrace(traceObject3d)
+    this.player = new Player(this.trace, this.traceObject3d.entity, this)
   }
   //#endregion
 

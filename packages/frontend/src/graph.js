@@ -48,6 +48,16 @@ export class Entity {
   sortAllChildren() {
     // do nothing
   }
+
+  allEntities(predicate = null) {
+    return predicate == null || predicate(this)
+      ? [this]
+      : []
+  }
+
+  allObjectEntities() {
+    return this.allEntities(entity => entity instanceof ObjectEntity)
+  }
   //#endregion
 
   //#region building
@@ -423,6 +433,17 @@ export class OrganizationEntity extends Entity {
   sortAllChildren() {
     this.children.forEach(child => child.sortAllChildren())
     this.children.sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  allEntities(predicate = null) {
+    const entities = []
+    if (predicate == null || predicate(this)) {
+      entities.push(this)
+    }
+    this.children.forEach(child => {
+      entities.push(...child.allEntities(predicate))
+    })
+    return entities
   }
   //#endregion
 

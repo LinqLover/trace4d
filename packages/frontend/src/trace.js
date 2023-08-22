@@ -7,6 +7,10 @@ export class Trace {
     this.classes = classes
     this.rootFrame = rootFrame
   }
+
+  createCursor() {
+    return new TraceCursor(this)
+  }
 }
 
 export class TraceObject {
@@ -50,6 +54,10 @@ export class TraceFrame {
     this.startTime = startTime
     this.endTime = endTime
     this.children = children
+  }
+
+  toString() {
+    return `${this.receiver.class.name}>>${this.message}`
   }
 }
 
@@ -192,4 +200,83 @@ export class TraceReader {
     const children = frameData.children.map(childFrameData => this.getFrame(childFrameData))
     return new TraceFrame(receiver, message, $arguments, answer, startTime, endTime, children)
   }
+}
+
+export class TraceCursor {
+  //#region properties
+  trace
+  currentTime
+  /** Last item is top frame */
+  currentStack
+
+  get startTime() {
+    return this.trace.rootFrame.startTime
+  }
+
+  get endTime() {
+    return this.trace.rootFrame.endTime
+  }
+  //#endregion
+
+  //#region constructor
+  constructor(trace) {
+    this.trace = trace
+    this.reset()
+  }
+  //#endregion
+
+  //#region steps
+  reset() {
+    this.currentTime = this.startTime - 1
+    this.currentStack = []
+  }
+
+  step(steps = Infinity, options = {}) {
+    const { visitFrame } = options
+
+    if (this.currentTime === this.startTime - 1) {
+      this.currentTime++
+      this.stepInto(this.trace.rootFrame)
+    }
+
+    let stepsLeft = steps
+    while (stepsLeft > 0) {
+      if (this.currentStack.length === 0) {
+        /* if (isFinite(stepsLeft)) {
+          throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
+        } */
+        break
+      }
+
+      const currentFrame = this.currentStack[this.currentStack.length - 1]
+      const nextChild = currentFrame.children.find(child => child.startTime > this.currentTime)
+      const nextFrameTime = nextChild ? nextChild.startTime : currentFrame.endTime + 1
+      const timeUntilNextFrame = nextFrameTime - this.currentTime
+      if (timeUntilNextFrame > 0) {
+        visitFrame?.(currentFrame, this)
+      }
+
+      if (timeUntilNextFrame > stepsLeft) {
+        this.currentTime += stepsLeft
+        stepsLeft = 0
+      } else {
+        this.currentTime += timeUntilNextFrame
+        stepsLeft -= timeUntilNextFrame
+        if (nextChild != null) {
+          this.stepInto(nextChild)
+        } else {
+          this.stepOut()
+        }
+      }
+    }
+  }
+
+  stepInto(frame) {
+    this.currentStack.push(frame)
+  }
+
+  stepOut() {
+    this.currentStack.pop()
+  }
+  //#endregion
 }
