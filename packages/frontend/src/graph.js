@@ -997,7 +997,7 @@ export class ObjectEntity extends OrganizationEntity {
       description += `\n${this.object.class.category.name}`
       if (this.object.fields) {
         description += `\n`
-        description += `\n${collect(this.object.fields).map((value, name) => `${name}: ${value instanceof TraceObject ? value.name : value}`).join('\n')}`
+        description += `\n${collect(this.object.fields).map((value, name) => `${name}: ${TraceObject.valueToString(value)}`).join('\n')}`
       }
     }
     return description
@@ -1072,11 +1072,7 @@ export class FieldEntity extends Entity {
 
   //#region accessors
   get description() {
-    return `${this.name}: ${
-      this.value instanceof TraceObject
-        ? this.value.name
-        : this.value
-    }`
+    return `${this.name}: ${TraceObject.valueToString(this.value)}`
   }
   //#endregion
 
@@ -1136,7 +1132,7 @@ export class FieldEntity extends Entity {
     if (this.primary) return
 
     const maxTextLength = 24
-    const fullText = `${this.name}: ${this.value instanceof TraceObject ? this.value.name : this.value}`
+    const fullText = `${this.name}: ${TraceObject.valueToString(this.value)}`
     const text = fullText.length > maxTextLength
       ? fullText.substring(0, maxTextLength - 1) + '…'
       : fullText
