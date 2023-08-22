@@ -595,6 +595,8 @@ traceMap.reloadTrace()
 
     this.buildTrace(traceObject3d)
     this.player = new Player(this.trace, this.traceObject3d.entity, this)
+    
+    setTimeout(() => this.player.start(), 3000) // TODO: Don't harcode
   }
   //#endregion
 
