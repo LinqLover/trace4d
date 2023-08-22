@@ -4,7 +4,7 @@ import * as d3Random from 'd3-random'
 const d3 = { ...d3Force, ...d3Random }
 import * as THREE from 'three'
 
-import Box3Extension from './utils/box3dextension.js'
+import Box3Extension from './utils/Box3Extension.js'
 
 import { TraceObject } from './trace.js'
 
