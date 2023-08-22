@@ -5,6 +5,7 @@ const d3 = { ...d3Force, ...d3Random }
 import * as THREE from 'three'
 
 import Box3Extension from './utils/Box3Extension.js'
+import BoxGeometryExtension from './utils/BoxGeometryExtension.js'
 
 import { TraceObject } from './trace.js'
 
@@ -75,6 +76,12 @@ export class Entity {
     this.cuboid.castShadow = true
     this.cuboid.receiveShadow = true
 
+    this.baseMaterial = new THREE.MeshStandardMaterial({
+      roughness: 0.75,
+      metalness: 0,
+      flatShading: true,
+      transparent: true
+    })
     this.topMaterial = new THREE.MeshStandardMaterial({
       roughness: 0.75,
       metalness: 0,
@@ -87,7 +94,15 @@ export class Entity {
       flatShading: true,
       transparent: true
     })
-    this.cuboid.material = [this.sideMaterial, this.sideMaterial, this.topMaterial, this.sideMaterial, this.sideMaterial, this.sideMaterial]
+    this.cuboid.material = [this.baseMaterial, this.topMaterial, this.sideMaterial]
+
+    cuboidGeometry.clearGroups()
+    cuboidGeometry.addGroup(0, Infinity, 0)  // base (global)
+    cuboidGeometry.addGroup(0, 6, 2)  // side 1 (right)
+    cuboidGeometry.addGroup(6, 6, 2)  // side 2 (left)
+    cuboidGeometry.addGroup(12, 6, 1)  // top
+    cuboidGeometry.addGroup(24, 6, 2)  // side 3 (front)
+    cuboidGeometry.addGroup(30, 6, 2)  // side 4 (back)
   }
 
   buildCuboidGeometry(traceMap) {
@@ -101,26 +116,17 @@ export class Entity {
       ? this.name?.substring(0, maxTextLength - 1) + '…'
       : this.name
 
-    console.assert(this.labelTextures == null, 'labelTextures already built', this)
-    this.labelTextures = collect({
-      'normal': this.constructor.color,
-      'hover': this.constructor.hoverColor,
-      'drag': this.constructor.dragColor
-    }).mapWithKeys((color, state) => {
-      return [state, [
-        this.buildLabelTexture(text, {
-          allSides: true,
-          align: 'center',
-          color: color
-        }),
-        this.buildLabelTexture(text, {
-          allSides: false,
-          align: 'center',
-          color: color,
-          ratioOrientation: 'side'
-        })
-      ]]
-    }).all()
+    this.topMaterial.map = this.buildLabelTexture(text, {
+      allSides: true,
+      align: 'center'
+    })
+    this.topMaterial.needsUpdate = true
+    this.sideMaterial.map = this.buildLabelTexture(text, {
+      allSides: false,
+      align: 'center',
+      ratioOrientation: 'side'
+    })
+    this.sideMaterial.needsUpdate = true
   }
 
   buildLabelTexture(text, options = {}) {
@@ -137,8 +143,10 @@ export class Entity {
     canvas.height = dynamicHeight * 2
     const context = canvas.getContext('2d')
 
-    const color = options.color ?? this.constructor.color
-    context.fillStyle = `#${color.toString(16).padStart(6, '0')}`
+    const color = options.color ?? 'transparent'
+    context.fillStyle = typeof color === 'number'
+      ? `#${color.toString(16).padStart(6, '0')}`
+      : color
     context.fillRect(0, 0, canvas.width, canvas.height)
 
     if (text) {
@@ -216,19 +224,19 @@ export class Entity {
   }
 
   updateFocusState() {
-    if (this.focusStates.includes('drag')) {
-      this.topMaterial.map = this.labelTextures['drag'][0]
-      this.sideMaterial.map = this.labelTextures['drag'][1]
-    } else if (this.focusStates.includes('hover')) {
-      this.topMaterial.map = this.labelTextures['hover'][0]
-      this.sideMaterial.map = this.labelTextures['hover'][1]
-    } else {
-      this.object3d.material.map = this.labelTextures['normal']
-      this.topMaterial.map = this.labelTextures['normal'][0]
-      this.sideMaterial.map = this.labelTextures['normal'][1]
+    if (this.baseMaterial) {
+      let color
+      if (this.focusStates.includes('drag')) {
+        color = this.constructor.dragColor
+      } else if (this.focusStates.includes('hover')) {
+        color = this.constructor.hoverColor
+      } else {
+        color = this.constructor.color
+      }
+
+      this.baseMaterial.color.setHex(color)
+      this.baseMaterial.needsUpdate = true
     }
-    this.topMaterial.needsUpdate = true
-    this.sideMaterial.needsUpdate = true
 
     this.connections.forEach(connection => {
       connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
@@ -447,7 +455,7 @@ export class OrganizationEntity extends Entity {
   }
 
   adoptSize(width, depth) {
-    this.cuboid.geometry = new THREE.BoxGeometry(width, this.height, depth)
+    this.cuboid.geometry = BoxGeometryExtension.copyWith(this.cuboid.geometry, width, this.height, depth)
   }
 
   layoutChildren() {
@@ -620,11 +628,7 @@ export class OrganizationEntity extends Entity {
       vector.y /= xRatio
       vector.z *= xRatio
       if (object3d != null) {
-        object3d.geometry = new THREE.BoxGeometry(
-          object3d.geometry.parameters.width,
-          object3d.geometry.parameters.height,
-          object3d.geometry.parameters.depth * xRatio
-        )
+        object3d.geometry = BoxGeometryExtension.copyWith(object3d.geometry, object3d.geometry.parameters.width, object3d.geometry.parameters.height, object3d.geometry.parameters.depth * xRatio)
 
         // Second step: rotate around z axis
         object3d.rotateZ(Math.PI * (
@@ -640,11 +644,7 @@ export class OrganizationEntity extends Entity {
       vector.x *= zRatio
       vector.y /= zRatio
       if (object3d != null) {
-        object3d.geometry = new THREE.BoxGeometry(
-          object3d.geometry.parameters.width * zRatio,
-          object3d.geometry.parameters.height,
-          object3d.geometry.parameters.depth
-        )
+        object3d.geometry = BoxGeometryExtension.copyWith(object3d.geometry, object3d.geometry.parameters.width * zRatio, object3d.geometry.parameters.height, object3d.geometry.parameters.depth)
       }
     }
   }
@@ -987,7 +987,6 @@ export class FieldEntity extends Entity {
   static hoverColor = 0x006000
   static dragColor = 0x008000
 
-  static cuboidGeometry = new THREE.BoxGeometry(10, .1, 2.5)
   static sideMaterials = undefined
 
   constructor(name, value) {
@@ -1013,7 +1012,7 @@ export class FieldEntity extends Entity {
 
   //#region building
   buildObject3d(traceMap, options = {}) {
-    const cuboidGeometry = this.constructor.cuboidGeometry
+    const cuboidGeometry = new THREE.BoxGeometry(10, .1, 2.5)
     this.cuboid = new THREE.Mesh(cuboidGeometry)
 
     if (this.primary) {
@@ -1023,36 +1022,40 @@ export class FieldEntity extends Entity {
         this.buildAllLabels()
       }
 
+      this.baseMaterial = new THREE.MeshStandardMaterial({
+        roughness: 0.75,
+        metalness: 0,
+        flatShading: true,
+        transparent: true
+      })
       this.topMaterial = new THREE.MeshStandardMaterial({
         roughness: 0.75,
         metalness: 0,
         flatShading: true,
         transparent: true
       })
-      if (this.constructor.sideMaterials === undefined) {
-        this.constructor.sideMaterials = collect({
-          'normal': this.constructor.color,
-          'hover': this.constructor.hoverColor,
-          'drag': this.constructor.dragColor
-        }).mapWithKeys((color, state) => {
-          const material = new THREE.MeshStandardMaterial({
-            roughness: 0.75,
-            metalness: 0,
-            flatShading: true,
-            transparent: true
-          })
-          const texture = this.buildLabelTexture(null, {
-            color: color
-          })
-          material.map = texture
-          material.needsUpdate = true
-          return [state, material]
+      if (this.constructor.sideMaterial === undefined) {
+        this.constructor.sideMaterial = new THREE.MeshStandardMaterial({
+          roughness: 0.75,
+          metalness: 0,
+          flatShading: true,
+          transparent: true
         })
+        const texture = this.buildLabelTexture(null)
+        this.constructor.sideMaterial.map = texture
+        this.constructor.sideMaterial.needsUpdate = true
       }
 
-      const sideMaterial = this.constructor.sideMaterials.get('normal')
-      this.cuboid.material = [sideMaterial, sideMaterial, this.topMaterial, sideMaterial, sideMaterial, sideMaterial]
+      this.cuboid.material = [this.baseMaterial, this.topMaterial, this.constructor.sideMaterial]
     }
+
+    cuboidGeometry.clearGroups()
+    cuboidGeometry.addGroup(0, Infinity, 0)  // base (global)
+    cuboidGeometry.addGroup(0, 6, 2)  // side 1 (right)
+    cuboidGeometry.addGroup(6, 6, 2)  // side 2 (left)
+    cuboidGeometry.addGroup(12, 6, 1)  // top
+    cuboidGeometry.addGroup(24, 6, 2)  // side 3 (front)
+    cuboidGeometry.addGroup(30, 6, 2)  // side 4 (back)
 
     this.cuboid.castShadow = true
     this.cuboid.receiveShadow = true
@@ -1067,51 +1070,19 @@ export class FieldEntity extends Entity {
       ? fullText.substring(0, maxTextLength - 1) + '…'
       : fullText
 
-    console.assert(this.labelTextures === undefined, 'label already built', this)
-    this.labelTextures = collect({
-      'normal': this.constructor.color,
-      'hover': this.constructor.hoverColor,
-      'drag': this.constructor.dragColor
-    }).mapWithKeys((color, state) => {
-      return [state, this.buildLabelTexture(text, {
-        align: 'left',
-        color: color,
-        fontScale: 2.5,
-        margin: 0.01,
-        ratioOrientation: 'top'
-      })]
-    }).all()
+    this.topMaterial.map = this.buildLabelTexture(text, {
+      align: 'left',
+      fontScale: 2.5,
+      margin: 0.01,
+      ratioOrientation: 'top'
+    })
+    this.topMaterial.needsUpdate = true
   }
   //#endregion
 
   //#region layout
   adoptSize(width, depth) {
-    this.cuboid.geometry = new THREE.BoxGeometry(width, this.height, depth)
-  }
-  //#endregion
-
-  //#region dynamic state
-  updateFocusState() {
-    if (!this.primary) {
-      let sideMaterial
-      if (this.focusStates.includes('drag')) {
-        this.topMaterial.map = this.labelTextures['drag']
-        sideMaterial = this.constructor.sideMaterials.get('drag')
-      } else if (this.focusStates.includes('hover')) {
-        this.topMaterial.map = this.labelTextures['hover']
-        sideMaterial = this.constructor.sideMaterials.get('hover')
-      } else {
-        this.object3d.material.map = this.labelTextures['normal']
-        this.topMaterial.map = this.labelTextures['normal']
-        sideMaterial = this.constructor.sideMaterials.get('normal')
-      }
-      this.topMaterial.needsUpdate = true
-      this.cuboid.material = [sideMaterial, sideMaterial, this.topMaterial, sideMaterial, sideMaterial, sideMaterial]
-    }
-
-    this.connections.forEach(connection => {
-      connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
-    })
+    this.cuboid.geometry = BoxGeometryExtension.copyWith(this.cuboid.geometry, width, this.height, depth)
   }
   //#endregion
 
