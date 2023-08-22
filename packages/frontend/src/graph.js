@@ -67,7 +67,7 @@ export class Entity {
 
   buildAllLabels() {
     this.buildLabel()
-    this.updateFocusState()
+    this.updateDisplayState()
   }
 
   buildObject3d(traceMap, options = {}) {
@@ -214,27 +214,59 @@ export class Entity {
 
     if (this.focusStates.includes(state)) return
     this.focusStates.push(state)
-    this.updateFocusState()
+    this.updateDisplayState()
   }
 
   unsetFocusState(state) {
     if (!this.focusStates.includes(state)) return
     this.focusStates.splice(this.focusStates.indexOf(state), 1)
-    this.updateFocusState()
+    this.updateDisplayState()
   }
 
-  updateFocusState() {
-    if (this.baseMaterial) {
-      let color
-      if (this.focusStates.includes('drag')) {
-        color = this.constructor.dragColor
-      } else if (this.focusStates.includes('hover')) {
-        color = this.constructor.hoverColor
-      } else {
-        color = this.constructor.color
-      }
+  setGlowState(state, fraction = 1) {
+    if (!fraction) return this.unsetGlowState(state)
 
-      this.baseMaterial.color.setHex(color)
+    if (this.glowFractions?.[state] === fraction) return
+
+    this.glowFractions ??= {}
+    this.glowFractions[state] = fraction
+    this.updateDisplayState()
+  }
+
+  unsetGlowState(state) {
+    if (!this.glowFractions?.[state]) return
+
+    delete this.glowFractions?.[state]
+    this.updateDisplayState()
+  }
+
+  getGlowFraction(state) {
+    return this.glowFractions?.[state] ?? 0
+  }
+
+  updateDisplayState() {
+    if (this.baseMaterial) {
+      let color = this.constructor.colors[
+        collect(['drag', 'hover']).intersect(this.focusStates).first() ?? 'default'
+      ]
+      let color3d = null
+
+      if (this.glowFractions) {
+        collect(this.glowFractions).each((fraction, state) => {
+          let glowColor = this.constructor.glowColors[state]
+          if (!glowColor) return
+
+          if (!color) color = color3d.getHSL()
+          else if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
+          glowColor = {...color, ...glowColor}
+          let lerpColor = new THREE.Color().setHSL(glowColor.h, glowColor.s, glowColor.l)
+          //color3d = lerpColor.lerpHSL(color3d, 1 - fraction)
+          color3d = lerpColor.lerp(color3d, 1 - fraction) // for our current set of colors, this looks better
+          color = null
+        })
+      }
+      if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
+      this.baseMaterial.color = color3d
       this.baseMaterial.needsUpdate = true
     }
 
@@ -361,8 +393,10 @@ export class OrganizationEntity extends Entity {
   children = []
   childConnections = []
 
-  static color = 0x008000
-  static hoverColor = 0xff0000
+  static colors = {
+    default: { h: 0.333, s: 1, l: 0.25 },
+    hover: { h: 0.333, s: 1, l: 0.5 }
+  }
 
   constructor(organization) {
     super()
@@ -843,8 +877,8 @@ export class TraceEntity extends OrganizationEntity {
   //#endregion
 
   //#region dynamic state
-  updateFocusState() {
-    // No focus state.
+  updateDisplayState() {
+    // No dynamic display state.
   }
 
   //#region interaction
@@ -867,9 +901,11 @@ export class TraceEntity extends OrganizationEntity {
 }
 
 export class PackageEntity extends OrganizationEntity {
-  static color = 0x200000
-  static hoverColor = 0x300000
-  static dragColor = 0x400000
+  static colors = {
+    default: { h: 0, s: 1, l: 0.13 },
+    hover: { h: 0, s: 1, l: 0.16 },
+    drag: { h: 0, s: 1, l: 0.19 }
+  }
 
   constructor($package) {
     super($package)
@@ -877,9 +913,11 @@ export class PackageEntity extends OrganizationEntity {
 }
 
 export class ClassCategoryEntity extends OrganizationEntity {
-  static color = 0x201000
-  static hoverColor = 0x300800
-  static dragColor = 0x402000
+  static colors = {
+    default: { h: 0.083, s: 1, l: 0.13 },
+    hover: { h: 0.083, s: 1, l: 0.16 },
+    drag: { h: 0.083, s: 1, l: 0.19 }
+  }
 
   constructor(category) {
     super(category)
@@ -887,9 +925,11 @@ export class ClassCategoryEntity extends OrganizationEntity {
 }
 
 export class ClassEntity extends OrganizationEntity {
-  static color = 0x202000
-  static hoverColor = 0x303000
-  static dragColor = 0x404000
+  static colors = {
+    default: { h: 0.167, s: 1, l: 0.13 },
+    hover: { h: 0.167, s: 1, l: 0.16 },
+    drag: { h: 0.167, s: 1, l: 0.19 }
+  }
 
   constructor($class) {
     super($class)
@@ -897,9 +937,14 @@ export class ClassEntity extends OrganizationEntity {
 }
 
 export class ObjectEntity extends OrganizationEntity {
-  static color = 0x002000
-  static hoverColor = 0x003000
-  static dragColor = 0x004000
+  static colors = {
+    default: { h: 0.333, s: 1, l: 0.13 },
+    hover: { h: 0.333, s: 1, l: 0.16 },
+    drag: { h: 0.333, s: 1, l: 0.19 }
+  }
+  static glowColors = {
+    active: { h: 0 }
+  }
 
   static headerHeight = 3.5
   static fieldHeight = 3
@@ -983,9 +1028,13 @@ export class ObjectEntity extends OrganizationEntity {
 }
 
 export class FieldEntity extends Entity {
-  static color = 0x004000
-  static hoverColor = 0x006000
-  static dragColor = 0x008000
+  static colors = {
+    default: { h: 0, s: 0, l: 0.25 },
+    hover: { h: 0, s: 0, l: 0.5 },
+    drag: { h: 0, s: 0, l: 0.75 }
+  }
+
+  static opacity = 0.5
 
   static sideMaterials = undefined
 
@@ -997,7 +1046,7 @@ export class FieldEntity extends Entity {
 
   /** A twin entity that holds all shared resources. If this is not null, the receiver will only work as a shallow copy of the primary with regard to these resources. Memory optimization. */
   primary = null
-  /** Twin entities that have a common hovering state. */
+  /** Twin entities that have a common display state. */
   twins = []
 
   //#region accessors
@@ -1026,7 +1075,8 @@ export class FieldEntity extends Entity {
         roughness: 0.75,
         metalness: 0,
         flatShading: true,
-        transparent: true
+        transparent: true,
+        opacity: this.constructor.opacity
       })
       this.topMaterial = new THREE.MeshStandardMaterial({
         roughness: 0.75,
@@ -1083,6 +1133,33 @@ export class FieldEntity extends Entity {
   //#region layout
   adoptSize(width, depth) {
     this.cuboid.geometry = BoxGeometryExtension.copyWith(this.cuboid.geometry, width, this.height, depth)
+  }
+  //#endregion
+
+  //#region dynamic state
+  setFocusState(state, bool) {
+    if (!this.primary) return super.setFocusState(state, bool)
+    return this.primary.setFocusState(state, bool)
+  }
+
+  unsetFocusState(state) {
+    if (!this.primary) return super.unsetFocusState(state)
+    return this.primary.unsetFocusState(state)
+  }
+
+  setGlowState(state, bool) {
+    if (!this.primary) return super.setGlowState(state, bool)
+    return this.primary.setGlowState(state, bool)
+  }
+
+  unsetGlowState(state) {
+    if (!this.primary) return super.unsetGlowState(state)
+    return this.primary.unsetGlowState(state)
+  }
+
+  getGlowFraction(state) {
+    if (!this.primary) return super.getGlowFraction(state)
+    return this.primary.getGlowFraction(state)
   }
   //#endregion
 
@@ -1157,7 +1234,7 @@ export class Connection {
       this.line.add(cone)
     }
 
-    this.updateFocusState()
+    this.updateDisplayState()
     this.updatePosition()
 
     return this.line
@@ -1208,16 +1285,16 @@ export class Connection {
 
     if (this.focusStates.includes(state)) return
     this.focusStates.push(state)
-    this.updateFocusState()
+    this.updateDisplayState()
   }
 
   unsetFocusState(state) {
     if (!this.focusStates.includes(state)) return
     this.focusStates.splice(this.focusStates.indexOf(state), 1)
-    this.updateFocusState()
+    this.updateDisplayState()
   }
 
-  updateFocusState() {
+  updateDisplayState() {
     if (this.focusStates.includes('hoverEntity')) {
       this.line.material.opacity = this.constructor.hoverOpacity
       this.chevronCones.forEach(head => head.material.opacity = this.constructor.hoverOpacity)
