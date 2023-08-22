@@ -560,11 +560,11 @@ traceMap.reloadTrace()
     this.render()
   }
 
-  buildTrace(traceEntity) {
-    if (this.traceEntity) this.scene.remove(this.traceEntity)
+  buildTrace(traceObject3d) {
+    if (this.traceObject3d) this.scene.remove(this.traceObject3d)
 
-    this.traceEntity = traceEntity
-    this.scene.add(traceEntity)
+    this.traceObject3d = traceObject3d
+    this.scene.add(traceObject3d)
 
     this.render()
   }
@@ -589,9 +589,9 @@ traceMap.reloadTrace()
   }
 
   reloadTrace() {
-    const traceEntity = this.entityBuilder.build(this)
+    const traceObject3d = this.entityBuilder.build(this)
 
-    this.buildTrace(traceEntity)
+    this.buildTrace(traceObject3d)
   }
   //#endregion
 
