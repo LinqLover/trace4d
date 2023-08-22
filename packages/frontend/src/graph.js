@@ -745,7 +745,7 @@ export class OrganizationEntity extends Entity {
         const depth = Math.max(collect(d3Nodes).map(d3Node => d3Node.y).max(), -collect(d3Nodes).map(d3Node => d3Node.y).min()) * 2
         this.adoptSize(width + offset, depth + offset)
 
-        traceMap.render()
+        traceMap.updateScene()
       })
       .restart()
 

@@ -340,7 +340,7 @@ export class TraceMap {
     this.buildControls()
     this.buildScene()
 
-    this.render()
+    this.renderer.setAnimationLoop(() => this.render())
   }
 
   buildConsoleInterface() {
@@ -386,7 +386,7 @@ traceMap.reloadTrace()
     this.mapControls.enableRotate = true
     // Enforce the camera to be above the ground plane
     this.mapControls.maxPolarAngle = Math.PI / 2 - 0.1
-    this.mapControls.addEventListener('change', () => this.render())
+    this.mapControls.addEventListener('change', () => this.updateScene())
     this.mapControls.listenToKeyEvents(this.window.document)
   }
 
@@ -404,7 +404,7 @@ traceMap.reloadTrace()
       this.dragEntity = event.object.entity
       this.lastDragEvent = event
       event.object.entity?.onDrag?.(event)
-      this.render()
+      this.updateScene()
     })
     this.dragControls.enabled = false
   }
@@ -469,8 +469,8 @@ traceMap.reloadTrace()
         this.dragEntity?.onDragStart?.(event)
       }
 
-      this.render()
       this.updateCursor()
+      this.updateScene()
     }, { capture: true })
     this.renderer.domElement.parentElement.addEventListener('mousemove', event => {
       // required for updating mouseOverEntities, see references
@@ -506,8 +506,8 @@ traceMap.reloadTrace()
         this.dragEntity = this.focusEntity
         this.dragEntity?.onDragStart?.(event)
 
-        this.render()
         this.updateCursor(event)
+        this.updateScene()
       }
     }, false)
     this.window.addEventListener('keyup', event => {
@@ -518,8 +518,8 @@ traceMap.reloadTrace()
         this.dragEntity?.onDragEnd?.(event)
         this.dragEntity = null
 
-        this.render()
         this.updateCursor(event)
+        this.updateScene()
       }
     }, false)
   }
@@ -557,7 +557,7 @@ traceMap.reloadTrace()
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-    this.render()
+    this.updateScene()
   }
 
   buildTrace(traceObject3d) {
@@ -566,7 +566,7 @@ traceMap.reloadTrace()
     this.traceObject3d = traceObject3d
     this.scene.add(traceObject3d)
 
-    this.render()
+    this.updateScene()
   }
   //#endregion
 
@@ -596,8 +596,15 @@ traceMap.reloadTrace()
   //#endregion
 
   //#region updating
+  updateScene() {
+    this.renderRequired = true
+  }
+
   render() {
-    this.renderer.render(this.scene, this.camera)
+    if (this.renderRequired) {
+      this.renderer.render(this.scene, this.camera)
+      this.renderRequired = false
+    }
 
     this.stats?.update()
   }
