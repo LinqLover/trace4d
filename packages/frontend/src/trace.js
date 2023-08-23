@@ -61,6 +61,10 @@ export class TraceFrame {
     this.children = children
   }
 
+  allFrames() {
+    return [this, ...this.children.flatMap(child => child.allFrames())]
+  }
+
   toString() {
     return `${this.receiver.class.name}>>${this.message}`
   }
