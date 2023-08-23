@@ -12,26 +12,54 @@ export class Player extends EventEmitter {
     //#endregion
 
     //#region constructor
-    constructor(trace, traceEntity) {
+    constructor(domElement) {
         super()
 
-        this.cursor = trace.createCursor()
-        this.traceEntity = traceEntity
-        this.updateEntities()
+        this.domElement = domElement
+
+        this.init()
     }
 
-    install() {
-        this.isInstalled = true
+    init() {
+        this.playButton.addEventListener('click', () => this.start())
+        this.pauseButton.addEventListener('click', () => this.pause())
+        this.on('isPlaying', isPlaying => this.domElement.classList.toggle('playing', isPlaying))
+
         setTimeout(() => this.tick(), 0)
     }
 
-    uninstall() {
-        this.isInstalled = false
+    setToTrace(trace, traceEntity) {
+        this.cursor = trace.createCursor()
+        this.traceEntity = traceEntity
+
+        this.updateEntities()
+    }
+    //#endregion
+
+    //#region accessors
+    get currentTime() {
+        return this.cursor.currentTime
+    }
+
+    set currentTime(value) {
+        this._tick(value - this.currentTime)
+    }
+
+    get playButton() {
+        return this.domElement.querySelector('#player-play')
+    }
+
+    get pauseButton() {
+        return this.domElement.querySelector('#player-pause')
     }
     //#endregion
 
     //#region control
     start() {
+        if (!this.canStepForward()) {
+            this.reset()
+        }
+
         this.resume()
     }
 
@@ -47,29 +75,21 @@ export class Player extends EventEmitter {
 
     resume() {
         this.isPlaying = true
+        this.emit('isPlaying', true)
     }
 
     pause() {
         this.isPlaying = false
+        this.emit('isPlaying', false)
     }
 
     reset() {
         this.resetSteps()
     }
-
-    get currentTime() {
-        return this.cursor.currentTime
-    }
-
-    set currentTime(value) {
-        this._tick(value - this.currentTime)
-    }
     //#endregion
 
     //#region steps
     tick() {
-        if (!this.isInstalled) return
-
         setTimeout(() => this.tick(), 1000 / this.ticksPerSecond)
 
         if (this.isPlaying) {
@@ -83,6 +103,8 @@ export class Player extends EventEmitter {
      * @param {*} steps If undefined, steps are calculated from the time since the last tick.
      */
     _tick(steps = undefined) {
+        if (!this.cursor) return
+
         const now = Date.now()
         const secondsSinceLastTick = (now - this.lastTick) / 1000
 
@@ -125,7 +147,7 @@ export class Player extends EventEmitter {
     }
 
     resetSteps() {
-        this.cursor.reset()
+        this.cursor?.reset()
     }
 
     canStepForward() {

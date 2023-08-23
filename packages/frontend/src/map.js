@@ -339,12 +339,11 @@ export class TraceMap {
     threeElement.appendChild(this.renderer.domElement)
     new ResizeObserver(() => this.updateViewport()).observe(threeElement)
 
-    const timelineElement = domElement.querySelector('#timeline')
-    this.timeline = new Timeline(timelineElement)
-
     this.buildConsoleInterface()
     this.buildControls()
     this.buildScene()
+    const playerElement = domElement.querySelector('#player')
+    this.buildPlayer(playerElement)
 
     this.renderer.setAnimationLoop(() => this.render())
   }
@@ -567,6 +566,29 @@ traceMap.reloadTrace()
     this.updateScene()
   }
 
+  buildPlayer(domElement) {
+    this.player = new Player(domElement)
+    this.player.on('step', () => this.updateScene())
+    const timelineElement = domElement.querySelector('#timeline')
+    this.timeline = new Timeline(timelineElement)
+
+    this.player.on('step', () => this.timeline.time = this.player.cursor.currentTime)
+    {
+      let wasPlaying = false
+      this.timeline.on('startDrag', () => {
+        wasPlaying = this.player.isPlaying
+        this.player.pause()
+      })
+      this.timeline.on('endDrag', () => {
+        if (wasPlaying) {
+          this.player.resume()
+        }
+      })
+    }
+    // NB: if this gets too slow, debounce updates
+    this.timeline.on('time', () => this.player.currentTime = this.timeline.time)
+  }
+
   buildTrace(traceObject3d) {
     if (this.traceObject3d) this.scene.remove(this.traceObject3d)
 
@@ -597,42 +619,23 @@ traceMap.reloadTrace()
 
   reloadTrace() {
     if (this.player) {
-      this.player.uninstall()
-      this.player = null
+      this.player.reset()
     }
 
     const traceObject3d = this.entityBuilder.build(this)
 
     this.buildTrace(traceObject3d)
 
-    this.loadPlayer()
+    this.reloadPlayer()
 
     setTimeout(() => this.player.start(), 3000) // TODO: Don't harcode
   }
 
-  loadPlayer() {
-    this.player = new Player(this.trace, this.traceObject3d.entity)
-    this.player.on('step', () => this.updateScene())
-
+  reloadPlayer() {
     this.timeline.minTime = this.trace.rootFrame.startTime
     this.timeline.maxTime = this.trace.rootFrame.endTime
-    this.player.on('step', () => this.timeline.time = this.player.cursor.currentTime)
-    {
-      let wasPlaying = false
-      this.timeline.on('startDrag', () => {
-        wasPlaying = this.player.isPlaying
-        this.player.pause()
-      })
-      this.timeline.on('endDrag', () => {
-        if (wasPlaying) {
-          this.player.resume()
-        }
-      })
-    }
-    // NB: if this gets too slow, debounce updates
-    this.timeline.on('time', () => this.player.currentTime = this.timeline.time)
 
-    this.player.install()
+    this.player.setToTrace(this.trace, this.traceObject3d.entity)
   }
   //#endregion
 
