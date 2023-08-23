@@ -240,21 +240,32 @@ export class TraceCursor {
     this.currentStack = []
   }
 
-  step(steps = Infinity, options = {}) {
+  step(steps, options = {}) {
+    if (steps > 0) {
+      steps = Math.min(steps, this.endTime + 1 - this.currentTime)
+      this.stepForward(steps, options)
+    } else if (steps < 0) {
+      steps = Math.max(steps, this.startTime - 1 - this.currentTime)
+      this.stepBackward(-steps, options)
+    }
+  }
+
+  stepTo(time, options = {}) {
+    this.step(time - this.currentTime, options)
+  }
+
+  stepForward(steps, options = {}) {
     const { visitFrame } = options
 
     if (this.currentTime === this.startTime - 1) {
       this.currentTime++
-      this.stepInto(this.trace.rootFrame)
+      this._stepInto(this.trace.rootFrame)
     }
 
     let stepsLeft = steps
     while (stepsLeft > 0) {
       if (this.currentStack.length === 0) {
-        /* if (isFinite(stepsLeft)) {
-          throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
-        } */
-        break
+        throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
       }
 
       const currentFrame = this.currentStack[this.currentStack.length - 1]
@@ -272,19 +283,64 @@ export class TraceCursor {
         this.currentTime += timeUntilNextFrame
         stepsLeft -= timeUntilNextFrame
         if (nextChild != null) {
-          this.stepInto(nextChild)
+          this._stepInto(nextChild)
         } else {
-          this.stepOut()
+          this._stepOut()
         }
       }
     }
   }
 
-  stepInto(frame) {
+  stepBackward(steps, options = {}) {
+    const { visitFrame } = options
+
+    if (this.currentTime === this.endTime + 1) {
+      this.currentTime--
+      this._stepInto(this.trace.rootFrame)
+    }
+
+    let stepsLeft = steps
+    while (stepsLeft > 0) {
+      if (this.currentStack.length === 0) {
+        throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
+      }
+
+      const currentFrame = this.currentStack[this.currentStack.length - 1]
+      const previousChild = currentFrame.children.slice().reverse().find(child => child.endTime < this.currentTime)
+      const previousFrameTime = previousChild ? previousChild.endTime : currentFrame.startTime - 1
+      const timeUntilPreviousFrame = this.currentTime - previousFrameTime
+      if (timeUntilPreviousFrame > 0) {
+        visitFrame?.(currentFrame, this)
+      }
+
+      if (timeUntilPreviousFrame > stepsLeft) {
+        this.currentTime -= stepsLeft
+        stepsLeft = 0
+      } else {
+        this.currentTime -= timeUntilPreviousFrame
+        stepsLeft -= timeUntilPreviousFrame
+        if (previousChild != null) {
+          this._stepInto(previousChild)
+        } else {
+          this._stepOut()
+        }
+      }
+    }
+  }
+
+  canStepForward(steps = 1) {
+    return this.currentTime + steps <= this.endTime
+  }
+
+  canStepBackward(steps = 1) {
+    return this.currentTime - steps >= this.startTime
+  }
+
+  _stepInto(frame) {
     this.currentStack.push(frame)
   }
 
-  stepOut() {
+  _stepOut() {
     this.currentStack.pop()
   }
   //#endregion

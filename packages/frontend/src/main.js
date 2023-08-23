@@ -25,7 +25,7 @@ async function init() {
   delete options.style
   Object.assign(traceMap.options, options)
 
-  traceMap.buildMap(document.getElementById('container'))
+  traceMap.buildMap(document.querySelector('#container'))
   await traceMap.loadTraceFromServerFile(traceUrl, style)
 }
 

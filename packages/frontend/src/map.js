@@ -5,7 +5,7 @@ import Stats from 'stats.js'
 import * as THREE from 'three'
 
 import { ClassCategoryEntity, ClassEntity, FieldEntity, ObjectEntity, PackageEntity, TraceEntity } from './graph.js'
-import { Player } from './player.js'
+import { Player, Timeline } from './player.js'
 import { TraceReader } from './trace.js'
 
 
@@ -334,8 +334,13 @@ export class TraceMap {
 
     this.window = domElement.ownerDocument.defaultView || domElement.ownerDocument.parentWindow
     this.window.traceMap = this
-    domElement.appendChild(this.renderer.domElement)
-    new ResizeObserver(() => this.updateViewport()).observe(domElement)
+
+    const threeElement = domElement.querySelector('#three')
+    threeElement.appendChild(this.renderer.domElement)
+    new ResizeObserver(() => this.updateViewport()).observe(threeElement)
+
+    const timelineElement = domElement.querySelector('#timeline')
+    this.timeline = new Timeline(timelineElement)
 
     this.buildConsoleInterface()
     this.buildControls()
@@ -591,12 +596,43 @@ traceMap.reloadTrace()
   }
 
   reloadTrace() {
+    if (this.player) {
+      this.player.uninstall()
+      this.player = null
+    }
+
     const traceObject3d = this.entityBuilder.build(this)
 
     this.buildTrace(traceObject3d)
-    this.player = new Player(this.trace, this.traceObject3d.entity, this)
-    
+
+    this.loadPlayer()
+
     setTimeout(() => this.player.start(), 3000) // TODO: Don't harcode
+  }
+
+  loadPlayer() {
+    this.player = new Player(this.trace, this.traceObject3d.entity)
+    this.player.on('step', () => this.updateScene())
+
+    this.timeline.minTime = this.trace.rootFrame.startTime
+    this.timeline.maxTime = this.trace.rootFrame.endTime
+    this.player.on('step', () => this.timeline.time = this.player.cursor.currentTime)
+    {
+      let wasPlaying = false
+      this.timeline.on('startDrag', () => {
+        wasPlaying = this.player.isPlaying
+        this.player.pause()
+      })
+      this.timeline.on('endDrag', () => {
+        if (wasPlaying) {
+          this.player.resume()
+        }
+      })
+    }
+    // NB: if this gets too slow, debounce updates
+    this.timeline.on('time', () => this.player.currentTime = this.timeline.time)
+
+    this.player.install()
   }
   //#endregion
 

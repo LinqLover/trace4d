@@ -781,17 +781,31 @@ export class OrganizationEntity extends Entity {
           child.moveTo(child.d3Node.x, y + child.object3d.geometry.parameters.height / 2, child.d3Node.y)
         })
 
+        /** Dispatch event without capturing/bubbling */
+        function processEvent(domElement, event) {
+          const dummy = document.createElement('div')
+          // WORKAROUND: Must not unhang three.js container
+          //domElement.replaceWith(dummy)
+          event.isT4dSimulated = true
+          try {
+            domElement.dispatchEvent(event)
+          } finally {
+            //dummy.replaceWith(domElement)
+            delete event.isT4dSimulated
+          }
+        }
+
         // Update DragControls to override forced position of dragged node
         // HACKED: simulate drag (onpointermove) if currently dragging
         if (traceMap.lastMouseMoveEvent != null) {
           Promise.resolve().then(() => {
             // TODO: updateCursor() is reached but cursor is not updated
-            traceMap.renderer.domElement.dispatchEvent(traceMap.lastMouseMoveEvent)
+            processEvent(traceMap.renderer.domElement, traceMap.lastMouseMoveEvent)
           })
         }
         if (traceMap.lastPointerMoveEvent != null) {
           Promise.resolve().then(() => {
-            traceMap.renderer.domElement.dispatchEvent(traceMap.lastPointerMoveEvent)
+            processEvent(traceMap.renderer.domElement, traceMap.lastPointerMoveEvent)
           })
         }
 

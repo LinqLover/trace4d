@@ -6,6 +6,7 @@
     "collect.js": "^4.36.1",
     "d3-force": "^3.0.0",
     "d3-random": "^3.0.1",
+    "eventemitter3": "^5.0.1",
     "stats.js": "^0.17.0",
     "three": "^0.152.2"
   },
