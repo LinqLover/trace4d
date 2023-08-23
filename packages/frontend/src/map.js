@@ -642,6 +642,8 @@ traceMap.reloadTrace()
 
     this.camera.aspect = this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight
     this.camera.updateProjectionMatrix()
+
+    this.updateScene()
   }
   //#endregion
 }
