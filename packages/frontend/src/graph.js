@@ -167,11 +167,12 @@ export class Entity {
       const margin = options.margin ?? 0
 
       context.fillStyle = textColor
-      context.font = `bolder ${360 * fontScale * resolution / 1024}px Comic Sans MS`
+      const fontSize = 360 * fontScale * resolution / 1024 // TODO: do not hardcode
+      context.font = `bolder ${fontSize}px Comic Sans MS`
       const textWidth = context.measureText(text).width
 
       let offsetY = canvas.height * margin
-      offsetY += 90 * 3 * fontScale * resolution / 1024 // TODO: do not hardcode
+      offsetY += .75 * fontSize
       let offsetX = canvas.width * margin
       if (allSides) {
         offsetX = offsetY
