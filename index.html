@@ -10,16 +10,57 @@
         margin: 0;
       }
 
+      .overlay {
+        background-color: #000000a0;
+        position: fixed;
+        overflow: hidden;
+      }
+
+      .has-touch-handler {
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
       #container {
         width: 100%;
         height: 100%;
       }
+
+      #three {
+        width: 100%;
+        height: 100%;
+      }
+
+      #timeline {
+        bottom: 4vh;
+        left: 4vw;
+        right: 4vw;
+        height: 5%;
+
+        cursor: pointer;
+      }
+
+      #cursor {
+        position: relative;
+        left: 0;
+        top: 0;
+        width: .2em;
+        height: 100%;
+        background-color: #ffffff;
+        /* glow */
+        box-shadow: 0 0 6px #ffffff;
+      }
     </style>
-    <script type="module" crossorigin src="./assets/index-aa8b3924.js"></script>
+    <script type="module" crossorigin src="./assets/index-72757d4b.js"></script>
   </head>
 
   <body>
     
-    <div id="container"></div>
+    <div id="container">
+      <div id="three"></div>
+      <div id="timeline" class="overlay has-touch-handler">
+        <div id="cursor" class="has-touch-handler"></div>
+      </div>
+    </div>
   </body>
 </html>
