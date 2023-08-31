@@ -10,6 +10,10 @@
         margin: 0;
       }
 
+      .overlay-container {
+        position: fixed;
+      }
+
       .overlay {
         overflow: hidden;
         height: 100%;
@@ -109,7 +113,7 @@
 
   <body>
     <script type="module" src="main.js"></script>
-    <script src="resizers.js"></script>
+    <script type="module" src="resizers.js"></script>
     <div id="container">
       <div id="three"></div>
       <div id="player-container" class="overlay-container">
