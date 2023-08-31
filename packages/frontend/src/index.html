@@ -11,8 +11,16 @@
       }
 
       .overlay {
-        position: fixed;
         overflow: hidden;
+        height: 100%;
+      }
+
+      .resizer[data-direction='vertical'] {
+        cursor: ns-resize;
+        height: 4px;
+        width: 100%;
+        position: absolute;
+        z-index: 2;
       }
 
       .has-touch-handler {
@@ -30,12 +38,15 @@
         height: 100%;
       }
 
-      #player {
+      #player-container {
         bottom: 4vh;
         left: 4vw;
         right: 4vw;
         height: 5%;
+        min-height: 4%;
+      }
 
+      #player {
         background-color: #000000a0;
 
         display: flex;
@@ -98,19 +109,21 @@
 
   <body>
     <script type="module" src="main.js"></script>
+    <script src="resizers.js"></script>
     <div id="container">
       <div id="three"></div>
-      <div id="player" class="overlay">
-        <div>
+      <div id="player-container" class="overlay-container">
+        <div class="resizer" data-direction="vertical" data-edge="bottom"></div>
+        <div id="player" class="overlay">
           <button id="player-play" class="player-button has-touch-handler">
             <i class="fas fa-play"></i>
           </button>
           <button id="player-pause" class="player-button has-touch-handler">
             <i class="fas fa-pause"></i>
           </button>
-        </div>
-        <div id="timeline" class="has-touch-handler">
-          <div id="cursor" class="has-touch-handler"></div>
+          <div id="timeline" class="has-touch-handler">
+            <div id="cursor" class="has-touch-handler"></div>
+          </div>
         </div>
       </div>
     </div>
