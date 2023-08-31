@@ -224,7 +224,6 @@ export class Timeline extends EventEmitter {
     onPointerMove(event) {
         if (event.isT4dSimulated) return
         if (!this.dragging) return
-        console.log('move', event)
 
         this.setCursorFromPointer(event)
     }
