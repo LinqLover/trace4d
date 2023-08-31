@@ -334,6 +334,11 @@ export class Entity {
   }
 
   onClick(event) {
+    if (event.ctrlKey) {
+      this.unpinD3Node()
+      return
+    }
+
     window.selectedEntity = this
     console.log(this.object ?? this.organization ?? this)
 
@@ -361,8 +366,10 @@ export class Entity {
     this.moved()
 
     if (this.d3Node) {
-      this.d3Node.x = /* this.d3Node.fx = */ this.object3d.position.x
-      this.d3Node.y = /* this.d3Node.fy = */ this.object3d.position.z
+      this.d3Node.x = this.object3d.position.x
+      this.d3Node.y = this.object3d.position.z
+
+      this.pinD3Node()
     }
   }
 
@@ -407,6 +414,16 @@ export class Entity {
     this.connections.forEach(connection => {
       connection.updatePosition()
     })
+  }
+
+  pinD3Node() {
+    this.d3Node.fx = this.d3Node.x
+    this.d3Node.fy = this.d3Node.y
+  }
+
+  unpinD3Node() {
+    delete this.d3Node.fx
+    delete this.d3Node.fy
   }
   //#endregion
 }
