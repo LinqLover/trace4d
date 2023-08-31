@@ -112,8 +112,9 @@
   </head>
 
   <body>
-    <script type="module" src="main.js"></script>
     <script type="module" src="resizers.js"></script>
+    <!-- Must be the LAST imported script or all others will be blocked in vite build -->
+    <script type="module" src="main.js"></script>
     <div id="container">
       <div id="three"></div>
       <div id="player-container" class="overlay-container">
