@@ -628,10 +628,10 @@ traceMap.reloadTrace()
   }
 
   reloadPlayer() {
-    this.timeline.minTime = this.trace.rootFrame.startTime
-    this.timeline.maxTime = this.trace.rootFrame.endTime
-
     this.player.setToTrace(this.trace, this.traceObject3d.entity)
+
+    this.timeline.minTime = this.player.cursor.startTime
+    this.timeline.maxTime = this.player.cursor.endTime
   }
   //#endregion
 

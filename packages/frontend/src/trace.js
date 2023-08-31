@@ -11,6 +11,14 @@ export class Trace {
   createCursor() {
     return new TraceCursor(this)
   }
+
+  maxStackDepth() {
+    let maxDepth = 0
+    this.createCursor().stepAll({
+      visitFrame: (_frame, cursor) => maxDepth = Math.max(maxDepth, cursor.currentStack.length)
+    })
+    return maxDepth
+  }
 }
 
 export class TraceObject {
@@ -66,8 +74,12 @@ export class TraceFrame {
     return [this, ...this.children.flatMap(child => child.allFrames())]
   }
 
-  toString() {
+  get name() {
     return `${this.receiver.class.name}>>${this.message}`
+  }
+
+  toString() {
+    return this.name
   }
 }
 

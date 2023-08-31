@@ -13,6 +13,7 @@ import { TraceObject } from './trace.js'
 export class Entity {
   parent = null
   focusStates = []
+  static allFocusStates = ['hover', 'drag']
   connections = []
   hoveredEntities = []
 
@@ -257,35 +258,42 @@ export class Entity {
     return this.glowFractions?.[state] ?? 0
   }
 
+  getDisplayColor(glow = true) {
+    let color = this.constructor.colors[
+      collect(this.focusStates).intersect(this.constructor.allFocusStates).first() ?? 'default'
+    ]
+    let color3d = null
+
+    if (glow && this.glowFractions) {
+      collect(this.glowFractions).each((fraction, state) => {
+        let glowColor = this.constructor.glowColors[state]
+        if (!glowColor) return
+
+        if (!color) color = color3d.getHSL({})
+        else if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
+        glowColor = {...color, ...glowColor}
+        let lerpColor = new THREE.Color().setHSL(glowColor.h, glowColor.s, glowColor.l)
+        //color3d = lerpColor.lerpHSL(color3d, 1 - fraction)
+        color3d = lerpColor.lerp(color3d, 1 - fraction) // for our current set of colors, this looks better
+        color = null
+      })
+    }
+    if (!color) color = color3d.getHSL({})
+    else if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
+
+    return [color, color3d]
+  }
+
   updateDisplayState() {
     if (this.baseMaterial) {
-      let color = this.constructor.colors[
-        collect(['drag', 'hover']).intersect(this.focusStates).first() ?? 'default'
-      ]
-      let color3d = null
-
-      if (this.glowFractions) {
-        collect(this.glowFractions).each((fraction, state) => {
-          let glowColor = this.constructor.glowColors[state]
-          if (!glowColor) return
-
-          if (!color) color = color3d.getHSL()
-          else if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
-          glowColor = {...color, ...glowColor}
-          let lerpColor = new THREE.Color().setHSL(glowColor.h, glowColor.s, glowColor.l)
-          //color3d = lerpColor.lerpHSL(color3d, 1 - fraction)
-          color3d = lerpColor.lerp(color3d, 1 - fraction) // for our current set of colors, this looks better
-          color = null
-        })
-      }
-      if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
+      let [_, color3d] = this.getDisplayColor()
       this.baseMaterial.color = color3d
       this.baseMaterial.needsUpdate = true
     }
     this.traceMap.updateScene()
 
     this.connections.forEach(connection => {
-      connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
+      connection.setFocusState('hoverEntity', collect(this.focusStates).intersect(this.constructor.allFocusStates).isNotEmpty())
     })
   }
 
