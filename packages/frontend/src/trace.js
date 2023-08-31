@@ -278,7 +278,7 @@ export class TraceCursor {
         throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
       }
 
-      const currentFrame = this.currentFrame]
+      const currentFrame = this.currentFrame
       const nextChild = currentFrame.children.find(child => child.startTime > this.currentTime)
       const nextFrameTime = nextChild ? nextChild.startTime : currentFrame.endTime + 1
       const timeUntilNextFrame = nextFrameTime - this.currentTime
