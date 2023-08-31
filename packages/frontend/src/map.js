@@ -476,7 +476,6 @@ traceMap.reloadTrace()
       }
 
       this.updateCursor()
-      this.updateScene()
     }, { capture: true })
     this.renderer.domElement.parentElement.addEventListener('mousemove', event => {
       // required for updating mouseOverEntities, see references
@@ -513,7 +512,6 @@ traceMap.reloadTrace()
         this.dragEntity?.onDragStart?.(event)
 
         this.updateCursor(event)
-        this.updateScene()
       }
     }, false)
     this.window.addEventListener('keyup', event => {
@@ -525,7 +523,6 @@ traceMap.reloadTrace()
         this.dragEntity = null
 
         this.updateCursor(event)
-        this.updateScene()
       }
     }, false)
   }
@@ -568,7 +565,6 @@ traceMap.reloadTrace()
 
   buildPlayer(domElement) {
     this.player = new Player(domElement)
-    this.player.on('step', () => this.updateScene())
     const timelineElement = domElement.querySelector('#timeline')
     this.timeline = new Timeline(timelineElement)
 

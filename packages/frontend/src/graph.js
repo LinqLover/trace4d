@@ -81,6 +81,8 @@ export class Entity {
   }
 
   buildObject3d(traceMap, options = {}) {
+    this.traceMap = traceMap
+
     const cuboidGeometry = this.buildCuboidGeometry(traceMap)
     this.cuboid = new THREE.Mesh(cuboidGeometry)
     this.cuboid.castShadow = true
@@ -280,6 +282,7 @@ export class Entity {
       this.baseMaterial.color = color3d
       this.baseMaterial.needsUpdate = true
     }
+    this.traceMap.updateScene()
 
     this.connections.forEach(connection => {
       connection.setFocusState('hoverEntity', this.focusStates.includes('hover') || this.focusStates.includes('drag'))
@@ -879,6 +882,7 @@ export class TraceEntity extends OrganizationEntity {
 
   //#region building
   build(traceMap, options = {}) {
+    this.traceMap = traceMap
     const planeGeometry = new THREE.PlaneGeometry(100, 100)
     planeGeometry.rotateX(-Math.PI / 2)
     this.plane = new THREE.Mesh(planeGeometry, this.constructor.planeMaterial)
@@ -1093,6 +1097,7 @@ export class FieldEntity extends Entity {
 
   //#region building
   buildObject3d(traceMap, options = {}) {
+    this.traceMap = traceMap
     const cuboidGeometry = new THREE.BoxGeometry(10, .1, 2.5)
     this.cuboid = new THREE.Mesh(cuboidGeometry)
 
