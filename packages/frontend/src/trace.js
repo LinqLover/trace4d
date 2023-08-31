@@ -57,6 +57,7 @@ export class TraceFrame {
     this.arguments = $arguments
     this.answer = answer
     this.startTime = startTime
+    /** inclusive */
     this.endTime = endTime
     this.children = children
   }
@@ -214,16 +215,21 @@ export class TraceReader {
 export class TraceCursor {
   //#region properties
   trace
+  /** Integer inside [startTime, endTime] */
   currentTime
   /** Last item is top frame */
   currentStack
+
+  get currentFrame() {
+    return this.currentStack[this.currentStack.length - 1]
+  }
 
   get startTime() {
     return this.trace.rootFrame.startTime
   }
 
   get endTime() {
-    return this.trace.rootFrame.endTime
+    return this.trace.rootFrame.endTime + 1
   }
   //#endregion
 
@@ -236,31 +242,35 @@ export class TraceCursor {
 
   //#region steps
   reset() {
-    this.currentTime = this.startTime - 1
-    this.currentStack = []
+    this.currentTime = this.startTime
+    this.currentStack = [this.trace.rootFrame]
   }
 
   step(steps, options = {}) {
+    // steps must be an integer
+    console.assert(steps === Math.floor(steps))
+
     if (steps > 0) {
-      steps = Math.min(steps, this.endTime + 1 - this.currentTime)
+      steps = Math.min(steps, this.endTime - this.currentTime)
       this.stepForward(steps, options)
     } else if (steps < 0) {
-      steps = Math.max(steps, this.startTime - 1 - this.currentTime)
+      steps = Math.max(steps, this.startTime - this.currentTime)
       this.stepBackward(-steps, options)
     }
+
+    return this
+  }
+
+  stepAll(options = {}) {
+    return this.stepTo(this.endTime, options)
   }
 
   stepTo(time, options = {}) {
-    this.step(time - this.currentTime, options)
+    return this.step(time - this.currentTime, options)
   }
 
   stepForward(steps, options = {}) {
     const { visitFrame } = options
-
-    if (this.currentTime === this.startTime - 1) {
-      this.currentTime++
-      this._stepInto(this.trace.rootFrame)
-    }
 
     let stepsLeft = steps
     while (stepsLeft > 0) {
@@ -268,7 +278,7 @@ export class TraceCursor {
         throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
       }
 
-      const currentFrame = this.currentStack[this.currentStack.length - 1]
+      const currentFrame = this.currentFrame]
       const nextChild = currentFrame.children.find(child => child.startTime > this.currentTime)
       const nextFrameTime = nextChild ? nextChild.startTime : currentFrame.endTime + 1
       const timeUntilNextFrame = nextFrameTime - this.currentTime
@@ -294,18 +304,21 @@ export class TraceCursor {
   stepBackward(steps, options = {}) {
     const { visitFrame } = options
 
-    if (this.currentTime === this.endTime + 1) {
-      this.currentTime--
-      this._stepInto(this.trace.rootFrame)
-    }
+    if (steps <= 0) return
 
     let stepsLeft = steps
+    if (this.currentTime === this.endTime) {
+      this.currentTime -= 1
+      this._stepInto(this.trace.rootFrame)
+      stepsLeft -= 1
+    }
+
     while (stepsLeft > 0) {
       if (this.currentStack.length === 0) {
         throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
       }
 
-      const currentFrame = this.currentStack[this.currentStack.length - 1]
+      const currentFrame = this.currentFrame
       const previousChild = currentFrame.children.slice().reverse().find(child => child.endTime < this.currentTime)
       const previousFrameTime = previousChild ? previousChild.endTime : currentFrame.startTime - 1
       const timeUntilPreviousFrame = this.currentTime - previousFrameTime

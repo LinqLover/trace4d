@@ -100,7 +100,7 @@ export class Player extends EventEmitter {
     }
 
     /**
-     * @param {*} steps If undefined, steps are calculated from the time since the last tick.
+     * @param {*} steps If undefined, tick automatically and calculate steps from the time since the last tick.
      */
     _tick(steps = undefined) {
         if (!this.cursor) return
@@ -116,7 +116,7 @@ export class Player extends EventEmitter {
             actualSteps = Math.round(exactSteps)
             this.stepsRoundingError = exactSteps - steps
         } else {
-            actualSteps = steps
+            actualSteps = Math.round(steps)
             delete this.stepsRoundingError
         }
 
