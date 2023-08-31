@@ -1169,7 +1169,7 @@ export class FieldEntity extends Entity {
     cuboidGeometry.addGroup(24, 6, 2)  // side 3 (front)
     cuboidGeometry.addGroup(30, 6, 2)  // side 4 (back)
 
-    this.cuboid.castShadow = true
+    this.cuboid.castShadow = false
     this.cuboid.receiveShadow = true
   }
 
