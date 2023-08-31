@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resizer.style.removeProperty('cursor')
             document.body.style.removeProperty('cursor')
 
-            previousStyles.forEach((previousStyle, child) => {
+            previousStyles?.forEach((previousStyle, child) => {
                 Object.entries(previousStyle).forEach(([prop, value]) => {
                     child.style[prop] = value
                 })
