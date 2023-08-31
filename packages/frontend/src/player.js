@@ -179,6 +179,17 @@ export class Timeline extends EventEmitter {
         this.cursor = this.domElement.querySelector('#cursor')
 
         this.domElement.addEventListener('pointerdown', this._boundEventHandler('onPointerDown'))
+
+        // Optimization (this saves us 4ms/call in Chrome!)
+        this.domElementClientWidth = this.domElement.clientWidth
+        this.cursorClientWidth = this.cursor.clientWidth
+
+        new ResizeObserver(() => {
+            this.domElementClientWidth = this.domElement.clientWidth
+        }).observe(this.domElement)
+        new ResizeObserver(() => {
+            this.cursorClientWidth = this.cursor.clientWidth
+        }).observe(this.cursor)
     }
     //#endregion
 
@@ -188,14 +199,14 @@ export class Timeline extends EventEmitter {
 
     get time() {
         return this.minTime + this._cursorX
-            / (this.domElement.clientWidth - this.cursor.clientWidth)
+            / (this.domElementClientWidth - this.cursorClientWidth)
             * (this.maxTime - this.minTime)
     }
 
     set time(value) {
         this._cursorX = (value - this.minTime)
             / (this.maxTime - this.minTime)
-            * (this.domElement.clientWidth - this.cursor.clientWidth)
+            * (this.domElementClientWidth - this.cursorClientWidth)
     }
 
     get _cursorX() {
