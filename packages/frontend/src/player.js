@@ -130,12 +130,17 @@ export class Player extends EventEmitter {
 
     doSteps(steps, secondsSinceLastTick) {
         const activeObjects = new Set()
-        this.cursor.step(steps, {
-            visitFrame: frame => {
-                console.log(frame.toString())
-                activeObjects.add(frame.receiver)
-            }
-        })
+        if (steps) {
+            this.cursor.step(steps, {
+                visitFrame: frame => {
+                    console.log(frame.toString())
+                    activeObjects.add(frame.receiver)
+                }
+            })
+        } else {
+            const currentFrame = this.cursor.currentFrame
+            if (currentFrame) activeObjects.add(currentFrame.receiver)
+        }
 
         this.objectEntities.forEach(objectEntity => {
             objectEntity.setGlowState('active', activeObjects.has(objectEntity.object)
