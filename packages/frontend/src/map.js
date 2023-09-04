@@ -382,8 +382,7 @@ traceMap.reloadTrace()
 
   buildMapControls() {
     this.mapControls = new MapControls(this.camera, this.renderer.domElement)
-    this.mapControls.enableDamping = true
-    this.mapControls.dampingFactor = 0.05
+    this.mapControls.enableDamping = false
     this.mapControls.enablePan = true
     this.mapControls.minDistance = 20
     //this.mapControls.maxDistance = 200
@@ -391,6 +390,8 @@ traceMap.reloadTrace()
     this.mapControls.enableRotate = true
     // Enforce the camera to be above the ground plane
     this.mapControls.maxPolarAngle = Math.PI / 2 - 0.1
+    this.mapControls.zoomToCursor = true
+
     this.mapControls.addEventListener('change', () => this.updateScene())
     this.mapControls.keyPanSpeed = 20
     this.mapControls.listenToKeyEvents(this.window.document)
@@ -531,7 +532,7 @@ traceMap.reloadTrace()
 
   buildScene() {
     // add lights
-    const directionalLight1 = new THREE.DirectionalLight(0xffffee)
+    const directionalLight1 = new THREE.DirectionalLight(0xffffee, 4)
     // TODO: don't hardcode sizes
     directionalLight1.position.set(250, 300, 200)
     directionalLight1.castShadow = true
@@ -546,7 +547,7 @@ traceMap.reloadTrace()
 
     const skyColor = 0x87ceeb
     const groundColor = 0xF6D7B0
-    const hemisphereLight = new THREE.HemisphereLight(skyColor, groundColor, 0.7)
+    const hemisphereLight = new THREE.HemisphereLight(skyColor, groundColor, 2.2)
     this.scene.add(hemisphereLight);
 
     // add ground
