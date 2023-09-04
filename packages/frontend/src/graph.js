@@ -839,8 +839,8 @@ export class OrganizationEntity extends Entity {
 
         // update size
         const offset = options.offset ?? 20
-        const width = Math.max(collect(d3Nodes).map(d3Node => d3Node.x).max(), -collect(d3Nodes).map(d3Node => d3Node.x).min()) * 2
-        const depth = Math.max(collect(d3Nodes).map(d3Node => d3Node.y).max(), -collect(d3Nodes).map(d3Node => d3Node.y).min()) * 2
+        const width = d3Nodes.length ? Math.max(collect(d3Nodes).map(d3Node => d3Node.x).max(), -collect(d3Nodes).map(d3Node => d3Node.x).min()) * 2 : 1
+        const depth = d3Nodes.length ? Math.max(collect(d3Nodes).map(d3Node => d3Node.y).max(), -collect(d3Nodes).map(d3Node => d3Node.y).min()) * 2 : 1
         this.adoptSize(width + offset, depth + offset)
 
         traceMap.updateScene()
