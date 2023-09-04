@@ -2,15 +2,20 @@ import collect from 'collect.js'
 import * as d3Force from 'd3-force'
 import * as d3Random from 'd3-random'
 const d3 = { ...d3Force, ...d3Random }
+import EventEmitter from 'eventemitter3'
 import * as THREE from 'three'
 
 import Box3Extension from './utils/Box3Extension.js'
 import BoxGeometryExtension from './utils/BoxGeometryExtension.js'
+import { EventBundler } from './utils/EventBundler.js'
 
 import { TraceObject } from './trace.js'
 
 
-export class Entity {
+const movementBundler = new EventBundler()
+
+
+export class Entity extends EventEmitter {
   parent = null
   focusStates = []
   static allFocusStates = ['hover', 'drag']
@@ -415,9 +420,7 @@ export class Entity {
   }
 
   moved() {
-    this.connections.forEach(connection => {
-      connection.updatePosition()
-    })
+    this.emit('moved')
   }
 
   pinD3Node() {
@@ -770,6 +773,16 @@ export class OrganizationEntity extends Entity {
     })
 
 
+    const applyPositions = () => {
+      movementBundler.bundle(() => {
+        const y = this.height / 2
+        this.children.forEach(child => {
+          child.moveTo(child.d3Node.x, y + child.object3d.geometry.parameters.height / 2, child.d3Node.y)
+        })
+      })
+    }
+
+
     // first layout pass: no collision yet
     this.simulation = d3.forceSimulation(d3Nodes)
     this.simulation
@@ -808,14 +821,11 @@ export class OrganizationEntity extends Entity {
         // TODO: dynamic speed to maintain enough FPS. might not need animation at all for small traces.
         this.simulation.tick(100)
 
-        const y = this.height / 2
-        this.children.forEach(child => {
-          child.moveTo(child.d3Node.x, y + child.object3d.geometry.parameters.height / 2, child.d3Node.y)
-        })
+        applyPositions()
 
         /** Dispatch event without capturing/bubbling */
         function processEvent(domElement, event) {
-          const dummy = document.createElement('div')
+          //const dummy = document.createElement('div')
           // WORKAROUND: Must not unhang three.js container
           //domElement.replaceWith(dummy)
           event.isT4dSimulated = true
@@ -861,9 +871,7 @@ export class OrganizationEntity extends Entity {
     })
 
     // apply positions
-    this.children.forEach(child => {
-      child.moveTo(child.d3Node.x, child.object3d.geometry.parameters.height, child.d3Node.y)
-    })
+    applyPositions()
 
     const size = new THREE.Box3().setFromObject(this.object3d).getSize(new THREE.Vector3())
     const margin = 10
@@ -1262,6 +1270,10 @@ export class Connection {
     this.source = source
     this.target = target
     this.strength = strength
+
+    const updatePosition = () => this.updatePosition()
+    ;(Array.isArray(this.source) ? this.source : [this.source]).forEach(eachSource => movementBundler.on(eachSource, 'moved', updatePosition))
+    movementBundler.on(this.target, 'moved', updatePosition)
   }
 
   //#region building
