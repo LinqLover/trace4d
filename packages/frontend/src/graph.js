@@ -903,6 +903,8 @@ export class TraceEntity extends OrganizationEntity {
     color: 0x777777
   })
 
+  trail = new Trail()
+
   constructor(trace) {
     super(trace)
   }
@@ -935,11 +937,19 @@ export class TraceEntity extends OrganizationEntity {
 
     this.buildChildConnections(traceMap)
 
+    this.buildTrail(traceMap)
+
     return this.plane
   }
 
   buildLabel() {
     // No label.
+  }
+
+  buildTrail(traceMap) {
+    if (!this.trail) return
+    const trailObject3d = this.trail.build(traceMap)
+    this.object3d.add(trailObject3d)
   }
   //#endregion
 
@@ -1382,6 +1392,144 @@ export class Connection {
       this.line.material.opacity = this.constructor.opacity
       this.chevronCones.forEach(head => head.material.opacity = this.constructor.opacity)
     }
+  }
+  //#endregion
+}
+
+export class Trail {
+  entities = []
+  /** Number of connected most recent entities. */
+  length = 15
+  /** Points to the entity to be displayed as most recent. */
+  headIndex = 0
+
+  hopHeight = 30
+  /** Controls the render quality of the trail. */
+  divisionsPerPoint = 5
+  color = 0xff0000
+
+  //#region building
+  build(traceMap) {
+    this.traceMap = traceMap
+
+    const geometry = new THREE.BufferGeometry()
+    const material = new THREE.ShaderMaterial({
+      vertexColors: true,
+      side: THREE.DoubleSide,
+      transparent: true,
+      uniforms: {
+        color: { value: new THREE.Color(this.color) },
+        arraySize: { value: 0 },
+        headPoint: { value: 0 },
+        /** < headPoint */
+        tailPoint: { value: 0 }
+      },
+      vertexShader: `
+        uniform float arraySize;
+        uniform float headPoint;
+        uniform float tailPoint;
+        varying float vAlpha;
+
+        void main() {
+          // alpha: generally 0, but 1 for head, .5 for middle, 0 for tail
+          vAlpha = (clamp(float(gl_VertexID), tailPoint, headPoint) - tailPoint)
+            / (headPoint - tailPoint)
+            - (1.0 - step(float(gl_VertexID), headPoint));
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying float vAlpha;
+        varying float vDebugP;
+        uniform vec3 color;
+
+        void main() {
+          gl_FragColor = vec4(color, vAlpha);
+        }
+      `
+    })
+
+    this.line = new THREE.Line(geometry, material)
+    this.line.entity = this
+    this.line.castShadow = false
+    this.line.receiveShadow = false
+    this.line.renderOrder = 2
+
+    return this.line
+  }
+  //#endregion
+
+  //#region updating
+  updateEntities() {
+    const listener = this._listener ??= () => this._updateEntities()
+    this.entities.forEach(entity => movementBundler.off(entity, 'moved', listener))
+    this.entities.forEach(entity => movementBundler.on(entity, 'moved', listener))
+
+    this._updateEntities()
+  }
+
+  _updateEntities() {
+    const entityPositions = this.entities.map(entity => {
+      const position = entity.object3d.position.clone()
+
+      position.y += entity.object3d.geometry.parameters.height / 2
+      position.y += 0.5
+
+      // randomize positions for better visibility
+      const offset = this._offsetForEntity(entity)
+      position.x += offset.x
+      position.z += offset.z
+
+      position.entity = entity
+      return position
+    })
+    const positions = entityPositions.flatMap((entityPosition, index) => {
+      const previousPosition = entityPositions[index - 1]
+      if (!previousPosition) return [entityPosition]
+
+      const hopPosition = previousPosition.clone().lerp(entityPosition, .5)
+      if (entityPosition.entity != previousPosition.entity) {
+        hopPosition.y = this.hopHeight
+      }
+      return [hopPosition, entityPosition]
+    })
+
+    if (positions.length < 2) {
+      this.line.visible = false
+    } else {
+      this.line.visible = true
+      const curve = new THREE.CatmullRomCurve3(positions)
+
+      // too expensive
+      //this.line.geometry = new THREE.TubeGeometry(curve, (curve.points.length - 1) * this.divisionsPerPoint * 20, 0.1, 8, false)
+      //this.line.needsUpdate = true
+
+      this.line.geometry.setFromPoints(curve.getPoints((curve.points.length - 1) * this.divisionsPerPoint))
+      this.line.material.uniforms.arraySize.value = this.line.geometry.attributes.position.count
+    }
+
+    this.updatePosition()
+  }
+
+  updatePosition() {
+    this.line.material.uniforms.headPoint.value = this.headIndex * 2 * this.divisionsPerPoint
+    this.line.material.uniforms.tailPoint.value = (this.headIndex - this.length) * 2 * this.divisionsPerPoint
+    this.line.material.uniformsNeedUpdate = true
+
+    this.traceMap.updateScene()
+  }
+
+  _offsetForEntity(entity) {
+    let offset = this._offsets?.get(entity)
+    if (offset) return offset
+
+    const { width, depth } = entity.object3d.geometry.parameters
+    offset = {
+      x: Math.max(-width / 2, Math.min(width / 2, d3.randomNormal(0, width / 4)())),
+      z: Math.max(-depth / 2, Math.min(depth / 2, d3.randomNormal(0, depth / 4)()))
+    }
+    ;(this._offsets ??= new WeakMap()).set(entity, offset)
+    return offset
   }
   //#endregion
 }

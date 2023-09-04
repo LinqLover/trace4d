@@ -108,7 +108,7 @@ export class Player extends EventEmitter {
     }
     //#endregion
 
-    //#region steps
+    //#region ticking
     tick() {
         setTimeout(() => this.tick(), 1000 / this.ticksPerSecond)
 
@@ -128,19 +128,20 @@ export class Player extends EventEmitter {
         const now = Date.now()
         const secondsSinceLastTick = (now - this.lastTick) / 1000
 
-        let actualSteps
-        if (steps === undefined) {  // calculate steps from time
+        let actualSteps, exactSteps
+        if (steps === undefined) { // calculate steps from time
             // Dithering (correct rounding errors)
-            let exactSteps = secondsSinceLastTick * this.stepsPerSecond
+            exactSteps = secondsSinceLastTick * this.stepsPerSecond
             exactSteps += this.stepsRoundingError || 0
-            actualSteps = Math.round(exactSteps)
-            this.stepsRoundingError = exactSteps - steps
+            actualSteps = Math.floor(exactSteps)
+            this.stepsRoundingError = exactSteps - actualSteps
         } else {
-            actualSteps = Math.round(steps)
+            actualSteps = Math.floor(steps)
             delete this.stepsRoundingError
+            exactSteps = steps
         }
 
-        this.doSteps(actualSteps, secondsSinceLastTick)
+        this.doSteps(actualSteps, secondsSinceLastTick, exactSteps)
         this.lastTick = now
 
         if (steps === undefined && !this.canStepForward()) {
@@ -148,13 +149,17 @@ export class Player extends EventEmitter {
         }
     }
 
-    doSteps(steps, secondsSinceLastTick) {
+    doSteps(steps, secondsSinceLastTick, exactSteps = steps) {
         const activeObjects = new Set()
         if (steps) {
             this.cursor.step(steps, {
-                visitFrame: frame => {
+                activateFrame: frame => {
                     console.log(frame.toString())
                     activeObjects.add(frame.receiver)
+                    if (this.getObjectEntity(frame.receiver)) {
+                        // NOTE: could optimize this check
+                        this.objectIndex += Math.sign(steps)
+                    }
                 }
             })
         } else {
@@ -167,6 +172,22 @@ export class Player extends EventEmitter {
                 ? 1
                 : Math.max(0, objectEntity.getGlowFraction('active') - secondsSinceLastTick / this.glowTime))
         })
+        if (this.trail) {
+            this.trail.headIndex = this.objectIndex < 0
+                ? 0 // not started yet
+                : !this.cursor.currentFrame
+                    ? this.trail.entities.length + this.trail.length // finished
+                        // TODO: could do nicer by remembering time since last frame
+                    : this.objectIndex
+                        // soft interpolation to next object
+                        + Math.min(1, Math.max(0, (
+                            this.objectIndex + 1 < this.objectTimes.length
+                                ? (this.cursor.currentTime - this.objectTimes[this.objectIndex] // between frames
+                                    + (exactSteps % 1)) // between steps
+                                        / (this.objectTimes[this.objectIndex + 1] - this.objectTimes[this.objectIndex])
+                                : 0)))
+            this.trail.updatePosition()
+        }
 
         this.flamegraph?.updateColors()
 
@@ -175,6 +196,12 @@ export class Player extends EventEmitter {
 
     resetSteps() {
         this.cursor?.reset()
+
+        this.objectIndex = -1
+        if (this.trail) {
+            this.trail.headIndex = 0
+            this.trail.updatePosition()
+        }
     }
 
     canStepForward() {
@@ -185,10 +212,35 @@ export class Player extends EventEmitter {
     //#region updating
     updateEntities() {
         this.updateObjectEntities()
+        this.updateTrailIndices()
     }
 
     updateObjectEntities() {
         this.objectEntities = this.traceEntity.allObjectEntities()
+    }
+
+    updateTrailIndices() {
+        const activeObjects = []
+        /** Start time of each receiver object. */
+        this.objectTimes = []
+        this.cursor.stepAll({
+            activateFrame: (frame, cursor) => {
+                if (this.getObjectEntity(frame.receiver)) {
+                    activeObjects.push(frame.receiver)
+                    this.objectTimes.push(cursor.currentTime)
+                }
+            }
+        })
+        this.cursor.reset()
+
+        if (this.trail) {
+            this.trail.entities = activeObjects.map(object => this.getObjectEntity(object))
+            this.trail.updateEntities()
+        }
+    }
+
+    getObjectEntity(traceObject) {
+        return this.objectEntities.find(objectEntity => objectEntity.object == traceObject)
     }
     //#endregion updating
 }
@@ -429,7 +481,7 @@ export class Flamegraph {
     }
 
     getObjectEntity(traceObject) {
-        return this.player.objectEntities.find(objectEntity => objectEntity.object == traceObject)
+        return this.player.getObjectEntity(traceObject)
     }
     //#endregion
 }

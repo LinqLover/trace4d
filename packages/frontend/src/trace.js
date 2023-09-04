@@ -282,18 +282,28 @@ export class TraceCursor {
   }
 
   stepForward(steps, options = {}) {
-    const { visitFrame } = options
+    const { activateFrame, visitFrame } = options
 
-    let stepsLeft = steps
-    while (stepsLeft > 0) {
-      if (this.currentStack.length === 0) {
+    if (steps <= 0) return
+
+    let stepsLeft = steps, hasStepped = false
+
+    if (this.currentTime === this.startTime) {
+      activateFrame?.(this.currentFrame, this)
+    }
+
+    while (true) {
+      const currentFrame = this.currentFrame
+      const nextChild = currentFrame && currentFrame.children.find(child => child.startTime > this.currentTime)
+      const nextFrameTime = currentFrame && (nextChild ? nextChild.startTime : currentFrame.endTime + 1)
+      const timeUntilNextFrame = currentFrame && nextFrameTime - this.currentTime
+      if (hasStepped && timeUntilNextFrame > 0) {
+        activateFrame?.(currentFrame, this)
+      }
+      if (stepsLeft <= 0) break
+      if (currentFrame == undefined) {
         throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
       }
-
-      const currentFrame = this.currentFrame
-      const nextChild = currentFrame.children.find(child => child.startTime > this.currentTime)
-      const nextFrameTime = nextChild ? nextChild.startTime : currentFrame.endTime + 1
-      const timeUntilNextFrame = nextFrameTime - this.currentTime
       if (timeUntilNextFrame > 0) {
         visitFrame?.(currentFrame, this)
       }
@@ -301,6 +311,7 @@ export class TraceCursor {
       if (timeUntilNextFrame > stepsLeft) {
         this.currentTime += stepsLeft
         stepsLeft = 0
+        hasStepped = false
       } else {
         this.currentTime += timeUntilNextFrame
         stepsLeft -= timeUntilNextFrame
@@ -309,31 +320,37 @@ export class TraceCursor {
         } else {
           this._stepOut()
         }
+        hasStepped = true
       }
     }
   }
 
   stepBackward(steps, options = {}) {
-    const { visitFrame } = options
+    const { activateFrame, visitFrame } = options
 
     if (steps <= 0) return
 
-    let stepsLeft = steps
+    let stepsLeft = steps, hasStepped = false
+
     if (this.currentTime === this.endTime) {
       this.currentTime -= 1
       this._stepInto(this.trace.rootFrame)
       stepsLeft -= 1
+      hasStepped = true
     }
 
-    while (stepsLeft > 0) {
-      if (this.currentStack.length === 0) {
+    while (true) {
+      const currentFrame = this.currentFrame
+      const previousChild = currentFrame && currentFrame.children.slice().reverse().find(child => child.endTime < this.currentTime)
+      const previousFrameTime = currentFrame && (previousChild ? previousChild.endTime : currentFrame.startTime - 1)
+      const timeUntilPreviousFrame = currentFrame && this.currentTime - previousFrameTime
+      if (hasStepped && timeUntilPreviousFrame > 0) {
+        activateFrame?.(currentFrame, this)
+      }
+      if (stepsLeft <= 0) break
+      if (currentFrame == undefined) {
         throw new Error(`Ran out of frames after ${steps - stepsLeft} steps`)
       }
-
-      const currentFrame = this.currentFrame
-      const previousChild = currentFrame.children.slice().reverse().find(child => child.endTime < this.currentTime)
-      const previousFrameTime = previousChild ? previousChild.endTime : currentFrame.startTime - 1
-      const timeUntilPreviousFrame = this.currentTime - previousFrameTime
       if (timeUntilPreviousFrame > 0) {
         visitFrame?.(currentFrame, this)
       }
@@ -341,6 +358,7 @@ export class TraceCursor {
       if (timeUntilPreviousFrame > stepsLeft) {
         this.currentTime -= stepsLeft
         stepsLeft = 0
+        hasStepped = false
       } else {
         this.currentTime -= timeUntilPreviousFrame
         stepsLeft -= timeUntilPreviousFrame
@@ -349,6 +367,7 @@ export class TraceCursor {
         } else {
           this._stepOut()
         }
+        hasStepped = true
       }
     }
   }

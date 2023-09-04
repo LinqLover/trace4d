@@ -590,8 +590,9 @@ traceMap.reloadTrace()
   buildTrace(traceObject3d) {
     if (this.traceObject3d) this.scene.remove(this.traceObject3d)
 
-    this.traceObject3d = traceObject3d
+    this.traceEntity = traceObject3d.entity
     this.scene.add(traceObject3d)
+    this.player.trail = this.traceEntity.trail
 
     this.updateScene()
   }
@@ -630,7 +631,7 @@ traceMap.reloadTrace()
   }
 
   reloadPlayer() {
-    this.player.setToTrace(this.trace, this.traceObject3d.entity)
+    this.player.setToTrace(this.trace, this.traceEntity)
 
     this.timeline.minTime = this.player.cursor.startTime
     this.timeline.maxTime = this.player.cursor.endTime
