@@ -325,6 +325,10 @@ export class Entity {
     return true
   }
 
+  wantsMouse(event) {
+    return true
+  }
+
   onHoverStart(event) {
     this.addHoveredEntity(this)
   }
@@ -1273,6 +1277,7 @@ export class Connection {
       linewidth: this.strength
     })
     this.line = new THREE.Line(lineGeometry, lineMaterial)
+    this.line.entity = this
     this.line.castShadow = true
     this.line.receiveShadow = true
 

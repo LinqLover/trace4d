@@ -445,7 +445,9 @@ traceMap.reloadTrace()
 
       const oldFocusEntity = this.focusEntity
       const oldMouseOverEntities = this.mouseOverEntities.slice()
-      this.mouseOverEntities = intersects.slice().reverse().map(intersect => intersect.object.entity).filter(entity => entity)
+      this.mouseOverEntities = intersects.slice().reverse()
+        .map(intersect => intersect.object.entity)
+        .filter(entity => entity?.wantsMouse?.(event))
       oldMouseOverEntities.forEach(entity => {
         if (!this.mouseOverEntities.includes(entity)) {
           entity.onMouseLeave?.(event)
