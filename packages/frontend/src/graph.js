@@ -1469,14 +1469,14 @@ export class Trail {
   }
 
   _updateEntities() {
-    const entityPositions = this.entities.map(entity => {
+    const entityPositions = this.entities.map((entity, index) => {
       const position = entity.object3d.position.clone()
 
       position.y += entity.object3d.geometry.parameters.height / 2
       position.y += 0.5
 
       // randomize positions for better visibility
-      const offset = this._offsetForEntity(entity)
+      const offset = this._offsetForEntity(entity, index)
       position.x += offset.x
       position.z += offset.z
 
@@ -1519,8 +1519,8 @@ export class Trail {
     this.traceMap.updateScene()
   }
 
-  _offsetForEntity(entity) {
-    let offset = this._offsets?.get(entity)
+  _offsetForEntity(entity, index) {
+    let offset = this._offsets?.get(entity)?.[index]
     if (offset) return offset
 
     const { width, depth } = entity.object3d.geometry.parameters
@@ -1528,7 +1528,12 @@ export class Trail {
       x: Math.max(-width / 2, Math.min(width / 2, d3.randomNormal(0, width / 4)())),
       z: Math.max(-depth / 2, Math.min(depth / 2, d3.randomNormal(0, depth / 4)()))
     }
-    ;(this._offsets ??= new WeakMap()).set(entity, offset)
+    let offsets = (this._offsets ??= new WeakMap()).get(entity)
+    if (!offsets) {
+      offsets = Array(this.entities.length)
+      this._offsets.set(entity, offsets)
+    }
+    offsets[index] = offset
     return offset
   }
   //#endregion
