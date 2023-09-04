@@ -1125,6 +1125,7 @@ export class FieldEntity extends Entity {
     this.traceMap = traceMap
     const cuboidGeometry = new THREE.BoxGeometry(10, .1, 2.5)
     this.cuboid = new THREE.Mesh(cuboidGeometry)
+    this.cuboid.renderOrder = 1 // fix transparency sorting
 
     if (this.primary) {
       this.cuboid.material = this.primary.cuboid.material
