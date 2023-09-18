@@ -176,7 +176,7 @@ export class Entity extends EventEmitter {
 
       context.fillStyle = textColor
       const fontSize = 360 * fontScale * resolution / 1024 // TODO: do not hardcode
-      context.font = `bolder ${fontSize}px Comic Sans MS`
+      context.font = `bolder ${fontSize}px Arial, sans-serif`
       const textWidth = context.measureText(text).width
 
       let offsetY = canvas.height * margin
