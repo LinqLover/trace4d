@@ -591,7 +591,7 @@ traceMap.reloadTrace()
   }
 
   buildTrace(traceObject3d) {
-    if (this.traceObject3d) this.scene.remove(this.traceObject3d)
+    if (this.traceEntity) this.scene.remove(this.traceEntity.object3d)
 
     this.traceEntity = traceObject3d.entity
     this.scene.add(traceObject3d)
