@@ -214,10 +214,10 @@ export class Entity extends EventEmitter {
     return texture
   }
 
-  addConnection(fieldName, otherEntity, strength) {
-    let fieldEntities = this.children.filter(child => child.name === fieldName)
+  addConnection(sourceName, targetEntity, strength) {
+    let fieldEntities = this.children.filter(child => child.name === sourceName)
     if (!fieldEntities.length) fieldEntities = this
-    return this.parent.addChildConnection(fieldEntities, otherEntity, strength)
+    return this.parent.addChildConnection(fieldEntities, targetEntity, strength)
   }
 
   moveTo(x, y, z) {
@@ -1097,13 +1097,12 @@ export class ObjectEntity extends OrganizationEntity {
     return new THREE.BoxGeometry(10, this.height, 10)
   }
 
-  addConnection(fieldName, otherEntity, strength) {
-    const connection = super.addConnection(fieldName, otherEntity, strength)
-    if (connection.source === this) {
-      connection.sourceAbsoluteY = this.constructor.headerHeight / 2
-    }
-    connection.targetAbsoluteY = this.constructor.headerHeight / 2
-    return connection
+  get connectionSourceAbsoluteY() {
+    return this.object3d.position.y + this.height / 2 - this.constructor.headerHeight / 2
+  }
+
+  get connectionTargetAbsoluteY() {
+    return this.object3d.position.y + this.height / 2 - this.constructor.headerHeight / 2
   }
   //#endregion
 
@@ -1331,6 +1330,8 @@ export class Connection {
   }
 
   updatePosition() {
+    const raycaster = this.constructor.raycaster ??= new THREE.Raycaster()
+
     const closestSource = Array.isArray(this.source)
       ? // find closest source to target
         collect(this.source).sortBy(source => {
@@ -1339,13 +1340,20 @@ export class Connection {
         }).first()
       : this.source
     let sourcePosition = this.line.worldToLocal(closestSource.object3d.getWorldPosition(new THREE.Vector3()))
-    if (this.sourceAbsoluteY != null) {
-      sourcePosition.y = this.sourceAbsoluteY
+    // find closest point on source
+    raycaster.set(sourcePosition, this.target.object3d.position.clone().sub(sourcePosition).normalize())
+    sourcePosition = raycaster.intersectObject(closestSource.object3d)[0]?.point ?? sourcePosition
+    if (closestSource.connectionSourceAbsoluteY != null) {
+      sourcePosition.y = closestSource.connectionSourceAbsoluteY
     }
+
     let targetPosition = this.target.object3d.position
-    if (this.targetAbsoluteY != null) {
+    // find closest point on target
+    raycaster.set(targetPosition, sourcePosition.clone().sub(targetPosition).normalize())
+    targetPosition = raycaster.intersectObject(this.target.object3d)[0]?.point ?? this.target.object3d.position
+    if (this.target.connectionTargetAbsoluteY != null) {
       targetPosition = targetPosition.clone()
-      targetPosition.y = this.targetAbsoluteY
+      targetPosition.y = this.target.connectionTargetAbsoluteY
     }
 
     const lineGeometry = this.line.geometry

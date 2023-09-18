@@ -206,8 +206,8 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
   }
 
   addConnections(objectEntities) {
-    objectEntities.forEach((objectEntity, index) => {
-      objectEntities.forEach((otherObjectEntity, otherIndex) => {
+    objectEntities.forEach(objectEntity => {
+      objectEntities.forEach(otherObjectEntity => {
         collect(objectEntity.object.fields).each((field, name) => {
           if (field === otherObjectEntity.object) {
             objectEntity.addConnection(name, otherObjectEntity, 1)
