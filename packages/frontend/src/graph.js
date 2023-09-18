@@ -274,9 +274,21 @@ export class Entity extends EventEmitter {
         let glowColor = this.constructor.glowColors[state]
         if (!glowColor) return
 
+        const delta = {
+          h: glowColor.dh,
+          s: glowColor.ds,
+          l: glowColor.dl
+        }
         if (!color) color = color3d.getHSL({})
         else if (!color3d) color3d = new THREE.Color().setHSL(color.h, color.s, color.l)
         glowColor = {...color, ...glowColor}
+
+        glowColor = { ...glowColor, ...collect(delta)
+          .reject(delta => delta == null)
+          .map((delta, key) => delta(glowColor[key]))
+          .all()
+        }
+
         let lerpColor = new THREE.Color().setHSL(glowColor.h, glowColor.s, glowColor.l)
         //color3d = lerpColor.lerpHSL(color3d, 1 - fraction)
         color3d = lerpColor.lerp(color3d, 1 - fraction) // for our current set of colors, this looks better
@@ -1025,12 +1037,12 @@ export class ClassEntity extends OrganizationEntity {
 
 export class ObjectEntity extends OrganizationEntity {
   static colors = {
-    default: { h: 0.333, s: 1, l: 0.13 },
-    hover: { h: 0.333, s: 1, l: 0.16 },
-    drag: { h: 0.333, s: 1, l: 0.19 }
+    default: { h: .056, s: 0, l: .97 - .2 },
+    hover: { h: .056, s: 0, l: .97 - .2 - .4 },
+    drag: { h: .056, s: 0, l: .97 - .2 - .6 }
   }
   static glowColors = {
-    active: { h: 0 }
+    active: { h: -.006, s: .79, dl: l => (l + .2) / 2 - .2 }
   }
 
   static headerHeight = 3.5
@@ -1115,9 +1127,9 @@ export class ObjectEntity extends OrganizationEntity {
 
 export class FieldEntity extends Entity {
   static colors = {
-    default: { h: 0, s: 0, l: 0.25 },
-    hover: { h: 0, s: 0, l: 0.5 },
-    drag: { h: 0, s: 0, l: 0.75 }
+    default: { h: 0, s: 0, l: .8 },
+    hover: { h: 0, s: 0, l: .4 },
+    drag: { h: 0, s: 0, l: .2 }
   }
 
   static opacity = 0.5
@@ -1271,7 +1283,7 @@ export class FieldEntity extends Entity {
 export class Connection {
   focusStates = []
 
-  static color = 0xbbbbbb
+  static color = 0x202020
   static opacity = .5
   static hoverOpacity = 1
 
@@ -1294,6 +1306,7 @@ export class Connection {
     ])
 
     const lineMaterial = new THREE.LineBasicMaterial({
+      color: this.constructor.color,
       transparent: true,
       linewidth: this.strength
     })
@@ -1414,7 +1427,7 @@ export class Trail {
   hopHeight = 30
   /** Controls the render quality of the trail. */
   divisionsPerPoint = 5
-  color = 0xff0000
+  color = 0xffff00
 
   //#region building
   build(traceMap) {

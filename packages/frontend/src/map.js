@@ -546,8 +546,10 @@ traceMap.reloadTrace()
     this.scene.add(directionalLight1)
 
     const skyColor = 0x87ceeb
-    const groundColor = 0xF6D7B0
-    const hemisphereLight = new THREE.HemisphereLight(skyColor, groundColor, 2.2)
+    const skyLightColor = 0xeaeafa
+    const groundColor = 0xbadea6
+    const groundLightColor = 0xbababa
+    const hemisphereLight = new THREE.HemisphereLight(skyLightColor, groundLightColor, 2.2)
     this.scene.add(hemisphereLight);
 
     // add ground
