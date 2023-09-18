@@ -1427,7 +1427,7 @@ export class Trail {
   hopHeight = 30
   /** Controls the render quality of the trail. */
   divisionsPerPoint = 5
-  color = 0xffff00
+  color = 0x88ff00
 
   //#region building
   build(traceMap) {
@@ -1471,6 +1471,9 @@ export class Trail {
     })
 
     this.line = new THREE.Line(geometry, material)
+    // tube:
+    //this.line = new THREE.Mesh(geometry, material)
+    //this.divisionsPerPoint *= 8
     this.line.entity = this
     this.line.castShadow = false
     this.line.receiveShadow = false
@@ -1521,9 +1524,10 @@ export class Trail {
       this.line.visible = true
       const curve = new THREE.CatmullRomCurve3(positions)
 
-      // too expensive
-      //this.line.geometry = new THREE.TubeGeometry(curve, (curve.points.length - 1) * this.divisionsPerPoint * 20, 0.1, 8, false)
-      //this.line.needsUpdate = true
+      // tube:
+      // this.line.geometry = new THREE.TubeGeometry(curve, (curve.points.length - 1) * this.divisionsPerPoint, .1, 8, false)
+      // this.line.needsUpdate = true
+      // NOTE: Tubes do not work for us mainly because of transparency sorting issues. Would have to hide invisible parts of the trail/split it up. Also, performance is an issue.
 
       this.line.geometry.setFromPoints(curve.getPoints((curve.points.length - 1) * this.divisionsPerPoint))
       this.line.material.uniforms.arraySize.value = this.line.geometry.attributes.position.count
@@ -1546,8 +1550,8 @@ export class Trail {
 
     const { width, depth } = entity.object3d.geometry.parameters
     offset = {
-      x: Math.max(-width / 2, Math.min(width / 2, d3.randomNormal(0, width / 4)())),
-      z: Math.max(-depth / 2, Math.min(depth / 2, d3.randomNormal(0, depth / 4)()))
+      x: Math.max(-width / 2, Math.min(width / 2, d3.randomNormal(0, width / 8)())),
+      z: Math.max(-depth / 2, Math.min(depth / 2, d3.randomNormal(0, depth / 8)()))
     }
     let offsets = (this._offsets ??= new WeakMap()).get(entity)
     if (!offsets) {
