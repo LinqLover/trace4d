@@ -654,7 +654,10 @@ traceMap.player.stepsPerSecond = 100
 
     this.reloadPlayer()
 
-    setTimeout(() => this.player.start(), 3000) // TODO: Don't harcode
+    this.traceEntity.trail.deferUpdates = true
+    if (this.options.autoStart ?? false) {
+      setTimeout(() => this.player.start(), 3000)
+    }
   }
 
   reloadPlayer() {
