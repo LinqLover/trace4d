@@ -163,16 +163,18 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
   excludeClasses = true
   /** all values may be a factor, a function, or undefined */
   forceWeights = {
-	  'references': 1,
-	  'organization': {
+	  references: 1,
+	  organization: {
       /** will be applied to all organization forces */
-      'force': .005,
-      'sameClass': 2,
-      'sameHierarchy': 1,
-      'sameCategory': .01,
-      'samePackage': .001
+      force: .005,
+      sameClass: 2,
+      sameHierarchy: 1,
+      sameCategory: .01,
+      samePackage: .001
 	  },
-	  'communication': 0.0001
+	  communication: 0.0001,
+    globalFactor: 1,
+    repulsion: .2
 	}
 
   build(traceMap) {
@@ -221,8 +223,8 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
     const force = (forceWeight, $default) => forceWeight === undefined
       ? force($default)
       : forceWeight instanceof Function
-        ? (value) => forceWeight(value ?? 1)
-        : (value) => (value ?? 1) * forceWeight
+        ? (value) => forceWeight(value ?? 1) * (this.forceWeights['globalFactor'] ?? 1)
+        : (value) => (value ?? 1) * forceWeight * (this.forceWeights['globalFactor'] ?? 1)
 
     // references
     if (this.forceWeights['references']) {
@@ -357,6 +359,8 @@ export class TraceMap {
     console.log(`
 traceMap.entityBuilder.forceWeights.references = 0.5
 traceMap.entityBuilder.forceWeights.organization.sameClass = 0.1
+traceMap.entityBuilder.forceWeights.globalFactor = 0.5
+traceMap.entityBuilder.forceWeights.repulsion = 0.3
 traceMap.entityBuilder.excludedObjectNames.push("''")
 traceMap.entityBuilder.excludedClassNames.push('ByteString')
 traceMap.entityBuilder.excludeClasses = false

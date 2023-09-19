@@ -808,7 +808,7 @@ export class OrganizationEntity extends Entity {
         .strength(force => force.strength))
 
       // repulsion
-      .force('charge', d3.forceManyBody().strength(-.2))
+      .force('charge', d3.forceManyBody().strength(-(options.repulsion ?? .2)))
 
     this.simulation
       .alpha(1)
@@ -831,7 +831,14 @@ export class OrganizationEntity extends Entity {
         // Accelerate simulation.
         // Con: Dropped nodes move too fast. TODO: reset ticks after dropping?
         // TODO: dynamic speed to maintain enough FPS. might not need animation at all for small traces.
-        this.simulation.tick(100)
+        // do as many ticks as possible within timebox
+        const maxTicks = 100
+        const maxDuration = options.maxDuration ?? 100
+        const startTime = performance.now()
+        for (let i = 0; i < maxTicks; i++) {
+          this.simulation.tick()
+          if (performance.now() - startTime > maxDuration) break
+        }
 
         applyPositions()
 
