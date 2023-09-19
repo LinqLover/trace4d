@@ -166,19 +166,19 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
   excludeClasses = true
   /** all values may be a factor, a function, or undefined */
   forceWeights = {
-	  references: 1,
-	  organization: {
+    references: 1,
+    organization: {
       /** will be applied to all organization forces */
       force: .005,
       sameClass: 2,
       sameHierarchy: 1,
       sameCategory: .01,
       samePackage: .001
-	  },
-	  communication: 0.0001,
+    },
+    communication: 0.0001,
     globalFactor: 1,
     repulsion: .2
-	}
+  }
 
   build(traceMap) {
     const objectEntities = this.trace.objects
@@ -548,7 +548,7 @@ traceMap.player.stepsPerSecond = 100
         Home: () => this.resetPlayer()
       }[event.key]
       if (!action) return
-      
+
       event.preventDefault()
       action()
     }, false)
@@ -634,7 +634,7 @@ traceMap.player.stepsPerSecond = 100
 
     this.updateScene()
   }
-  
+
   initHoverableObjects() {
     const pending = [...this.scene.children]
     this.hoverableObject3ds = []

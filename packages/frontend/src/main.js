@@ -4,8 +4,8 @@ import { TraceMap } from './map.js'
 
 
 if (!WebGL.isWebGLAvailable()) {
-	const warning = WebGL.getWebGLErrorMessage()
-	document.getElementById( 'container' ).appendChild( warning )
+  const warning = WebGL.getWebGLErrorMessage()
+  document.getElementById( 'container' ).appendChild( warning )
   throw new Error('WebGL is not available')
 }
 
