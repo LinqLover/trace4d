@@ -896,6 +896,10 @@ export class OrganizationEntity extends Entity {
     const margin = 10
     this.adoptSize(size.x + margin, size.z + margin)
   }
+
+  stopForceSimulation() {
+    this.simulation?.stop()
+  }
   //#endregion
 
   //#region interaction
