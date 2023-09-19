@@ -242,8 +242,7 @@ export class Player extends EventEmitter {
 		this.cursor.reset()
 
 		if (this.trail) {
-			this.trail.entities = activeObjects.map(object => this.getObjectEntity(object))
-			this.trail.updateEntities()
+			this.trail.setEntities(activeObjects.map(object => this.getObjectEntity(object)))
 		}
 	}
 

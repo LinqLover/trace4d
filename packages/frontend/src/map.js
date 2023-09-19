@@ -618,11 +618,17 @@ traceMap.player.stepsPerSecond = 100
     if (this.traceEntity) {
       this.stopForceSimulation()
       this.scene.remove(this.traceEntity.object3d)
+      this.player.off('isPlaying', this.traceEntity.mapSyncTrailToPlayer)
     }
 
     this.traceEntity = traceObject3d.entity
     this.scene.add(traceObject3d)
     this.player.trail = this.traceEntity.trail
+
+    this.player.on('isPlaying', this.traceEntity.mapSyncTrailToPlayer = isPlaying => {
+      this.traceEntity.trail.deferUpdates = /* !isPlaying */ false
+      // TODO: reenabling deferUpdates would be great but is only possible when hiding the trail
+    })
 
     this.initHoverableObjects()
 

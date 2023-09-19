@@ -1445,6 +1445,10 @@ export class Trail {
   /** Controls the render quality of the trail. */
   divisionsPerPoint = 5
   color = 0x88ff00
+  useTube = true
+
+  needsUpdate = false
+  deferUpdates = false
 
   //#region building
   build(traceMap) {
@@ -1455,6 +1459,7 @@ export class Trail {
       vertexColors: true,
       side: THREE.DoubleSide,
       transparent: true,
+      depthWrite: false, // fix transparency sorting with ourselves
       uniforms: {
         color: { value: new THREE.Color(this.color) },
         arraySize: { value: 0 },
@@ -1487,10 +1492,12 @@ export class Trail {
       `
     })
 
+    if (this.useTube) {
+      this.line = new THREE.Mesh(geometry, material)
+      this.divisionsPerPoint *= 8
+    } else {
     this.line = new THREE.Line(geometry, material)
-    // tube:
-    //this.line = new THREE.Mesh(geometry, material)
-    //this.divisionsPerPoint *= 8
+    }
     this.line.entity = this
     this.line.castShadow = false
     this.line.receiveShadow = false
@@ -1501,20 +1508,28 @@ export class Trail {
   //#endregion
 
   //#region updating
-  updateEntities() {
-    const listener = this._listener ??= () => this._updateEntities()
+  setEntities(entities) {
+    const listener = this._listener ??= () => this.updateEntities()
     this.entities.forEach(entity => movementBundler.off(entity, 'moved', listener))
+
+    this.entities = entities
+
     this.entities.forEach(entity => movementBundler.on(entity, 'moved', listener))
 
-    this._updateEntities()
+    this.updateEntities()
   }
 
-  _updateEntities() {
+  updateEntities() {
+    if (this.deferUpdates) {
+      this.needsUpdate = true
+      return
+    }
+
     const entityPositions = this.entities.map((entity, index) => {
       const position = entity.object3d.position.clone()
 
       position.y += entity.object3d.geometry.parameters.height / 2
-      position.y += 0.5
+      position.y += .5 // TODO: spline still ocassionally intersects with object3d because no convex hull containment
 
       // randomize positions for better visibility
       const offset = this._offsetForEntity(entity, index)
@@ -1541,21 +1556,33 @@ export class Trail {
       this.line.visible = true
       const curve = new THREE.CatmullRomCurve3(positions)
 
-      // tube:
-      // this.line.geometry = new THREE.TubeGeometry(curve, (curve.points.length - 1) * this.divisionsPerPoint, .1, 8, false)
-      // this.line.needsUpdate = true
-      // NOTE: Tubes do not work for us mainly because of transparency sorting issues. Would have to hide invisible parts of the trail/split it up. Also, performance is an issue.
+      if (this.useTube) {
+        this.line.geometry = new THREE.TubeGeometry(curve, (curve.points.length - 1) * this.divisionsPerPoint, .2, 8, false)
+        this.line.needsUpdate = true
+      }
 
       this.line.geometry.setFromPoints(curve.getPoints((curve.points.length - 1) * this.divisionsPerPoint))
       this.line.material.uniforms.arraySize.value = this.line.geometry.attributes.position.count
     }
 
+    this.needsUpdate = false
+
     this.updatePosition()
   }
 
   updatePosition() {
-    this.line.material.uniforms.headPoint.value = this.headIndex * 2 * this.divisionsPerPoint
-    this.line.material.uniforms.tailPoint.value = (this.headIndex - this.length) * 2 * this.divisionsPerPoint
+    if (this.needsUpdate) {
+      this.updateEntities()
+      return
+    }
+
+    const headPoint = this.headIndex * 2 * this.divisionsPerPoint
+    const tailPoint = (this.headIndex - this.length) * 2 * this.divisionsPerPoint
+
+    if (this.line.material.uniforms.headPoint.value === headPoint && this.line.material.uniforms.tailPoint.value === tailPoint) return
+
+    this.line.material.uniforms.headPoint.value = headPoint
+    this.line.material.uniforms.tailPoint.value = tailPoint
     this.line.material.uniformsNeedUpdate = true
 
     this.traceMap.updateScene()
