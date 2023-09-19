@@ -615,7 +615,10 @@ traceMap.player.stepsPerSecond = 100
   }
 
   buildTrace(traceObject3d) {
-    if (this.traceEntity) this.scene.remove(this.traceEntity.object3d)
+    if (this.traceEntity) {
+      this.stopForceSimulation()
+      this.scene.remove(this.traceEntity.object3d)
+    }
 
     this.traceEntity = traceObject3d.entity
     this.scene.add(traceObject3d)
