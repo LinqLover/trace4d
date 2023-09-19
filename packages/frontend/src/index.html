@@ -149,6 +149,9 @@
   </head>
 
   <body>
+    <script>
+      window.loadStartTime = performance.now()
+    </script>
     <script type="module" src="resizers.js"></script>
     <!-- Must be the LAST imported script or all others will be blocked in vite build -->
     <script type="module" src="main.js"></script>

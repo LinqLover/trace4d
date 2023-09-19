@@ -691,6 +691,16 @@ traceMap.player.stepsPerSecond = 100
     if (this.renderRequired) {
       this.renderer.render(this.scene, this.camera)
       this.renderRequired = false
+
+      if ((this.options.measureStartTime ?? false) !== false && window.loadStartTime && this.player?.trail) {
+        const startTime = window.loadStartTime
+        delete window.loadStartTime
+        // to appear after current frame
+        setTimeout(() => {
+          const timeToLoad = performance.now() - startTime
+          alert("time to load: " + timeToLoad)
+        }, 0)
+      }
     }
 
     this.mapControls?.update()
