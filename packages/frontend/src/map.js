@@ -156,9 +156,12 @@ export class FlatFDGEntityBuilder extends EntityBuilder {
     'UndefinedObject',
     'SmallInteger', 'LargePositiveInteger', 'LargeNegativeInteger', 'SmallFloat64',
     'FullBlockClosure', 'CompiledBlock', 'CompiledMethod', 'CompiledMethodTrailer',
-    'Association',
     'Array', 'OrderedCollection',
-    'Point', 'Rectangle'
+    'Bitmap', 'Point', 'Rectangle',
+    'ByteSymbol',
+    'Process', 'ProcessorScheduler', 'Mutex',
+    'Association', 'DependentsArray', 'Heap', 'IdentityDictionary', 'IdentitySet', 'Interval', 'SparseLargeTable', 'WeakArray', 'WeakIdentityKeyDictionary', 'WeakKeyAssociation', 'WeakSet', 'WeakValueAssociation',
+    'Environment'
   ]
   excludeClasses = true
   /** all values may be a factor, a function, or undefined */
