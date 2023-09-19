@@ -376,6 +376,7 @@ traceMap.reloadTrace()
     this.buildMapControls()
     this.buildDragControls()
     this.buildMouseHandler()
+    this.buildKeyboardHandler()
   }
 
   buildFPSCounter() {
@@ -534,6 +535,20 @@ traceMap.reloadTrace()
     }, false)
   }
 
+  buildKeyboardHandler() {
+    this.window.addEventListener('keydown', event => {
+      const action = {
+        ' ': () => this.togglePlaying(),
+        Escape: () => this.stopForceSimulation(),
+        Home: () => this.resetPlayer()
+      }[event.key]
+      if (!action) return
+      
+      event.preventDefault()
+      action()
+    }, false)
+  }
+
   buildScene() {
     // add lights
     const directionalLight1 = new THREE.DirectionalLight(0xffffee, 4)
@@ -642,6 +657,20 @@ traceMap.reloadTrace()
 
     this.timeline.minTime = this.player.cursor.startTime
     this.timeline.maxTime = this.player.cursor.endTime
+  }
+  //#endregion
+
+  //#region actions
+  stopForceSimulation() {
+    this.traceEntity.stopForceSimulation()
+  }
+
+  resetPlayer() {
+    this.player.reset()
+  }
+
+  togglePlaying() {
+    this.player.togglePlaying()
   }
   //#endregion
 

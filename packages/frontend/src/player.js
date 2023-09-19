@@ -103,6 +103,14 @@ export class Player extends EventEmitter {
 		this.emit('isPlaying', false)
 	}
 
+  togglePlaying() {
+    if (this.isPlaying) {
+      this.pause()
+    } else {
+      this.resume()
+    }
+  }
+
 	reset() {
 		this.resetSteps()
 	}
