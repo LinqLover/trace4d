@@ -452,7 +452,7 @@ traceMap.player.stepsPerSecond = 100
 
 	    raycaster.setFromCamera(mouse, this.camera)
 
-    	const intersects = raycaster.intersectObjects(this.scene.children, true)
+        const intersects = raycaster.intersectObjects(this.hoverableObject3ds ?? [], false)
 
       const oldFocusEntity = this.focusEntity
       const oldMouseOverEntities = this.mouseOverEntities.slice()
@@ -621,7 +621,22 @@ traceMap.player.stepsPerSecond = 100
     this.scene.add(traceObject3d)
     this.player.trail = this.traceEntity.trail
 
+    this.initHoverableObjects()
+
     this.updateScene()
+  }
+  
+  initHoverableObjects() {
+    const pending = [...this.scene.children]
+    this.hoverableObject3ds = []
+    while (pending.length > 0) {
+      const object = pending.pop()
+      if (object.visible === false) continue
+      if (!object.entity) continue
+      if (object.entity.wantsMouse && !object.entity.wantsMouse()) continue
+      this.hoverableObject3ds.push(object)
+      pending.push(...object.children)
+    }
   }
   //#endregion
 

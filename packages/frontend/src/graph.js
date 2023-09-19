@@ -1426,6 +1426,12 @@ export class Connection {
     }
   }
   //#endregion
+
+  //#region interaction
+  wantsMouse(event) {
+    return false
+  }
+  //#endregion
 }
 
 export class Trail {
@@ -1571,6 +1577,12 @@ export class Trail {
     }
     offsets[index] = offset
     return offset
+  }
+  //#endregion
+
+  //#region interaction
+  wantsMouse(event) {
+    return false
   }
   //#endregion
 }
