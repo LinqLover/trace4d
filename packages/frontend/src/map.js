@@ -368,6 +368,8 @@ traceMap.entityBuilder.excludedObjectNames.push("''")
 traceMap.entityBuilder.excludedClassNames.push('ByteString')
 traceMap.entityBuilder.excludeClasses = false
 traceMap.reloadTrace()
+
+traceMap.player.stepsPerSecond = 100
 `) // , "color: #0000ff"  // WORKAROUND: formatted newlines are not copyable in Chrome Dev Tools
   }
 
