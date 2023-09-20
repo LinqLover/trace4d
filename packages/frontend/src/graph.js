@@ -1496,7 +1496,7 @@ export class Trail {
       this.line = new THREE.Mesh(geometry, material)
       this.divisionsPerPoint *= 8
     } else {
-    this.line = new THREE.Line(geometry, material)
+      this.line = new THREE.Line(geometry, material)
     }
     this.line.entity = this
     this.line.castShadow = false
