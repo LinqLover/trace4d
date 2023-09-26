@@ -1,0 +1,36 @@
+name: Build Paper
+
+on:
+  push:
+    paths:
+    - docs/paper/**
+    - .github/workflows/paper.yml
+  workflow_dispatch:
+
+jobs:
+  latex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: mkdir -p build
+        working-directory: docs/paper
+      - uses: xu-cheng/latex-action@v2-texlive2022
+        with:
+          root_file: paper.tex
+          working_directory: docs/paper
+          post_compile: "mv paper.pdf build/ && latexmk -c"
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: paper.pdf
+          path: docs/paper/build/paper.pdf
+
+
+      - run: mkdir -p build && mv docs/paper/build/paper.pdf build/
+      - uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          keep_files: true
