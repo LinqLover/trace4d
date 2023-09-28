@@ -1,0 +1,28 @@
+% Semantic markup (analogously to \emph{})
+\renewcommand\bold[1]{\textbf{#1}}
+\newcommand\code[1]{%
+	%\texttt{#1}}
+	\textsf{#1}} % This looks more like Smalltalk
+\newcommand\hardcode[1]{%
+	\texttt{#1}}
+\newcommand\name[1]{\textsc{#1}}
+\newenvironment{multicode}{%
+	\begin{quote}\sffamily\setlength{\parindent}{0pt}}{\end{quote}}
+
+
+% Line-breaks after slashes
+\newcommand\?{\hspace{0pt}}
+
+
+% double-blinding
+\makeatletter
+\@ifclasswith{acmart}{anonymous}{%
+	\newcommand{\ifanon}[2]{#1}%
+}{%
+	\newcommand{\ifanon}[2]{#2}%
+}
+\makeatother
+
+\newcommand{\tdb}{\name{\ifanon{OurExistingOmniscientDebugger}{TraceDebugger}}}
+\newcommand{\tfd}{\name{\ifanon{OurNewVisualizationTool}{trace4d}}}
+
