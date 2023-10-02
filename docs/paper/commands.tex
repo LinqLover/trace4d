@@ -75,7 +75,7 @@
 	\draw[umlcd style,fill=\umldrawcolor,diamond-] (#1.south) -- ($(#1.south) - (0, 0.425)$);
 	\draw[umlcd style] ($(#1.south) - (0, 0.425)$) -- ($(#1.west) - (0.75, 1)$);
 	\draw[umlcd style] ($(#1.west) - (0.75, 1)$) -- ($(#1.west) - (0.75, 0)$);
-	\draw[umlcd style] ($(#1.west) - (0.75, 0)$) -> (#1.west)
+	\draw[umlcd style,->] ($(#1.west) - (0.75, 0)$) -> (#1.west)
 		node[midway, below]{#2}
 		node[midway, above]{#3};
 }
@@ -84,7 +84,7 @@
 	\draw[umlcd style,fill=\umldrawcolor,diamond-] (#1.east) -- ($(#1.east) + (0.25, 0)$);
 	\draw[umlcd style] ($(#1.east) + (0.25, 0)$) -- ($(#1.north) + (0.8, 0.25)$);
 	\draw[umlcd style] ($(#1.north) + (0.8, 0.25)$) -- ($(#1.north) + (0, 0.25)$);
-	\draw[umlcd style] ($(#1.north) + (0, 0.25)$) -> (#1.north)
+	\draw[umlcd style,->] ($(#1.north) + (0, 0.25)$) -> (#1.north)
 		node[midway, right]{#2}
 		node[midway, left]{#3};
 }
