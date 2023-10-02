@@ -524,10 +524,7 @@ export class OrganizationEntity extends Entity {
   }
 
   buildChildren(traceMap, options = {}) {
-    let i = 0
-    const n = this.children.length
     const childObjects = this.children.map(child => {
-      if (i++ % 100 == 0) console.log(`${i} / ${n}`)
       return child.build(traceMap, options)
     })
     if (childObjects.length == 0) return
