@@ -456,9 +456,9 @@ traceMap.player.stepsPerSecond = 100
       mouse.x = (event.clientX / this.window.innerWidth) * 2 - 1
       mouse.y = -(event.clientY / this.window.innerHeight) * 2 + 1
 
-	    raycaster.setFromCamera(mouse, this.camera)
+      raycaster.setFromCamera(mouse, this.camera)
 
-        const intersects = raycaster.intersectObjects(this.hoverableObject3ds ?? [], false)
+      const intersects = raycaster.intersectObjects(this.hoverableObject3ds ?? [], false)
 
       const oldFocusEntity = this.focusEntity
       const oldMouseOverEntities = this.mouseOverEntities.slice()
