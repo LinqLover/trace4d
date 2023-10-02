@@ -1,0 +1,33 @@
+% !TeX root = ../../../paper.tex
+{\setlength\tabcolsep{3pt}
+\begin{tabularx}{\linewidth}{l c *{3}{Y} c *{5}{Y}}
+	\toprule
+
+		&
+		&
+	\multicolumn{3}{c}{\bold{Backend (Squeak)}}	&
+		&
+	\multicolumn{5}{c}{\bold{Frontend (THREE.js)}}	\\
+
+	\multicolumn{1}{c}{\bold{Program}}	&
+		&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{Tracer}\\\bold{[\si{\second}]}}}	&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{Serializer}\\\bold{[\si{\second}]}}}	&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{Serialization}\\\bold{[\si{\kilo\byte}]}}}	&
+		&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{Start-up}\\\bold{[\si{\second}]}}}	&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{Frame rate}\\\bold{(force simulation)}\\\bold{[FPS]}}}	&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{Frame rate}\\\bold{(animation)}\\\bold{[FPS]}}}	&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{RAM}\\\bold{[\si{\mega\byte}]}}}	&
+	\multicolumn{1}{c}{\makecell[cc]{\bold{GPU}\\\bold{[\si{\mega\byte}]}}}	\\
+
+	\midrule
+
+	\multicolumn{6}{l}{\emph{\code{Regex} engine}}	\\
+
+	\tabitem Test & & 0.1 & 0.1 & 0.1 & & 0.1 & 60 & 60 & 60 & 60 \\
+	% TODO: new numbers here!
+	%\tabitem Construction	&
+
+	\bottomrule
+\end{tabularx}}

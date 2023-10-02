@@ -7,6 +7,7 @@
 \newcommand\code[1]{%
 	\texttt{#1}}
 	%\textsf{#1}} % This looks more like Smalltalk
+% TODO: apply existing italic emphasis
 \newcommand\hardcode[1]{%
 	\texttt{#1}}
 \newcommand\name[1]{\textsc{#1}}
@@ -16,6 +17,8 @@
 
 % SI units
 \usepackage{siunitx}
+% bold SI units
+\sisetup{detect-all=true}
 
 
 % Line-breaks after slashes
@@ -35,8 +38,25 @@
 \newcommand{\tfd}{\name{\ifanon{OurNewVisualizationTool}{trace\-4d}}}
 
 
+% linebreaks in table cells
+\usepackage{makecell}
+
 % table notes below table (used for hacked footnotes)
 \usepackage{threeparttable}
+
+% yet another table package, don't allow for too much simplicity
+\usepackage{tabularx}
+\newcolumntype{L}{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}X}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\usepackage{ragged2e}
+\newcolumntype{M}[1]{>{\RaggedRight\hspace{0pt}}m{#1}}
+\newcolumntype{B}[1]{>{\RaggedRight\hspace{0pt}}b{#1}}
+\newcolumntype{P}[1]{>{\RaggedRight\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}b{#1}}
+
+% itemize-like item in table
+% CREDITS: https://tex.stackexchange.com/a/150650/221054
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
 
 
 % tikz
