@@ -1,0 +1,42 @@
+% !TeX root = ../../../paper.tex
+\begin{tikzpicture}
+	\tikzstyle{every node}=[font=\small]
+	\begin{class}
+		[text width=2cm]
+		{StackFrame}
+		% 0.5 too low
+		% 0.1 too high
+		% 0 too high
+		{0,0}
+		\attribute{method}
+		\attribute{startTime}
+		\attribute{endTime}
+	\end{class}
+	\begin{class}
+		[text width=2cm]
+		{Object}
+		{0,-1}
+		\attribute{label}
+		\attribute{}
+	\end{class}
+	\begin{class}
+		[text width=2cm]
+		{Class}
+		{1.5,-1}
+		\attribute{name}
+		\attribute{path}
+	\end{class}
+	\begin{class}
+		[text width=2cm]
+		{Field}
+		{-1.5,-1}
+		\attribute{name}
+		\attribute{value}
+	\end{class}
+
+	\selfCompositionEN{StackFrame}{children}{*}
+	\unidirectionalAssociation{StackFrame}{receiver}{}{Object}
+	\unidirectionalAssociation{Object}{}{}{Class}
+	\composition{Object}{}{*}{Field}
+\end{tikzpicture}
+% TODO: equalize label box heights (\vphantom is not supported)
