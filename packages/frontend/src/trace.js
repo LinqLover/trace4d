@@ -75,7 +75,7 @@ export class TraceFrame {
   }
 
   get name() {
-    return `${this.receiver.class.name}>>${this.message}`
+    return `${this.receiver.class?.name}>>${this.message}` // ?: robustness for manual serialization filtering
   }
 
   toString() {
@@ -123,9 +123,10 @@ export class TraceReader {
   }
 
   getObjects(objectDatas) {
-    return collect(objectDatas).map((objectData, objectID) =>
-      this.getObject(objectID, objectData)
-    ).values().all()
+    return collect(objectDatas)
+      .reject(objectData => objectData == null) // robustness for manual serialization filtering
+      .map((objectData, objectID) => this.getObject(objectID, objectData))
+      .values().all()
   }
 
   getObject(objectID, objectData = undefined) {
