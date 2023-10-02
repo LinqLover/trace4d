@@ -96,9 +96,9 @@ Between each pair of object blocks $(a, b)$, we apply several \emph{weighted att
 In addition to the attractive forces, we define globally weighted \emph{repulsion} and \emph{centripetation} forces on all blocks to control the entropy of the graph, and we define \emph{radial constraints} to avoid collisions between blocks.
 
 We provide an empirical base configuration for all force weights but enable users to override them for specific program traces.
-By default, we prioritize reference forces the highest and organizational forces the lowest with a distance of six orders of magnitudes and scale organizational forces logarithmically~(\cref{tab:visualization_approach/mapping/object_graph/default_configuration}).
-This configuration fosters a state-centric layout of the object graph while leaving a margin for the characteristic of particular program traces (e.g., their ratio between intrinsic and extrinsic state~\cite[p. 218ff]{gamma1994design}) towards a more dataflow-driven layout. % TODO: does this belong into discussion?
-Additionally, users can drag and drop blocks to override the layout.
+By default, we weight reference forces the highest and organizational forces the lowest with a distance of six orders of magnitudes and scale organizational forces logarithmically~(\cref{tab:visualization_approach/mapping/object_graph/default_configuration}).
+This configuration fosters a state-centric layout of the object graph while leaving a margin for the characteristic of particular program traces (e.g., their ratio between intrinsic and extrinsic state~\cite[p. 218ff]{gamma1994design}) towards a more dataflow-driven layout.
+Additionally, users can drag and drop blocks to customize the layout.
 To reduce response times and maintain an experience of immediacy~\cites[chap. 11]{shneiderman2005designing}{ungar1997debugging}, we render the graph continuously before the force simulation has converged.
 
 \paragraph{Object selection}
@@ -121,14 +121,13 @@ Similarly to the layout configuration~(\lcnameref{sec:visualization_approach/map
 
 The color of each object block displays its recent activity:
 \emph{inactive} blocks are colored in a neutral light gray while \emph{active} blocks whose objects have received a message recently are highlighted in a bright red~(\cref{fig:visualization_approach/mapping/object_behavior}).
-After the control flow passes on to other objects, blocks linearly fade back to the base color within one second, thus applying a single-hue continuous sequential color scheme by Brewer et al.\footnote{Cynthia Brewer and Mark Harrower. 2013 -- 2021. ColorBrewer: Color Advice for Cartography. Pennsylvania State University. URL: \url{https://colorbrewer2.org/}}
+After the control flow passes on to other objects, blocks linearly fade back to the base color within one second, thus applying a single-hue continuous sequential color scheme by Brewer et al.\footnote{Cynthia Brewer and Mark Harrower. 2013 -- 2021. ColorBrewer: Color Advice for Cartography. Pennsylvania State University. \textsc{URL}: \url{https://colorbrewer2.org/}}
 
-Next to the color coding, a \emph{trail} connects the most recent $k = 15$ object activations to support the delayed observation of short activations and the recognition of exact activation order.
+Next to the color coding, a \emph{trail} connects the $k = 15$ most recent object activations to support the delayed observation of short activations and the recognition of exact activation order.
 The trail curve is based on a centripetal Catmull-Rom spline~\cite{catmull1974class} whose control points are placed on the top of each relevant block and are alternated with intermediate points between blocks.
 Block control points are normally randomized to make multiple activations of the same object distinguishable.
 Intermediate control points are vertically elevated to give the curve a wave-like shape that makes activated objects identifiable.
-The direction of the trail is displayed by continuously moving it to the next object and applying a linear translucency gradient to fade out the tail of the curve.
-% TODO: Somewhere talk about callstack idea? Footnote?
+The direction of the trail is displayed by continuously moving it to the next object during the animation and applying a linear translucency gradient to fade out the tail of the curve.
 
 \paragraph{Timeline}
 \label{sec:visualization_approach/mapping/timeline}
@@ -147,5 +146,5 @@ a \emph{player} with a slider and a play/pause button indicates the current poin
 Behind the player, a collapsed \emph{flame graph} displays the course of the call stack depth.
 Users can resize the timeline to explore the full call tree hierarchy and examine single frames in the flame graph.
 
-Both the flame graph and the object map are interactively connected, i.e., users can hover an object in the map to discover all of its activations in the timeline, or vice versa, they can click on a frame to move the trail in the map to the relevant activation of the object.
+Both the flame graph and the object map are interactively connected, i.e., users can hover an object in the map to discover all of its activations in the timeline, or vice versa, they can click on a frame to forward or rewind the trail in the map to the relevant object activation.
 Thus, object map and timeline provide two orthogonal means for navigating through the object-oriented program trace with different granularities.
