@@ -67,20 +67,28 @@ To indicate the direction of arrows, we place between one and ten evenly distrib
 % TODO: improve figure layout? bundle object_graph and object_behavior in a single figure?
 
 To arrange object blocks in the 2.5D object map, we define a force-directed graph layout~\cite{fruchterman1991graph}.
-Between each pair of object blocks $(a, b)$, we apply several \emph{weighted attractive forces} based on the class membership, the organizational proximity of classes, and the references and communication between objects~(\cref{fig:visualization_approach/mapping/object_graph}):
+Between each pair of object blocks $(a, b)$, we apply several \emph{weighted attractive forces} based on the class membership, the organizational proximity of classes, and the references and communication between objects~(\cref{fig:visualization_approach/mapping/object_graph}).
+In the following, $w_{\_}$ denotes the weight of a force and $\text{org}(o)$ denotes the organizational path of an object $o$'s class (e.g., a file path):
 
-\begin{equation}
-	\begin{split}
-		F_{\text{class}}(a, b) &= w_{\text{class}}\left(\begin{cases}1, & \text{if $\text{class}(a) = \text{class}(b)$;} \\ 0, & \text{otherwise}.\end{cases}\right) \,, \\
-		F_{\text{org}}(a, b) &= w_{\text{org}}\bigl(\text{LCP}\footnotemark\bigl(\text{org}\footnotemark(a), \text{org}(b)\bigr)\bigr) \,, \\
-		F_{\text{ref}}(a, b) &= w_{\text{ref}}\left(\left|\bigl\{ (k, v) \in \text{fields}(a) ~\middle\vert~ v = b \bigr\}\right|\right) \,, \\
-		F_{\text{comm}}(a, b) &= w_{\text{comm}}\big(\big|\big\{\text{frame }f ~\big\vert \\
-			& \hphantom{= w} \text{$f$.receiver} = a \wedge \text{$f$.parent.receiver} = b\big\}\big|\big) \, .
-	\end{split}
-\end{equation}
-\addtocounter{footnote}{-1}
-\footnotetext{$\text{LCP}(u, v)$: Largest common prefix of two sequences $u$ and $v$.}
-\footnotetext{$\text{org}(o)$: Organizational path to an object $o$'s class (e.g., a file path).}
+%\begin{equation}
+%	\begin{split}
+%		F_{\text{class}}(a, b) &= w_{\text{class}}\left(\begin{cases}1, & \text{if $\text{class}(a) = \text{class}(b)$;} \\ 0, & \text{otherwise}.\end{cases}\right) \,, \\
+%		F_{\text{org}}(a, b) &= w_{\text{org}}\bigl(\text{LCP}\footnotemark\bigl(\text{org}\footnotemark(a), \text{org}(b)\bigr)\bigr) \,, \\
+%		F_{\text{ref}}(a, b) &= w_{\text{ref}}\left(\left|\bigl\{ (k, v) \in \text{fields}(a) ~\middle\vert~ v = b \bigr\}\right|\right) \,, \\
+%		F_{\text{comm}}(a, b) &= w_{\text{comm}}\big(\big|\big\{\text{frame }f ~\big\vert \\
+%			& \hphantom{= w} \text{$f$.receiver} = a \wedge \text{$f$.parent.receiver} = b\big\}\big|\big) \, .
+%	\end{split}
+%\end{equation}
+%\addtocounter{footnote}{-1}
+%\footnotetext{$\text{LCP}(u, v)$: Largest common prefix of two sequences $u$ and $v$.}
+%\footnotetext{$\text{org}(o)$: Organizational path to an object $o$'s class (e.g., a file path).}
+
+\begin{algorithm}
+	$F_{\text{class}}(a, b) = \begin{cases}w_{\text{class}}, & \text{if $\text{class}(a) = \text{class}(b)$;} \\ 0, & \text{otherwise}.\end{cases}$ \;
+	$F_{\text{org}}(a, b) = w_{\text{org}}\bigl(\text{commonPrefixLength}(\text{org}(a), \text{org}(b))\bigr)$ \;
+	$F_{\text{ref}}(a, b) = w_{\text{ref}}\bigl(\text{number of fields in $a$ that reference $b$}\bigr)$ \;
+	$F_{\text{comm}}(a, b) = w_{\text{comm}}\bigl(\text{number of messages from $a$ to $b$}\bigr)$ \;
+\end{algorithm}
 
 \begin{table}
 	\centering
