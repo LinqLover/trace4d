@@ -4,6 +4,8 @@ import { MapControls } from 'three/addons/controls/MapControls.js'
 import Stats from 'stats.js'
 import * as THREE from 'three'
 
+import * as statsLogs from './utils/statsLogs.js'
+
 import { ClassCategoryEntity, ClassEntity, FieldEntity, ObjectEntity, PackageEntity, TraceEntity } from './graph.js'
 import { Player, Timeline } from './player.js'
 import { TraceReader } from './trace.js'
@@ -385,9 +387,13 @@ traceMap.player.stepsPerSecond = 100
   }
 
   buildFPSCounter() {
+    statsLogs.logging(((this.options.measureFPS ?? false) !== false))
+
     this.stats = new Stats()
     this.stats.showPanel(0) // FPS
     this.window.document.body.appendChild(this.stats.dom)
+
+    this.stats.logs = statsLogs.logs
   }
 
   buildMapControls() {
