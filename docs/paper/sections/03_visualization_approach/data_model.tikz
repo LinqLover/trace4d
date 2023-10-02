@@ -1,6 +1,6 @@
 % !TeX root = ../../../paper.tex
 \begin{tikzpicture}
-	[font=\small\sffamily]
+	\tikzstyle{every node}=[font=\small]
 	\begin{class}
 		[text width=2cm]
 		{StackFrame}
@@ -15,21 +15,21 @@
 	\begin{class}
 		[text width=2cm]
 		{Object}
-		{0,-1.25}
+		{0,-1}
 		\attribute{label}
 		\attribute{}
 	\end{class}
 	\begin{class}
 		[text width=2cm]
 		{Class}
-		{1.5,-1.25}
+		{1.5,-1}
 		\attribute{name}
 		\attribute{path}
 	\end{class}
 	\begin{class}
 		[text width=2cm]
 		{Field}
-		{-1.5,-1.25}
+		{-1.5,-1}
 		\attribute{name}
 		\attribute{value}
 	\end{class}
@@ -39,5 +39,4 @@
 	\unidirectionalAssociation{Object}{}{}{Class}
 	\composition{Object}{}{*}{Field}
 \end{tikzpicture}
-% TODO: Maybe change color theme later
-% TODO: hide empty operations box, equalize label box heights (\vphantom is not supported)
+% TODO: equalize label box heights (\vphantom is not supported)
