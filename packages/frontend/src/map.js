@@ -657,37 +657,41 @@ traceMap.player.stepsPerSecond = 100
 
   //#region loading
   async loadTraceFromServerFile(serverFile, style) {
-    return this.loadTrace(await TraceReader.readTraceFromServerFile(serverFile), style)
+    return await this.loadTrace(TraceReader.readTraceFromServerFile(serverFile), style)
   }
 
   async loadTraceFromLocalFile(localFile, style) {
-    return this.loadTrace(await TraceReader.readTraceFromLocalFile(localFile), style)
+    return await this.loadTrace(TraceReader.readTraceFromLocalFile(localFile), style)
   }
 
   loadTrace(trace, style = undefined) {
-    this.trace = trace
+    return this.beBusyDuring(async () => {
+      this.trace = await trace
 
-    style ??= this.defaultStyle
-    this.entityBuilder = EntityBuilder.newForStyle(style, this.trace)
+      style ??= this.defaultStyle
+      this.entityBuilder = EntityBuilder.newForStyle(style, this.trace)
 
-    this.reloadTrace()
+      await this.reloadTrace()
+    })
   }
 
   reloadTrace() {
-    if (this.player) {
-      this.player.reset()
-    }
+    return this.beBusyDuring(async () => {
+      if (this.player) {
+        this.player.reset()
+      }
 
-    const traceObject3d = this.entityBuilder.build(this)
+      const traceObject3d = this.entityBuilder.build(this)
 
-    this.buildTrace(traceObject3d)
+      this.buildTrace(traceObject3d)
 
-    this.reloadPlayer()
+      this.reloadPlayer()
 
-    this.traceEntity.trail.deferUpdates = true
-    if (this.options.autoStart ?? false) {
-      setTimeout(() => this.player.start(), 3000)
-    }
+      this.traceEntity.trail.deferUpdates = true
+      if (this.options.autoStart ?? false) {
+        setTimeout(() => this.player.start(), 3000)
+      }
+    })
   }
 
   reloadPlayer() {
@@ -695,6 +699,30 @@ traceMap.player.stepsPerSecond = 100
 
     this.timeline.minTime = this.player.cursor.startTime
     this.timeline.maxTime = this.player.cursor.endTime
+  }
+
+  async beBusyDuring(fn) {
+    if (this.mouseCursor === 'wait') return await fn()
+
+    const previousMouseCursor = this.mouseCursor
+    this.mouseCursor = 'wait'
+    const previousCursor = this.renderer.domElement.style.cursor
+    this.renderer.domElement.style.cursor = this.mouseCursor
+    try {
+      return await fn()
+    } finally {
+      if (this.mouseCursor === 'wait') {
+        this.mouseCursor = 'progress'
+        this.renderer.domElement.style.cursor = this.mouseCursor
+        setTimeout(() => {
+          if (this.mouseCursor === 'progress') {
+            this.mouseCursor = previousMouseCursor
+            this.renderer.domElement.style.cursor = previousCursor
+          }
+        }, 0)
+      } else {
+      }
+    }
   }
   //#endregion
 
@@ -722,15 +750,7 @@ traceMap.player.stepsPerSecond = 100
       this.renderer.render(this.scene, this.camera)
       this.renderRequired = false
 
-      if ((this.options.measureStartTime ?? false) !== false && window.loadStartTime && this.player?.trail) {
-        const startTime = window.loadStartTime
-        delete window.loadStartTime
-        // to appear after current frame
-        setTimeout(() => {
-          const timeToLoad = performance.now() - startTime
-          alert("time to load: " + timeToLoad)
-        }, 0)
-      }
+      this.renderedNow()
     }
 
     this.mapControls?.update()
@@ -738,7 +758,21 @@ traceMap.player.stepsPerSecond = 100
     this.stats?.update()
   }
 
+  renderedNow() {
+    if ((this.options.measureStartTime ?? false) !== false && window.loadStartTime && this.player?.trail) {
+      const startTime = window.loadStartTime
+      delete window.loadStartTime
+      // to appear after current frame
+      setTimeout(() => {
+        const timeToLoad = performance.now() - startTime
+        alert("time to load: " + timeToLoad)
+      }, 0)
+    }
+  }
+
   updateCursor(event) {
+    if (this.mouseCursor) return this.mouseCursor
+
     let cursor = 'auto'
     if (this.dragControls.enabled) {
       this.mouseOverEntities.forEach(entity => {
