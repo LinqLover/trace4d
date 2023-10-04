@@ -64,8 +64,18 @@
 \usepackage{tikzscale}
 \usetikzlibrary{calc}
 
+
 % UML diagrams
 \usepackage[simplified]{pgf-umlcd}
+% fix inconsistent class name box heights (https://tex.stackexchange.com/a/697490/221054)
+\tikzset{
+    umlcd style class/.append style={
+        execute at begin node=\strut}}
+% fix inconsistent operation/attribute row heights (https://tex.stackexchange.com/a/697490/221054)
+\usepackage{xpatch}
+\xpatchcmd{\pgfumlcd@operation}{\break}{\break\strut}{}{}
+\xpatchcmd{\pgfumlcd@attribute}{\break}{\break\strut}{}{}
+% better colors
 \renewcommand{\umldrawcolor}{black}
 \renewcommand{\umlfillcolor}{white!90!black}
 
@@ -90,6 +100,11 @@
 		node[midway, right]{#2}
 		node[midway, left]{#3};
 }
+
+
+% algorithms
+\usepackage{algorithm2e}
+\SetEndCharOfAlgoLine{.}
 
 
 % \cites for natbib
