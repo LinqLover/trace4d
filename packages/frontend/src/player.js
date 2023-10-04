@@ -254,7 +254,7 @@ export class Player extends EventEmitter {
 
 export class Flamegraph {
   //#region constants
-  filteredObjectColor = '#aaa'
+  filteredObjectColor = '#777'
   minEffectiveCellHeightForLabel = 6
   //#endregion
 
