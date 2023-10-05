@@ -1,33 +1,61 @@
 % !TeX root = ../../../paper.tex
-{\setlength\tabcolsep{3pt}
-\begin{tabularx}{\linewidth}{l c *{3}{Y} c *{5}{Y}}
+\begin{longtblr}[
+	note{a} = {System: Windows 10 64-bit 22H1, Intel Core i7-8550U 1.80GHz, 16GB RAM, Intel UHD Graphics 620 8GB.},
+	note{b} = {Backend: Squeak 6.1Alpha \#22599, OpenSmalltalk VM 202206021410.},
+	note{c} = {Frontend: THREE.js r156, single-threaded, Chrome 117.0.5938.62 (inner window size: $1920 \times 963$).},
+	note{d} = {Excluding garbage collection.},
+]{
+	colspec = {
+		l
+		c
+		X[c, si={table-format=3}]
+		X[c, si={table-format=5}]
+		X[c, si={table-format=3}]
+		c
+		X[c, si={table-format=4}]
+		X[c, si={table-format=2.1}]
+		X[c, si={table-format=2.1}]
+		X[c, si={table-format=3}]
+		X[c, si={table-format=4}]
+	},
+	row{1,2} = {guard, font=\bfseries},
+	stretch = 0,
+}
 	\toprule
 
+	\SetCell[r=2]{c} {{{Program}}}	&
 		&
+	\SetCell[c=3]{c} {{{Backend (Squeak)\TblrNote{a}\phantom{\textsuperscript{a}}\TblrNote{b}}}}	& & &
 		&
-	\multicolumn{3}{c}{\bold{Backend (Squeak)}}	&
-		&
-	\multicolumn{5}{c}{\bold{Frontend (THREE.js)}}	\\
+	\SetCell[c=5]{c} {{{Frontend (THREE.js)\TblrNote{a}\phantom{\textsuperscript{a}}\TblrNote{c}}}}	& & & & \\
 
-	\multicolumn{1}{c}{\bold{Program}}	&
 		&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{Tracer}\\\bold{[\si{\second}]}}}	&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{Serializer}\\\bold{[\si{\second}]}}}	&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{Serialization}\\\bold{[\si{\kilo\byte}]}}}	&
 		&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{Start-up}\\\bold{[\si{\second}]}}}	&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{Frame rate}\\\bold{(force simulation)}\\\bold{[FPS]}}}	&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{Frame rate}\\\bold{(animation)}\\\bold{[FPS]}}}	&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{RAM}\\\bold{[\si{\mega\byte}]}}}	&
-	\multicolumn{1}{c}{\makecell[cc]{\bold{GPU}\\\bold{[\si{\mega\byte}]}}}	\\
+	\SetCell{c,m} {Tracer\TblrNote{d}\\ {[\si{\second}]}}	&
+	\SetCell{c,m} {Serializer\TblrNote{d}\\ {[\si{\second}]}}	&
+	\SetCell{c,m} {Serialization\\ {[\si{\kilo\byte}]}}	&
+		&
+	\SetCell{c,m} {Start-up\\ {[\si{\second}]}}	&
+	\SetCell{c,m} {Frame rate\\(force simulation)\\ {[\si{FPS}]}}	&
+	\SetCell{c,m} {Frame rate\\(animation)\\ {[\si{FPS}]}}	&
+	\SetCell{c,m} {RAM\\ {[\si{\mega\byte}]}}	&
+	\SetCell{c,m} {GPU\\ {[\si{\mega\byte}]}}	\\
 
 	\midrule
 
-	\multicolumn{6}{l}{\emph{\code{Regex} engine}}	\\
+	\SetCell[c=11]{l} {\emph{\code{Regex} engine}}	\\
 
-	\tabitem Test & & 0.1 & 0.1 & 0.1 & & 0.1 & 60 & 60 & 60 & 60 \\
-	% TODO: new numbers here!
-	%\tabitem Construction	&
+	\tabitem Construction	&	& 76	& 3317	& 138	&	& 1247	& 21.7	& 58.6	& 224	& 479 \\
+	\tabitem Matching	&	& 104	& 10127	& 316	&	& 2250	& 15.1	& 34.0	& 386	& 491 \\
+
+	\SetCell[c=11]{l} {\emph{\code{Morphic} UI framework}}	\\
+
+	\tabitem Event handling	&	& 159	& 31725	& 365	&	& 1571	& 22.3	& 52.1	& 267	& 530 \\
+	\tabitem Layouting	&	& 74	& 14164	& 369	&	& 2998	& 10.2	& 23.4	& 279	& 645 \\
+
+	\code{Inspector} tool initialization	&	& 147	& 18044	& 616	&	& 4676	& 5.6	& 15.3	& 397	& 1805 \\
+
+	HTML parsing	&	& 176	& 17494	& 453	& &	7089	& 18.1	& 34.6	& 458	& 2022 \\
 
 	\bottomrule
-\end{tabularx}}
+\end{longtblr}

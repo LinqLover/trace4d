@@ -65,9 +65,8 @@ To address this challenge, we want to apply trace summarization techniques to el
 	\centering
 	\caption{
 		Performance evaluation of the \tfd{} prototype for different program traces with respect to frame rate, memory consumption, and saving/loading times.
-		We measure the frame rate both during the initial force simulation and afterward when playing the animation of the program trace.
-		We found the frame rate to be sufficient for most of the considered program traces but see the need for optimization for larger program traces with respect to trace serialization, force simulation, and 3D rendering.
-		% TODO: indicate system specs
+		We measure the frame rate both during the initial force simulation and when playing the animation afterward.
+		We find the performance to be practical for most of the considered program traces but see the need for optimization for larger program traces with respect to trace serialization, force simulation, and 3D rendering.
 	}
 	\label{tab:discussion/performance}
 	\begin{threeparttable}
@@ -77,8 +76,16 @@ To address this challenge, we want to apply trace summarization techniques to el
 	\end{threeparttable}
 \end{table*}
 
-Another challenge regards the technical performance of the visualization which affected our experience for larger program trace.
-While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need for optimizing the frame rate, graphic memory consumption, and saving/loading times of program traces~(\cref{tab:discussion/performance}).
+Another challenge regards the technical performance of the visualization which affected our experience for larger program traces.
+We evaluate the performance of our prototype with regard to the tracing and serialization of program traces, the start-up time of the visualization, the rendering frame rates during the initial force simulation as well as when playing the animation of the program trace, and the memory consumption~(\cref{tab:discussion/performance}).
+
+To reduce network latency, we run the \tfd{} prototype locally using Node.js' built-in HTTP server \hardcode{http-server}\footnote{\hardcode{http-server} v14.1.1, node v16.8.0.} and view the visualization in a Google Chrome browser on the same machine.
+To measure the frame rate, we instrument the \hardcode{stats.js} library\footnote{\url{https://mrdoob.github.io/stats.js/}} to record the number of frames per second (FPS) and report the average frame rate after rendering the scene for 30 seconds.
+We retrieve the memory consumption from the Chrome Task Manager for the tab of the \tfd{} prototype and for the GPU process; to estimate the effective GPU consumption of the visualization, we subtract the GPU consumption before starting the visualization from the later GPU consumption.
+To avoid distortions from the garbage collector, we invoke the visualization of each trace from an empty browser tab, exclude the first two seconds from the frame rate measurements, log the minimum memory consumption from a 30-second interval for each measurement, and report the best frame rate average and memory consumption of three runs for each trace.
+
+While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need for optimizing the frame rate, graphic memory consumption, and saving/loading times of program traces.
+Note that the limited frame rate during the force simulation is a deliberate trade-off to reduce the time until the layout stabilizes and the animation can be played.
 
 To speed up the saving/loading times, we see great optimization potential in applying object filters in the backend (IDE) prior the serializing the program trace.
 To improve the responsiveness of the visualization, we consider replacing the current force-simulation libary \hardcode{d3-force} by a more efficient alternative and extracting it from the UI thread into a parallel web worker.
