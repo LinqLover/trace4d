@@ -206,6 +206,12 @@
 \makeatother
 
 
+% inline icons
+\usepackage{textcomp}  % Required for encoding \textbigcircle
+\usepackage{scalerel}  % Required for emoji \scalerel
+\newcommand{\texticon}[1]{\  \scalerel*{\includegraphics{#1}}{\textrm{\textbigcircle}}\  }
+
+
 % switch to \onecolumn in appendix
 \usepackage{afterpage}
 
