@@ -1440,7 +1440,7 @@ export class Trail {
 
   hopHeight = 30
   /** Controls the render quality of the trail. */
-  divisionsPerPoint = 5
+  divisionsPerPoint = 3
   color = 0xb00dddd
   useTube = true
 
