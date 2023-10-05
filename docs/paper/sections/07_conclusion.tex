@@ -1,3 +1,23 @@
 % !TeX root = ../paper.tex
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \label{sec:conclusion}
+
+In this paper, we proposed a noval approach to visualize the behavior of object-oriented programs through animated 2.5D object maps that depict particular objects and their interactions from a program trace.
+We described the visual design of our approach and implemented it in a prototypical web application that displays program traces from a Squeak/Smalltalk environment.
+We described how programmers can use our tool to explore the behavior of object-oriented programs and found that especially for smaller and coherent program traces, they can gain several insights regarding the structure of the object graph and the segments of the program behavior while larger and more redundant program traces still pose practical challenges regarding the configuration of the object map, the clarity of the object graph, irrelevant details in the communication between objects, and the performance of the visualization.
+
+In future work, we want to scale our approach to larger program traces by experimenting with different (hierarchical) layout approaches~\cite{kuhn2008consistent,atzberger2023visualization}, heuristics for automatic configuration, and techniques for trace summarization~\cite{hamouLhadj2006summarizing,noda2017identifying} as well as by investing in technical optimizations of our prototype.
+To further improve the compactness and oversight of larger object graphs, we also consider defining state filters for hiding irrelevant fields of objects or defining conditions for aggregating similar objects into collapsed blocks.
+
+Similarly, we hypothetize that the clarity of object graphs could benefit significantly from the use of domain-specific knowledge about the explored system~\cite{chis2014moldable}.
+For instance, particular domains such as the \code{Regex} engine or the \code{Morphic} UI framework could provide meaningful labels for objects (e.g., ``\textbackslash{}d'' instead of ``a RxsPredicate''), recommended filter presets, or structural hints (e.g., suggesting the use of the variables \code{submorphs} and \code{owner} to display the composite structure of a Morphic widget tree in the object map).
+
+To explore the full potential of animated object maps for programmers, we want to integrate it into their usual development process by embedding the visualization into an IDE such as the Squeak/Smalltalk environment.
+This would allow programmers to immediately switch between the program trace visualization and existing code browsing and debugging tool to take different views on the system under exploration; for example, they could open an animated object map from an omniscient debugger, select an object in the map to inspect it in an inspector tool, click on a stack frame in the flame graph to browse it in an editor, or even monitor a running program in the visualization.
+In addition, this integration could improve the performance of our prototype as data (e.g., the fields of filtered objects) could be streamed on demand into the visualization instead of serializing the complete trace in a single operation%
+\footnote{In terms of our \tfd{} prototype, one implementation strategy for this would be to embed the web app in Squeak using the \name{MagicMouse} package (\url{https://github.com/cmfcmf/MagicMouse}) and exchange events and data through a WebSockets connection between the frontend and the backend.}%
+.
+
+Finally, we see another interesting research direction in including the historic state of objects into our visualization~\cite{thiede2023object,thiede2023time}.
+In the object map, we could add or remove object blocks based on their lifecycle in the program trace or highlight state changes in their fields.
+This would allow programmers to explore the evolution of the object graph by playing the animation or to navigate along state changes by selecting relevant fields of objects.
