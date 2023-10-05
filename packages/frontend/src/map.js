@@ -366,7 +366,7 @@ traceMap.entityBuilder.forceWeights.references = 0.5
 traceMap.entityBuilder.forceWeights.organization.sameClass = 0.1
 traceMap.entityBuilder.forceWeights.globalFactor = 0.5
 traceMap.entityBuilder.forceWeights.repulsion = 0.3
-traceMap.entityBuilder.excludedObjectNames.push("''")
+traceMap.entityBuilder.excludedObjectNames.push("'an Object'")
 traceMap.entityBuilder.excludedClassNames.push('ByteString')
 traceMap.entityBuilder.excludeClasses = false
 traceMap.reloadTrace()
