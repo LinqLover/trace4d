@@ -3,8 +3,8 @@ buildJson
 
 	| trace objects classes |
 	objectIds := PluggableDictionary
-		hashBlock: [:a | a perform: #identityHash]
-		equalBlock: [:a :b | a tdbIdentical: b].
+		hashBlock: [:a | a t4dIdentityHash]
+		equalBlock: [:a :b | a t4dIdentical: b].
 	classNames := Dictionary new.
 	
 	trace := self buildTrace.
