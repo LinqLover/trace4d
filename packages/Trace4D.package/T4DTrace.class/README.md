@@ -1,0 +1,1 @@
+I serialize a program trace from the TraceDebugger into a JSON file.
