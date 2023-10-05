@@ -31,7 +31,9 @@ For a condensed summary of open research questions, read the conclusion of our [
 - Level of Detail (LOD): ???
 - customizable force simulation speed (trade-off between time to stability and smoothness)
 - systematically try to reduce number of geometries/triangles (see `traceMap.renderer.info`)
+- trail is very ineffficient (esp. to reposition during force simulation) yet low-res (see `divisionsPerPoints`), maybe needs a different approach
 - [if ever required] optimize trace cursor through indices or binary/exponential search (currently handles 100 steps/frame smoothly, not yet tried anything faster) (see also https://github.com/hpi-swa-lab/squeak-tracedebugger/issues/17#:~:text=rolling%20out%20an-,exponential%20search,-mechanism.%20For%20this)
+- app sometimes crashed when reloading huge trace through console interface: manually trigger GC?
 
 ### Convenience
 
@@ -61,6 +63,7 @@ For a condensed summary of open research questions, read the conclusion of our [
   - linebreaks in fields? (strategy: diy inspired by three.js dynamic texture)
   - emphasize label names?
 - vertical positioning of nodes (hill structure based on graph density/force field?)
+- display method plates in object blocks (see behaviors and context, navigate to their activations)
 
 ## Technical Debt
 
