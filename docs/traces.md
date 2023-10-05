@@ -39,6 +39,20 @@ T4DTrace forBlock:
 3. `self fullBoundsTextView`
 4. `T4DTrace forBlock: [self layoutChanged; fullBounds]`
 
+### Full World Cycle (`worldCycle.json`)
+
+```smalltalk
+T4DTrace forBlock:
+	[Project current world doOneCycleNow].
+```
+
+### Text Rendering (`displayScanner.json`)
+
+```smalltalk
+T4DTrace forBlock:
+	['a\b' withCRs asTextMorph imageForm].
+```
+
 ## Inspection Tool Construction (`inspectorResetFields.json`)
 
 1. `Color red inspect`
@@ -50,4 +64,35 @@ T4DTrace forBlock:
 ```smalltalk
 T4DTrace forBlock:
 	['<b>Hello <a href="lol">World!</a></b>' asTextFromHtml].
+```
+
+## Compiler (`doIt.json`)
+
+```smalltalk
+self clearHaltOnce.
+T4DTrace forBlock:
+	[Compiler evaluate: 'self haltOnce'].
+```
+
+## Trivia
+
+### Factorial (`factorial2.json`)
+
+```smalltalk
+T4DTrace forBlock:
+	[2 factorial].
+```
+
+### Non-Local Return (`nonLocalReturn.json`)
+
+```smalltalk
+T4DTrace forBlock:
+	['123' detect: [:ea | ea = $2]].
+```
+
+### Exception Signaling (`zeroDivision.json`)
+
+```smalltalk
+T4DTrace forBlock:
+	[2 / 0].
 ```
