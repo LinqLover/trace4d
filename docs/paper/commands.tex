@@ -12,7 +12,10 @@
 	\texttt{#1}}
 \newcommand\name[1]{\textsc{#1}}
 \newenvironment{multicode}{%
-	\begin{quote}\sffamily\setlength{\parindent}{0pt}}{\end{quote}}
+	\begin{quote}%
+		\ttfamily%
+		% \sffamily% % This looks more like Smalltalk
+		\setlength{\parindent}{0pt}}{\end{quote}}
 
 
 % SI units
@@ -65,6 +68,11 @@
 % itemize-like item in table
 % CREDITS: https://tex.stackexchange.com/a/150650/221054
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+% true itemize in table
+\usepackage{enumitem}
+\UseTblrLibrary{varwidth}
+\SetTblrInner{measure=vbox}
 
 
 % tikz
@@ -196,3 +204,11 @@
 	}%
 }%
 \makeatother
+
+
+% switch to \onecolumn in appendix
+\usepackage{afterpage}
+
+\newcommand\afterfullpage[1]{%
+	\makeatletter\afterpage{\if@firstcolumn \else\afterpage{#1}\fi}\makeatother
+}

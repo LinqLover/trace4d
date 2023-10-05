@@ -1,0 +1,518 @@
+% !TeX root = ../paper.tex
+\section{Protocol of Experience Report}
+\label{sec:appendix/experience_report}
+
+Here we provide the raw data of our experience report in \autoref{sec:discussion/experience_report}.
+
+\subsection{Criteria}
+
+\begin{enumerate}
+	\item \emph{Configuration effort}: How many operations are required to reach a usable configuration in terms of filters and forces?
+	\item \emph{Clarity of objects}: Is the quantity of displayed objects manageable or overwhelming?
+	\item \emph{Object layout}: Is it possible and easy to identify regions of the object graph? How meaningful are the identified patterns?
+	\item \emph{Animation}: Is it possible and easy to recognize, follow, and perceive the flow of activity?
+	\item \emph{Program comprehension}: Is it possible and easy to identify sections of the program execution? How meaningful are the identified patterns?
+\end{enumerate}
+
+%\afterfullpage{\onecolumn}
+%\afterpage{\onecolumn}
+% use \twocolumn[{...}] instead - requires some makeatletter stuff because we want
+
+\subsection{Ratings}
+
+{\setlength{\leftmargini}{.25cm}
+
+\subsubsection{\code{Regex} engine}
+
+\paragraph{Construction}
+
+Program trace: \hardcode{regexParse.json}.\\[\parskip]
+
+\begin{tblr}{
+	width=\linewidth-\parindent,
+	colspec = {
+		p{1.1cm}
+		X[l]
+		X[l]
+		X[-1,c]
+	},
+	rows = {font=\footnotesize},
+	row{1} = {font=\footnotesize\bfseries},
+	stretch = -1,
+}
+	\toprule
+
+	Criterion	&
+	Positive	&
+	Negative	&
+	Rating	\\
+
+	\midrule
+
+	Con\-fi\-gu\-ra\-tion effort	&
+	\begin{itemize}
+		\item no additional configuration required
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	Clarity of objects (26)	&
+	\SetCell{c} {-}	&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	{Object\\ layout}	&
+	\begin{itemize}
+		\item identified groups: input, AST, NFA
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	Animation	&
+	\begin{itemize}
+		\item manageable, overly consistent speed
+		\item no noise
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item long delay in hidden dictionaries of \code{Rx\-Match\-Op\-ti\-mi\-zer}
+	\end{itemize}
+		&
+	$+$	\\
+
+	Program comprehension	&
+	\begin{itemize}
+		\item identified sections: parsing, compiling, optimizing
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	\bottomrule
+\end{tblr}
+
+\paragraph{Matching}
+
+Program trace: \hardcode{regexMatch.json}.\\[\parskip]
+
+\begin{tblr}{
+	width=\linewidth-\parindent,
+	colspec = {
+		p{1.1cm}
+		X[l]
+		X[l]
+		X[-1,c]
+	},
+	rows = {font=\footnotesize},
+	row{1} = {font=\footnotesize\bfseries},
+	stretch = -1,
+}
+	\toprule
+
+	Criterion	&
+	Positive	&
+	Negative	&
+	Rating	\\
+
+	\midrule
+
+	Con\-fi\-gu\-ra\-tion effort	&
+	\begin{itemize}
+		\item no additional configuration required
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item wait a few seconds for force simulation to stabilize
+	\end{itemize}
+		&
+	$+$	\\
+
+	Clarity of objects (31)	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item too many similar input characters
+	\end{itemize}
+		&
+	$+$	\\
+
+	{Object\\ layout}	&
+	\begin{itemize}
+		\item identified groups: input, NFA
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	Animation	&
+	\begin{itemize}
+		\item overly consistent speed
+		\item no noise
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item too lengthy animation / too slow speed
+	\end{itemize}
+		&
+	$+$	\\
+
+	Program comprehension	&
+	\begin{itemize}
+		\item identified single matches
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	\bottomrule
+\end{tblr}
+
+\subsubsection{\code{Morphic} UI framework}
+
+\paragraph{Event handling}
+
+Program trace: \hardcode{mouseDown.json}.\\[\parskip]
+
+\onecolumn % HACKED: should be handled with \afterpage
+
+\begin{tblr}{
+	width=\linewidth-\parindent,
+	colspec = {
+		%p{1.1cm}
+		l
+		X[l]
+		X[l]
+		X[-1,c]
+	},
+	rows = {font=\footnotesize},
+	row{1} = {font=\footnotesize\bfseries},
+	stretch = -1,
+}
+	\toprule
+
+	Criterion	&
+	Positive	&
+	Negative	&
+	Rating	\\
+
+	\midrule
+
+	Con\-fi\-gu\-ra\-tion effort	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item required force weights:
+			{\advance\leftmargini 0.5em
+			\begin{multicode}
+				globalFactor = 0.1
+			\end{multicode}}
+		\item required object filters:
+			{\advance\leftmargini 1em
+			\begin{multicode}
+				excludedClassNames.push(\textquotesingle{}MorphExtension\textquotesingle{}, \textquotesingle{}Dictionary\textquotesingle{})
+			\end{multicode}}
+		\item wait many seconds for force simulation to stabilize
+	\end{itemize}
+		&
+	$-$	\\
+
+	Clarity of objects (53)	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item too many morphs, too many events with redundant state
+		\item many irrelevant fields in morphs
+		\item labels too small when zooming out, poor font quality
+		\item did not find central button morph
+	\end{itemize}
+		&
+	$-$	\\
+
+	{Object\\ layout}	&
+	\begin{itemize}
+		\item identified groups: kinds of morphs, events
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item overwhelmingly large cluster of morphs
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	Animation	&
+	\begin{itemize}
+		\item followable
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item too lengthy animation
+		\item some delays in hidden objects
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	Program comprehension	&
+	\begin{itemize}
+		\item identified sections: event dispatching
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item not identified receiver morph for event
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	\bottomrule
+\end{tblr}
+
+\paragraph{Layouting}
+
+Program trace: \hardcode{fullBoundsTextView.json}.\\[\parskip]
+
+\begin{tblr}{
+	width=\linewidth-\parindent,
+	colspec = {
+		%p{1.1cm}
+		l
+		X[l]
+		X[l]
+		X[-1,c]
+	},
+	rows = {font=\footnotesize},
+	row{1} = {font=\footnotesize\bfseries},
+	stretch = -1,
+}
+	\toprule
+
+	Criterion	&
+	Positive	&
+	Negative	&
+	Rating	\\
+
+	\midrule
+
+	Con\-fi\-gu\-ra\-tion effort	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item required force weights:
+			{\advance\leftmargini 0.5em
+			\begin{multicode}
+				globalFactor = 0.1
+			\end{multicode}}
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	Clarity of objects (29)	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item many irrelevant fields in morphs
+		\item labels too small when zooming out
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	Object layout	&
+	\begin{itemize}
+		\item identified groups: central morphs, peripheral state
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	Animation	&
+	\begin{itemize}
+		\item followable
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item too lengthy animation
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	Program comprehension	&
+	\begin{itemize}
+		\item identified sections: very rough tree traversal
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item not understood tree structure or its implications on layout
+	\end{itemize}
+		&
+	$-$	\\
+
+	\bottomrule
+\end{tblr}
+
+\subsubsection{Inspection tool construction}
+
+Program trace: \hardcode{inspectorResetFields.json}.\\[\parskip]
+
+\begin{tblr}{
+	width=\linewidth-\parindent,
+	colspec = {
+		%p{1.1cm}
+		l
+		X[l]
+		X[l]
+		X[-1,c]
+	},
+	rows = {font=\footnotesize},
+	row{1} = {font=\footnotesize\bfseries},
+	stretch = -1,
+}
+	\toprule
+
+	Criterion	&
+	Positive	&
+	Negative	&
+	Rating	\\
+
+	\midrule
+
+	Con\-fi\-gu\-ra\-tion effort	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item required force weights:
+			{\advance\leftmargini 0.5em
+			\begin{multicode}
+				repulsion = .4 \\
+				communication = 0 \\
+				globalFactor = .4
+			\end{multicode}}
+		\item required object filters:
+			{\advance\leftmargini 1em
+			\begin{multicode}
+				excludedObjectNames.push(\textquotesingle{}an Object\textquotesingle{})
+			\end{multicode}}
+		\item wait many seconds for force simulation to stabilize
+	\end{itemize}
+		&
+	$-$	\\
+
+	Clarity of objects (46)	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item too many homogeneous inspector fields
+	\end{itemize}
+		&
+	$-$	\\
+
+	Object layout	&
+	\begin{itemize}
+		\item identified groups: inspector fields, streams, texts
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item cannot distinguish versions of inspector fields
+	\end{itemize}
+		&
+	$-$	\\
+
+	Animation	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item too lengthy animation
+		\item insufficient frame rate
+		\item some delays in hidden objects
+	\end{itemize}
+		&
+	$-$	\\
+
+	Program comprehension	&
+	\begin{itemize}
+		\item identified sections: very rough traversal of inspector fields
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item not identified different versions / traversals of inspector fields
+		\item not identified object under inspection
+	\end{itemize}
+		&
+	$-$	\\
+
+	\bottomrule
+\end{tblr}
+
+\subsubsection{HTML parsing}
+
+Program trace: \hardcode{asTextFromHtml.json}.\\[\parskip]
+
+\begin{tblr}{
+	width=\linewidth-\parindent,
+	colspec = {
+		%p{1.1cm}
+		l
+		X[l]
+		X[l]
+		X[-1,c]
+	},
+	rows = {font=\footnotesize},
+	row{1} = {font=\footnotesize\bfseries},
+	stretch = -1,
+}
+	\toprule
+
+	Criterion	&
+	Positive	&
+	Negative	&
+	Rating	\\
+
+	\midrule
+
+	Con\-fi\-gu\-ra\-tion effort	&
+	\SetCell{c} {-}	&
+	\begin{itemize}
+		\item required object filters:
+			{\advance\leftmargini 0.5em
+			\begin{multicode}
+				excludedClassNames.push(\textquotesingle{}ByteString\textquotesingle{}, \textquotesingle{}Character\textquotesingle{})
+			\end{multicode}}
+		\item cannot filter on single relevant string
+		\item required player configuration:
+			{\advance\leftmargini 1em
+			\begin{multicode}
+				player.stepsPerSecond = 200
+			\end{multicode}}
+	\end{itemize}
+		&
+	$\circ$	\\
+
+	Clarity of objects (21)	&
+	\SetCell{c} {-}	&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	Object layout	&
+	\begin{itemize}
+		\item identified groups: parser with stack, text parts, streams
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	Animation	&
+	\begin{itemize}
+		\item followable
+	\end{itemize}
+		&
+	\begin{itemize}
+		\item slightly too lengthy animation
+	\end{itemize}
+		&
+	$+$	\\
+
+	Program comprehension	&
+	\begin{itemize}
+		\item identified sections: parsing of HTML tags, pushing / popping of stack, construction of text parts
+	\end{itemize}
+		&
+	\SetCell{c} {-}	&
+	$+$	\\
+
+	\bottomrule
+\end{tblr}
+
+}
+
+% TODO: improve layout: optimize column widths per page, ideally break one table

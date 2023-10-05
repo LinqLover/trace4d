@@ -15,7 +15,7 @@ Configuration effort: +
   + no additional configuration required
 Clarity of entities: + (26)
 Structure: +
-  + identified groups: AST, NFA
+  + identified groups: input, AST, NFA
 Animation: +
   + manageable, overly consistent speed
   + no noise
@@ -29,17 +29,17 @@ Program comprehension: +
 ```
 Configuration effort: +
   + no additional configuration required
-  - wait a few seconds for simulation to converge
+  - wait a few seconds for force simulation to stabilize
 Clarity of entities: + (31)
   - too many similar input characters
 Structure: +
-  + identified groups: input string, NFA
+  + identified groups: input, NFA
 Animation: 0
   + overly consistent speed
   + no noise
-  - too lengthy animation/too small speed
+  - too lengthy animation/too slow speed
 Program comprehension: +
-  + identified matches
+  + identified single matches
 ```
 
 ## Morphic UI Framework (`Morphic`)
@@ -52,22 +52,22 @@ Configuration effort: -
       globalFactor = 0.1
   - required object filters:
       excludedClassNames.push('MorphExtension', 'Dictionary')
-  - wait many seconds for simulation to converge
+  - wait many seconds for force simulation to stabilize
 Clarity of entities: - (53)
   - too many morphs, too many events with redundant state
-  - too many fields in morphs
-  - too tiny font when zoomed out
-  - did not find central button morph (poor font quality)
+  - many irrelevant fields in morphs
+  - labels too small when zooming out, poor font quality
+  - did not find central button morph
 Structure: 0
-  - too large cluster of morphs
   + identified groups: kinds of morphs, events
+  - overwhelmingly large cluster of morphs
 Animation: 0
   + followable
   - too lengthy animation
   - some delays in hidden objects
 Program comprehension: 0
   + identified sections: event dispatching
-  - not identified receiver of event
+  - not identified receiver morph for event
 ```
 
 ### Layouting (`fullBoundsTextView.json`)
@@ -77,8 +77,8 @@ Configuration effort: 0
   - required force weights:
       globalFactor = 0.1
 Clarity of entities: 0 (29)
-  - too many fields in morphs
-  - too tiny font when zoomed out
+  - many irrelevant fields in morphs
+  - labels too when zooming out
 Structure: +
   + identified groups: central morphs, peripheral state
 Animation: 0
@@ -99,20 +99,20 @@ Configuration effort: -
       globalFactor = .4
   - required object filters:
       excludedObjectNames.push('an Object')
-  - wait many seconds for simulation to converge
+  - wait many seconds for force simulation to stabilize
 Clarity of entities: - (46)
   - too many homogeneous inspector fields
 Structure: -
-  - cannot distinguish versions of inspector fields
   + identified groups: inspector fields, streams, texts
+  - cannot distinguish versions of inspector fields
 Animation: -
   - too lengthy animation
-  - too slow, not enough fps
+  - insufficient frame rate
   - some delays in hidden objects
 Program comprehension: -
   + identified sections: very rough traversal of inspector fields
   - not identified different versions/traversals of inspector fields
-  - not identified inspected object
+  - not identified object under inspection
 ```
 
 ## HTML Parsing (`asTextFromHtml.json`)
@@ -121,15 +121,15 @@ Program comprehension: -
 Configuration effort: 0
   - required object filters:
       excludedClassNames.push('ByteString', 'Character')
-  - cannot show single relevant string
+  - cannot filter on single relevant string
   - required player configuration:
       player.stepsPerSecond = 200
 Clarity of entities: + (21)
 Structure: +
   + identified groups: parser with stack, text parts, streams
 Animation: +
-  - slightly too lengthy animation
   + followable
+  - slightly too lengthy animation
 Program comprehension: +
-  + identified sections: parsing of html tags, pushing/popping of stack, construction of text parts
+  + identified sections: parsing of HTML tags, pushing/popping of stack, construction of text parts
 ```
