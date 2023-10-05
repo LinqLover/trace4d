@@ -60,7 +60,6 @@
 % just one more table package, this one should help with stretching siunitx columns and generally promises to be better
 \usepackage{tabularray}
 \UseTblrLibrary{booktabs, siunitx}
-%\DefTblrTemplate{middlehead,lasthead}{default}{} % hide caption
 \DefTblrTemplate{caption}{default}{}    % Removes a caption
 \DefTblrTemplate{capcont}{default}{}    % Removes a caption on subsequent pages
 \DefTblrTemplate{contfoot}{default}{}   % Removes text denoting continuation on next page
@@ -204,6 +203,12 @@
 	}%
 }%
 \makeatother
+
+
+% inline icons
+\usepackage{textcomp}  % Required for encoding \textbigcircle
+\usepackage{scalerel}  % Required for emoji \scalerel
+\newcommand{\texticon}[1]{\  \scalerel*{\includegraphics{#1}}{\textrm{\textbigcircle}}\  }
 
 
 % switch to \onecolumn in appendix

@@ -9,7 +9,7 @@ In this section, we describe the prerequisites and the design of our proposed vi
 
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/data_model.tikz}
-	\caption{TODO}
+	\caption{UML class diagram showing the data model of an object-oriented program trace for the visualization.}
 	\Description{TODO}
 	\label{fig:visualization_approach/data_model}
 \end{figure}
@@ -39,13 +39,12 @@ They can unrestrictedly navigate through the visual scene using their keyboard a
 \paragraph{Objects}
 \label{sec:visualization_approach/mapping/objects}
 
-\begin{figure}
+\begin{figure}[b!]
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/objects}
-	\caption{TODO}
+	\caption{Visual mapping of objects, fields, and references to block entities, plates, and arrows in the object map.}
 	\Description{TODO}
 	\label{fig:visualization_approach/mapping/objects}
 \end{figure}
-% TODO: maybe cut better
 
 Each object is represented as a square cuboid \emph{block} entity that displays the label and fields of the object~(\cref{fig:visualization_approach/mapping/objects}).
 To maximize legibility from any perspective, the label is repeated on all four sides and in four orientations on the top of the block.
@@ -56,18 +55,8 @@ To indicate the direction of arrows, we place between one and ten evenly distrib
 \paragraph{Object graph}
 \label{sec:visualization_approach/mapping/object_graph}
 
-\begin{figure}
-	\includegraphics[height=.25\textheight]{sections/03_visualization_approach/mapping/object_graph}
-	\caption{TODO}
-	\Description{TODO}
-	\label{fig:visualization_approach/mapping/object_graph}
-\end{figure}
-% TODO: maybe highlight object for dragging?
-% TODO: how useful is this? you can't read anything.
-% TODO: improve figure layout? bundle object_graph and object_behavior in a single figure?
-
 To arrange object blocks in the 2.5D object map, we define a force-directed graph layout~\cite{fruchterman1991graph}.
-Between each pair of object blocks $(a, b)$, we apply several \emph{weighted attractive forces} based on the class membership, the organizational proximity of classes, and the references and communication between objects~(\cref{fig:visualization_approach/mapping/object_graph}).
+Between each pair of object blocks $(a, b)$, we apply several \emph{weighted attractive forces} based on the class membership, the organizational proximity of classes, and the references and communication between objects.
 In the following, $w_{\_}$ denotes the weight of a force and $\text{org}(o)$ denotes the organizational path of an object $o$'s class (e.g., a file path):
 
 %\begin{equation}
@@ -92,7 +81,11 @@ In the following, $w_{\_}$ denotes the weight of a force and $\text{org}(o)$ den
 
 \begin{table}
 	\centering
-	\caption{TODO}
+	\caption{
+		Default configuration of force weights for the object graph layout.
+		References between objects dominate the layout while organizational proximity and communication between objects are weighted lower.
+		Users can override these weights for specific program traces.
+	}
 	\label{tab:visualization_approach/mapping/object_graph/default_configuration}
 	\begin{threeparttable}
 		\centering
@@ -121,11 +114,14 @@ Similarly to the layout configuration~(\lcnameref{sec:visualization_approach/map
 
 \begin{figure}
 	\includegraphics[height=.25\textheight]{sections/03_visualization_approach/mapping/object_behavior}
-	\caption{TODO}
+	\caption{
+		Visual mapping of object behavior to color and trail in the object map.
+		The intensity of the red color indicates the recency of the last message received by each object.
+		The gradient trail connects the most recent object activations (control points of the curve are marked with a \protect\texticon{sections/03_visualization_approach/mapping/object_behavior_cross} cross).
+	}
 	\Description{TODO}
 	\label{fig:visualization_approach/mapping/object_behavior}
 \end{figure}
-% TODO: add different tones of red! maybe change cropping?
 
 The color of each object block displays its recent activity:
 \emph{inactive} blocks are colored in a neutral light gray while \emph{active} blocks whose objects have received a message recently are highlighted in a bright red~(\cref{fig:visualization_approach/mapping/object_behavior}).
@@ -142,11 +138,13 @@ The direction of the trail is displayed by continuously moving it to the next ob
 
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/timeline}
-	\caption{TODO}
+	\caption{
+		Timeline overlay with widgets for controlling the playback of the program trace and a flame graph with a variable degree of detail for navigating the call tree.
+		The flame graph and the object map are interactively connected, e.g., the user can hover a frame to highlight the corresponding object in the map.
+	}
 	\Description{TODO}
 	\label{fig:visualization_approach/mapping/timeline}
 \end{figure}
-% TODO: change cropping?
 
 The object map integrates a \emph{timeline} overlay at the bottom of the viewport that provides a time-centric navigational aid.
 The timeline consists of two widgets stacked on top of each other~(\cref{fig:visualization_approach/mapping/timeline}):
