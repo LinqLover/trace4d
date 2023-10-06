@@ -19,7 +19,7 @@ Regarding the objects referenced as values from fields, we only include those ob
 
 We implement the visualization frontend of \tfd{} as a JavaScript web application.
 The web app retrieves a serialized program trace and offers a programmatical interface for customizing the visual configuration~(\cref{sec:visualization_approach/mapping/object_graph,sec:visualization_approach/mapping/object_selection}).
-To build the 2.5D object map, we generate and display a 3D scene from the program trace using the JavaScript 3D library \name{THREE.js}\footnote{\url{https://threejs.org/}} and layout the object blocks using the \hardcode{d3-force} module of the visualization framework \name{d3.js}\footnote{\url{https://d3js.org/}}.
+To build the 2.5D object map, we generate and display a 3D scene from the program trace using the JavaScript 3D library \name{three.js}\footnote{\url{https://threejs.org/}} and layout the object blocks using the \hardcode{d3-force} module of the visualization framework \name{d3.js}\footnote{\url{https://d3js.org/}}.
 To build the timeline, we create a flame graph using the \hardcode{d3-flame-graph} plugin for \name{d3.js}\footnote{\url{https://github.com/spiermar/d3-flame-graph}} and combine it with a custom HTML widget for the player controls%
 \footnote{As \hardcode{d3-flame-graph} at the time of writing does not support a notion of starting points but only lengths for frames, we inject auxiliary transparent frames into the flame graph to adjust the horizontal layout of actual frames (see \ifanon{\url{https://gist.github.com/user/id} (blinded)}{\url{https://github.com/spiermar/d3-flame-graph/issues/227}}).}%
 .
