@@ -4,174 +4,89 @@
     <meta charset="utf-8" />
     <title>Trace4D</title>
     <link rel="shortcut icon" href="./assets/t4d-8924d59a.ico" />
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
 
-        font-family: sans-serif;
-      }
-
-      .overlay-container {
-        position: fixed;
-      }
-
-      .overlay {
-        overflow: hidden;
-        height: 100%;
-      }
-
-      .resizer[data-direction='vertical'] {
-        cursor: ns-resize;
-        height: 4px;
-        width: 100%;
-        position: absolute;
-        z-index: 2;
-      }
-
-      .has-touch-handler {
-        touch-action: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      #container {
-        width: 100%;
-        height: 100%;
-      }
-
-      #three {
-        width: 100%;
-        height: 100%;
-      }
-
-      #player-container {
-        bottom: 4vh;
-        left: 4vw;
-        right: 4vw;
-        height: 5%;
-        min-height: 4%;
-      }
-
-      #player {
-        background-color: #000000a0;
-
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        user-select: none;
-      }
-
-      .player-button {
-        height: 100%;
-        font-size: 2vh;
-        width: 4vh;
-        flex-shrink: 0;
-
-        color: white;
-        background: transparent;
-        border: none;
-
-        cursor: pointer;
-      }
-
-      #player-play {
-        display: block;
-      }
-
-      #player-pause {
-        display: none;
-      }
-
-      #player.playing #player-play {
-        display: none;
-      }
-
-      #player.playing #player-pause {
-        display: block;
-      }
-
-      #timeline {
-        height: 100%;
-        flex: auto;
-
-        background-color: #000000a0;
-
-        cursor: pointer;
-      }
-
-      #cursor {
-        position: relative;
-        left: 0;
-        top: 0;
-        z-index: 2;
-        width: .2em;
-        height: 100%;
-        background-color: #ffffff;
-        /* glow */
-        box-shadow: 0 0 6px #ffffff;
-
-        pointer-events: none; /* otherwise blocks clicks on flamegraph */
-      }
-
-      #flamegraph {
-        transform: translateY(-100%);
-        width: 100%;
-        height: 100%;
-      }
-
-      #flamegraph * {
-        user-select: none;
-      }
-
-      #flamegraph > svg {
-        width: 100%;
-        height: 100%;
-      }
-
-      #flamegraph .d3-flame-graph-label {
-        font-size: small;
-        transform: scaleX(0.8);
-        transform-origin: left;
-      }
-
-      .d3-flame-graph-tip.s {
-        background: #000000d0;
-        font-family: sans-serif;
-        padding: 5px;
-        color: white;
-        font-size: small;
-      }
-    </style>
     
-    <script type="module" crossorigin src="./assets/index-e8d17ed0.js"></script>
-    <link rel="stylesheet" href="./assets/index-5a6fc9b6.css">
+    <script type="module" crossorigin src="./assets/index-eb51b3f0.js"></script>
+    <link rel="stylesheet" href="./assets/index-5b770db7.css">
   </head>
 
   <body>
-    <script>
-      window.loadStartTime = performance.now()
-    </script>
-    
-    <!-- Must be the LAST imported script or all others will be blocked in vite build -->
-    
-    <div id="container">
-      <div id="three"></div>
-      <div id="player-container" class="overlay-container">
-        <div class="resizer" data-direction="vertical" data-edge="bottom"></div>
-        <div id="player" class="overlay">
-          <button id="player-play" class="player-button has-touch-handler">
-            <i class="fas fa-play"></i>
-          </button>
-          <button id="player-pause" class="player-button has-touch-handler">
-            <i class="fas fa-pause"></i>
-          </button>
-          <div id="timeline" class="has-touch-handler">
-            <div id="cursor" class="has-touch-handler"></div>
-            <div id="flamegraph"></div>
+    <div class="col-lg-8 mx-auto p-4 py-md-5">
+      <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+        <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
+          <svg class="bi me-2" width="40" height="32">
+            <image xlink:href="./assets/t4d-8924d59a.ico" width="32" height="32" />
+          </svg>
+          <span class="fs-4">trace4d</span>
+        </a>
+      </header>
+
+    <main>
+      <h1 class="text-body-emphasis">trace4d</h1>
+      <p class="fs-5 col-md-8">Visualization of program traces in animated 2.5D object maps. Research prototype.</p>
+
+      <div class="mb-5">
+        <a href="https://github.com/LinqLover/trace4d" class="btn btn-secondary px-3" target="_blank">Browse GitHub repository</a>
+        <a href="https://linqlover.github.io/trace4d/paper.pdf" class="btn btn-secondary px-3" target="_blank">Read paper (preprint)</a>
+      </div>
+
+      <div class="col-md-12 mb-5">
+        <h2 class="text-body-emphasis">Featured program traces</h2>
+        <!-- <ul class="list-unstyled ps-0">
+          <li t4d-template style="visibility: hidden;">
+            <a class="icon-link mb-1" href="t4d-template-href" rel="noopener" target="_blank">
+              <i class="bi bi-arrow-right-circle-fill" style="position: relative; top: -0.2em;"></i>
+              t4d-template-label (t4d-template-name)
+            </a>
+          </li>
+        </ul> -->
+        <div class="row gy-4">
+          <div class="col-sm-4" t4d-template="trace" style="display: none;">
+            <a type="button" class="btn btn-outline-primary card" style="text-align: left;" href="t4d-template-href" rel="noopener" target="_blank">
+              <div class="card-body">
+                <h5 class="card-title">t4d-template-name</h5>
+                <p class="card-text">t4d-template-label</p>
+              </div>
+            </a>
           </div>
         </div>
+        
+
+        <p class="fs-5 mt-5">
+          <a href="https://github.com/LinqLover/trace4d#usage" target="_blank">Learn how to use this visualization</a> or <a href="https://github.com/LinqLover/trace4d/blob/main/docs/traces.md" target="_blank">read more about the origin of these traces</a>.
+        </p>
       </div>
-    </div>
+
+      <div class="col-md-12">
+        <h2 class="text-body-emphasis">Bring your own trace</h2>
+        <p class="fs-5">You can select your own trace file in JSON format.</p>
+
+        <form id="trace-upload-form" class="row g-3 align-items-center" action="javascript:submit()">
+          <div class="col-auto">
+            <input type="file" class="form-control" id="trace-upload" accept=".json" required>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Load trace</button>
+          </div>
+          <script>
+            const input = document.getElementById('trace-upload')
+
+            function submit() {
+              const file = input.files[0]
+              if (!file) {
+                return
+              }
+
+              const reader = new FileReader()
+              reader.onload = function() {
+                sessionStorage.setItem('trace', reader.result)
+                window.location.href = 'app.html'
+              }
+              reader.readAsText(file)
+            }
+          </script>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
