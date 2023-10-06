@@ -10,3 +10,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 **The Software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort or otherwise, arising from,
 out of or in connection with the Software or the use or other dealings in the Software.**
+
+## Other Licenses
+
+All occurrences of the term `CREDITS` in this repository refer to materials by other authors. These materials are covered by their respective licenses.
