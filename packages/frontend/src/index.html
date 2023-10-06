@@ -63,8 +63,8 @@
           <div class="col-sm-4" t4d-template="trace" style="display: none;">
             <a type="button" class="btn btn-outline-primary card" style="text-align: left;" href="t4d-template-href" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-placement="top" title="t4d-template-tooltip">
               <div class="card-body">
-                <h5 class="card-title">t4d-template-name</h5>
-                <p class="card-text">t4d-template-label</p>
+                <h5 class="card-title">t4d-template-title</h5>
+                <p class="card-text">t4d-template-text</p>
               </div>
             </a>
           </div>
@@ -103,22 +103,22 @@
           ]
 
           traces.forEach(trace => {
-            let name = trace.name
+            let title = trace.name
             if (trace.recommended) {
-              name += ' ⭐'
+              title += ' ⭐'
             }
-            const label = trace.label
+            const text = trace.label
 
             const tooltip = trace.recommended ? "Recommended prime example" : ""
-            const href = `app.html?trace=traces/${name}`
+            const href = `app.html?trace=traces/${trace.name}`
 
             const clone = template.cloneNode(true)
             clone.style.display = 'block'
             // replace placeholders in HTML
             clone.innerHTML = clone.innerHTML
               .replace('t4d-template-href', href)
-              .replace('t4d-template-label', label)
-              .replace('t4d-template-name', name)
+              .replace('t4d-template-title', title)
+              .replace('t4d-template-text', text)
               .replace('t4d-template-tooltip', tooltip)
             parent.appendChild(clone)
           })
