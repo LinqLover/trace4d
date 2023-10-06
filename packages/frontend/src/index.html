@@ -7,8 +7,17 @@
 
     <script type="module">
       // WORKAROUND: should load CSS via <link> tags, but we couldn't configure vite to find the files (we don't use vue or sass or anything)
+      import '@popperjs/core/dist/umd/popper.min.js'
       import 'bootstrap/dist/css/bootstrap.min.css'
-      import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+      import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js'
+
+      // set up tooltips
+      document.addEventListener('DOMContentLoaded', () => {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+      })
     </script>
   </head>
 
@@ -52,7 +61,7 @@
         </ul> -->
         <div class="row gy-4">
           <div class="col-sm-4" t4d-template="trace" style="display: none;">
-            <a type="button" class="btn btn-outline-primary card" style="text-align: left;" href="t4d-template-href" rel="noopener" target="_blank">
+            <a type="button" class="btn btn-outline-primary card" style="text-align: left;" href="t4d-template-href" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-placement="top" title="t4d-template-tooltip">
               <div class="card-body">
                 <h5 class="card-title">t4d-template-name</h5>
                 <p class="card-text">t4d-template-label</p>
@@ -67,11 +76,13 @@
           const traces = [
             {
               label: "Regular expression construction",
-              name: 'regexParse.json'
+              name: 'regexParse.json',
+              recommended: true
             },
             {
               label: "Regular expression matching",
-              name: 'regexMatch.json'
+              name: 'regexMatch.json',
+              recommended: true
             },
             {
               label: "Morphic UI framework: Event handling",
@@ -92,15 +103,23 @@
           ]
 
           traces.forEach(trace => {
-            const href = `app.html?trace=traces/${trace.name}`
+            let name = trace.name
+            if (trace.recommended) {
+              name += ' ⭐'
+            }
+            const label = trace.label
+
+            const tooltip = trace.recommended ? "Recommended prime example" : ""
+            const href = `app.html?trace=traces/${name}`
 
             const clone = template.cloneNode(true)
             clone.style.display = 'block'
             // replace placeholders in HTML
             clone.innerHTML = clone.innerHTML
               .replace('t4d-template-href', href)
-              .replace('t4d-template-label', trace.label)
-              .replace('t4d-template-name', trace.name)
+              .replace('t4d-template-label', label)
+              .replace('t4d-template-name', name)
+              .replace('t4d-template-tooltip', tooltip)
             parent.appendChild(clone)
           })
         </script>
