@@ -618,6 +618,13 @@ traceMap.player.stepsPerSecond = 100
     }
     // NB: if this gets too slow, debounce updates
     this.timeline.on('time', () => this.player.currentTime = this.timeline.time)
+
+    // Hardcoded: On mobile devices, stop force simulation when starting to play (there is not yet a mobile-friendly way to stop it manually)
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      this.player.once('isPlaying', () => {
+        this.stopForceSimulation()
+      })
+    }
   }
 
   buildTrace(traceObject3d) {

@@ -45,7 +45,7 @@ For a condensed summary of open research questions, read the conclusion of our [
 - smooth zooming (through mouse wheel?)
 - world-in-hand navigation (e.g., rotateAroundCursor - currently not supported by OrbitControls)
 - player: control speed, hierarchical navigation (step over button/ctrl + right, ...)?, reset layout?, display key bindings?
-- fix mobile support: resizable timeline (or small expand/collapse button/handle), entity dragging
+- fix mobile support: resizable timeline (or small expand/collapse button/handle), entity dragging, stop simulation on touch, ...
 - horizontal/vertical zooming in flamegraph?
 - search for objects/fields/messages
 - hovercard/side panel for object details?
