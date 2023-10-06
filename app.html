@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Trace4D</title>
+    <link rel="shortcut icon" href="./assets/t4d-8924d59a.ico" />
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+
+        font-family: sans-serif;
+      }
+
+      .overlay-container {
+        position: fixed;
+      }
+
+      .overlay {
+        overflow: hidden;
+        height: 100%;
+      }
+
+      .resizer[data-direction='vertical'] {
+        cursor: ns-resize;
+        height: 4px;
+        width: 100%;
+        position: absolute;
+        z-index: 2;
+      }
+
+      .has-touch-handler {
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      #container {
+        width: 100%;
+        height: 100%;
+      }
+
+      #three {
+        width: 100%;
+        height: 100%;
+      }
+
+      #player-container {
+        bottom: 4vh;
+        left: 4vw;
+        right: 4vw;
+        height: 5%;
+        min-height: 4%;
+      }
+
+      #player {
+        background-color: #000000a0;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        user-select: none;
+      }
+
+      .player-button {
+        height: 100%;
+        font-size: 2vh;
+        width: 4vh;
+        flex-shrink: 0;
+
+        color: white;
+        background: transparent;
+        border: none;
+
+        cursor: pointer;
+      }
+
+      #player-play {
+        display: block;
+      }
+
+      #player-pause {
+        display: none;
+      }
+
+      #player.playing #player-play {
+        display: none;
+      }
+
+      #player.playing #player-pause {
+        display: block;
+      }
+
+      #timeline {
+        height: 100%;
+        flex: auto;
+
+        background-color: #000000a0;
+
+        cursor: pointer;
+      }
+
+      #cursor {
+        position: relative;
+        left: 0;
+        top: 0;
+        z-index: 2;
+        width: .2em;
+        height: 100%;
+        background-color: #ffffff;
+        /* glow */
+        box-shadow: 0 0 6px #ffffff;
+
+        pointer-events: none; /* otherwise blocks clicks on flamegraph */
+      }
+
+      #flamegraph {
+        transform: translateY(-100%);
+        width: 100%;
+        height: 100%;
+      }
+
+      #flamegraph * {
+        user-select: none;
+      }
+
+      #flamegraph > svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      #flamegraph .d3-flame-graph-label {
+        font-size: small;
+        transform: scaleX(0.8);
+        transform-origin: left;
+      }
+
+      .d3-flame-graph-tip.s {
+        background: #000000d0;
+        font-family: sans-serif;
+        padding: 5px;
+        color: white;
+        font-size: small;
+      }
+    </style>
+    
+    <script type="module" crossorigin src="./assets/app-8c8b13b6.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/_commonjsHelpers-a1841df3.js">
+    <link rel="stylesheet" href="./assets/app-5a6fc9b6.css">
+  </head>
+
+  <body>
+    <script>
+      window.loadStartTime = performance.now()
+    </script>
+    
+    <!-- Must be the LAST imported script or all others will be blocked in vite build -->
+    
+    <div id="container">
+      <div id="three"></div>
+      <div id="player-container" class="overlay-container">
+        <div class="resizer" data-direction="vertical" data-edge="bottom"></div>
+        <div id="player" class="overlay">
+          <button id="player-play" class="player-button has-touch-handler">
+            <i class="fas fa-play"></i>
+          </button>
+          <button id="player-pause" class="player-button has-touch-handler">
+            <i class="fas fa-pause"></i>
+          </button>
+          <div id="timeline" class="has-touch-handler">
+            <div id="cursor" class="has-touch-handler"></div>
+            <div id="flamegraph"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
