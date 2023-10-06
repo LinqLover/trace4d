@@ -26,7 +26,13 @@ async function init() {
   Object.assign(traceMap.options, options)
 
   traceMap.buildMap(document.querySelector('#container'))
-  await traceMap.loadTraceFromServerFile(traceUrl, style)
+  // check session storage for trace file
+  const sessionTrace = sessionStorage.getItem('trace')
+  if (sessionTrace) {
+    await traceMap.loadTraceFromString(sessionTrace, style)
+  } else {
+    await traceMap.loadTraceFromServerFile(traceUrl, style)
+  }
 }
 
 await init()

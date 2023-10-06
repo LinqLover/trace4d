@@ -75,11 +75,11 @@ You can customize much of it through optional URL parameters:
 
 Examples:
 
-- [https://linqlover.github.io/trace4d](https://linqlover.github.io/trace4d)
-- [https://linqlover.github.io/trace4d/?trace=traces/regexMatch.json&countFPS](https://linqlover.github.io/trace4d/?trace=traces/regexMatch.json&countFPS)
-- http://localhost:5173?trace=https://raw.githubusercontent.com/LinqLover/trace4d/main/assets/traces/displayScanner.json?measureStartTime
+- [https://linqlover.github.io/trace4d/app.html](https://linqlover.github.io/trace4d/app.html)
+- [https://linqlover.github.io/trace4d/app.html?trace=traces/regexMatch.json&countFPS](https://linqlover.github.io/trace4d/app.html?trace=traces/regexMatch.json&countFPS)
+- http://localhost:5173/app.html?trace=https://raw.githubusercontent.com/LinqLover/trace4d/main/assets/traces/displayScanner.json?measureStartTime
 
-If you have an [own trace file](#creating-a-program-trace), you first need to copy it to `assets/traces` (or to any public web server).
+If you have an [own trace file](#creating-a-program-trace), you can select it on the [landing page](https://linqlover.github.io/trace4d/).
 
 #### Navigation
 

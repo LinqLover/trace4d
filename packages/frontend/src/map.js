@@ -660,8 +660,8 @@ traceMap.player.stepsPerSecond = 100
     return await this.loadTrace(TraceReader.readTraceFromServerFile(serverFile), style)
   }
 
-  async loadTraceFromLocalFile(localFile, style) {
-    return await this.loadTrace(TraceReader.readTraceFromLocalFile(localFile), style)
+  async loadTraceFromString(jsonString, style) {
+    return await this.loadTrace(TraceReader.readTraceFromString(jsonString), style)
   }
 
   loadTrace(trace, style = undefined) {

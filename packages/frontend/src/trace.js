@@ -97,21 +97,15 @@ export class TraceReader {
     return new this(traceData).getTrace()
   }
 
-  static async readTraceFromLocalFile(localFile) {
-    const fileReader = new FileReader()
-    fileReader.readAsText(localFile)
-    const result = await new Promise((resolve, reject) => {
-      fileReader.onload = () => resolve(fileReader.result)
-      fileReader.onerror = () => reject(fileReader.error)
-    })
-    const traceData = JSON.parse(result)
-    return this.readTrace(traceData)
-  }
-
   static async readTraceFromServerFile(serverFile) {
     const response = await fetch(serverFile)
     if (!response.ok) throw new Error(`Failed to load trace: ${response.status} ${response.statusText}`)
     const traceData = await response.json()
+    return this.readTrace(traceData)
+  }
+
+  static async readTraceFromString(jsonString) {
+    const traceData = JSON.parse(jsonString)
     return this.readTrace(traceData)
   }
 
