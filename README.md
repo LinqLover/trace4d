@@ -1,6 +1,6 @@
 # trace4d
 
-This project aims to improve program comprehension by visualizing traces of object-oriented programs in animated 2.5D object maps.
+This project aims to improve program comprehension by visualizing traces of object-oriented programs through animated 2.5D object maps.
 Program traces are created in [Squeak](https://squeak.org) using the [TraceDebugger](https://github.com/hpi-swa-lab/squeak-tracedebugger) and visualized in the browser using [three.js](https://threejs.org).
 
 - **[Read the paper (preprint)](https://linqlover.github.io/trace4d/paper.pdf)** [![PDF](https://img.shields.io/badge/PDF-blue)](https://linqlover.github.io/trace4d/paper.pdf) [![HTML](https://img.shields.io/badge/HTML-blue)](https://linqlover.github.io/trace4d/paper.html)
@@ -49,7 +49,7 @@ See [packages/frontend/README.md](./packages/frontend/README.md).
 
 ### Creating a Program Trace
 
-Open a workspace and execute the following code (<kbd>Cmd</kbd> + <kbd>A</kbd>, <kbd>Cmd</kbd> + <kbd>D</kbd>):
+For example, open a workspace and execute the following code (<kbd>Cmd</kbd> + <kbd>A</kbd>, <kbd>Cmd</kbd> + <kbd>D</kbd>):
 
 ```smalltalk
 trace := T4DTrace forBlock:
@@ -85,9 +85,10 @@ If you have an [own trace file](#creating-a-program-trace), you can select it on
 
 - **Navigate** through the scene using the mouse (drag to move, <kbd>Ctrl</kbd> + drag to rotate, scroll to zoom) or the keyboard (arrow keys to move, <kbd>Ctrl</kbd> + arrow keys to rotate).
 - **Inspect** an object/field by clicking on it.
-- **Override** the layout by moving objects around (<kbd>Shift</kbd> + drag) or unpin objects again (<kbd>Ctrl</kbd> + click).
-- Press <kbd>Esc</kbd> to **stop the layout simulation** (recommended before starting the animation for performance reasons).
-- To **control the animation,** use the play/pause button in the timeline and the bottom, click on the timeline to jump to a specific point in time, or use the keyboard shortcuts (<kbd>Space</kbd> to play/pause, <kbd>Home</kbd> to reset the animation).
+- **Override the layout** by moving objects around (<kbd>Shift</kbd> + drag) or unpin objects again (<kbd>Ctrl</kbd> + click).
+- Press <kbd>Esc</kbd> to **stop the layout simulation** (recommended before starting the animation for performance reasons!).
+- To **control the animation,** use the play/pause button in the timeline at the bottom, click on the timeline to jump to a specific point in time, or use the keyboard shortcuts (<kbd>Space</kbd> to play/pause, <kbd>Home</kbd> to reset the animation).
+- To **explore the call tree** of the program trace, expand the flame graph by resizing the timeline and click/hover interesting frames.
 
 #### Configuration
 
