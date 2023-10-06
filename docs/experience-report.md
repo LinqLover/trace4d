@@ -89,7 +89,7 @@ Program comprehension: -
   - not understood tree structure or its implications on layout
 ```
 
-## Inspection Tool Construction (`inspectorResetFields.json`)
+## Inspection Tool Initialization (`inspectorResetFields.json`)
 
 ```
 Configuration effort: -
