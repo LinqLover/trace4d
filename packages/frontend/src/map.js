@@ -1,3 +1,4 @@
+/** Main logic: construct and manage scene, handle events, ... */
 import collect from 'collect.js'
 import { DragControls } from 'three/addons/controls/DragControls.js'
 import { MapControls } from 'three/addons/controls/MapControls.js'

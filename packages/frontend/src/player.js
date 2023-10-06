@@ -1,3 +1,4 @@
+/** Timeline, player, and flame graph. */
 import * as d3 from 'd3'
 import * as d3Flamegraph from 'd3-flame-graph'
 import d3Tip from 'd3-tip'

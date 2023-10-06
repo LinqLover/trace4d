@@ -1,3 +1,4 @@
+/** Program trace model. */
 import collect from 'collect.js'
 
 

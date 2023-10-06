@@ -1,3 +1,4 @@
+/** Entry point for app.html. */
 import WebGL from 'three/addons/capabilities/WebGL.js'
 
 import { TraceMap } from './map.js'

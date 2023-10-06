@@ -1,3 +1,4 @@
+/** Scene elements. */
 import collect from 'collect.js'
 import * as d3Force from 'd3-force'
 import * as d3Random from 'd3-random'
