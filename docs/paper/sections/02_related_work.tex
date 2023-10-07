@@ -3,7 +3,7 @@
 \label{sec:related_work}
 
 Several approaches for visualizing the architecture and behavior of software systems have been proposed in the past.
-In the broad field of program visualization~\cite{myers1986visual,sorva2013review,teyseyre2009overview}, \emph{algorithm animation} is an early approach that mainly focuses on visualizing procedural algorithms and data structures in educational contexts~\cite{brown1984system}.
+In the broad field of program visualization~\cite{myers1986visual,teyseyre2009overview,sorva2013review,merino2018towards}, \emph{algorithm animation} is an early approach that mainly focuses on visualizing procedural algorithms and data structures in educational contexts~\cite{brown1984system}.
 During the last decades, more approaches have been proposed that allow to create general-purpose visualizations for the architecture and behavior of arbitrary software systems~\cite{reiss2006visualizing,cheng2008xdiva,chis2014moldable,devkota2022domain}.
 
 \subsection{Software Architecture Visualization}
@@ -16,7 +16,7 @@ The term \emph{software maps} describes a family of approaches that use metaphor
 They offer different visual variables such as the size, color, and position of the shapes to encode additional information about the system's size or evolution.
 Shapes are usually rectangles but can also be polygons as in Voronoi tesselation treemaps~\cite{balzer2005voronoi}.
 A popular modern type of treemaps is \emph{2.5D treemaps} that add a third dimension to the visualization by transforming each shape into a right prisma (usually cuboid) of a variable height.
-Many approaches use the \emph{software city} metaphor to style the cuboids of a 2.5D treemap as buildings of a city~\cite{dugerdil2008execution,wettel2007visualizing,ardigo2021visualizing,mortara2021visualization,hoff2022utilizing,limberger2022visual}.
+Many approaches use the \emph{software city} metaphor to style the cuboids of a 2.5D treemap as buildings of a city~\cite{dugerdil2008execution,wettel2007visualizing,sasso2015blended,ardigo2021visualizing,mortara2021visualization,hoff2022utilizing,limberger2022visual}.
 
 \paragraph{Thematic software maps}
 
@@ -62,10 +62,11 @@ Lienhard et al. propose an \emph{inter-unit flow view} that displays the amount 
 
 Lienhard et al. also propose a \emph{side-effects graph}~\cite{lienhard2009flow,fierz2009compass} (also referred to as \emph{test blueprints}~\cite{lienhard2008test}) that displays connections between objects changing each other's state.
 Similarly, \emph{object traces} describe a way to slice a call graph for exploring the state evolution of single objects~\cite{thiede2023object}.
+\emph{Memory cities} support the heap memory analysis of programs by displaying objects and their memory consumption in a 2.5D treemap and animating the allocation and deallocation of objects~\cite{weninger2020memory}.
 
 \subsection{Time-Centric Behavior Visualization}
 
-Next to the communication between entities, another perspective that visualizations commonly take on software behavior is the temporal order of program execution.
+Next to the communication or evolution of entities, another perspective that visualizations commonly take on software behavior is the temporal order of program execution.
 
 \paragraph{Call trees}
 
