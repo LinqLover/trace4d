@@ -2,13 +2,13 @@
 \section{Implementation}
 \label{sec:implementation}
 
-We demonstrate the feasibility of animated 2.5D object maps by describing the implementation of our prototype \tfd{} that displays program traces from a Squeak/Smalltalk environment in a web application.
+We demonstrate the feasibility of animated 2.5D object maps by describing the implementation of our prototype \tfd{} that displays program traces from a Squeak/Smalltalk environment (\emph{backend}) in a web application (\emph{frontend}).
 
 \paragraph{Program tracing}
 \label{sec:implementation/program_tracing}
 
-Squeak/Smalltalk is an interactive programming environment that is based on the object-oriented paradigm (everything is an object, including classes, methods, and stack frames) and offers programmers rich control for inspecting and manipulating all parts of the system (by instrumenting method objects, recording stack frame objects, etc.)~\cite{ingalls1997back,rowledge2001tour,thiede2023squeak}.
-We use the \tdb{}\footnote{\ifanon{\url{https://github.com/user/repo} (blinded)}{\url{https://github.com/hpi-swa-lab/squeak-tracedebugger}}}\ifanon{}{~\cite{thiede2023object}}, which is an omniscient debugger for Squeak, to record a program trace of interesting behavior such as compiling a method, matching a string against a regular expression, or handling user events in a graphical user interface (GUI).
+Squeak/Smalltalk is an interactive development environment (IDE) that is based on the object-oriented paradigm (everything is an object, including classes, methods, and stack frames) and offers programmers rich control for inspecting and manipulating all parts of the system (by instrumenting method objects, recording stack frame objects, etc.)~\cite{ingalls1997back,rowledge2001tour,thiede2023squeak}.
+In our backend implementation, we use the \tdb{}\footnote{\ifanon{\url{https://github.com/user/repo} (blinded)}{\url{https://github.com/hpi-swa-lab/squeak-tracedebugger}}}\ifanon{}{~\cite{thiede2023object}}, which is an omniscient debugger for Squeak, to record a program trace of interesting behavior such as compiling a method, matching a string against a regular expression, or handling user events in a graphical user interface (GUI).
 
 We serialize the resulting program trace consisting of a call tree, an object graph, and a class hierarchy and export it to a JSON file.
 To retrieve the fields for each object, we use Squeak's built-in inspector tool~\cite[chap. 6, sec. 3]{thiede2023squeak} which collects all instance variables or array elements from each object but also provides higher-level views on the state of known domain objects; for instance, the view on a dictionary will omit its internal overallocation array structure but display a more comprehensible collection of key-value pairs instead.

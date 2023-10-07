@@ -89,6 +89,6 @@ To avoid distortions from the garbage collector, we invoke the visualization of 
 While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need for optimizing the frame rate, graphic memory consumption, and saving times and loading times of program traces.
 Note that the limited frame rate during the force simulation is a deliberate trade-off to reduce the time until the layout stabilizes and the animation can be played.
 
-To speed up the saving times and loading times, we see great optimization potential in applying object filters in the backend (IDE) prior to serializing the program trace.
+To speed up the saving times and loading times, we see great optimization potential in applying object filters in the backend prior to serializing the program trace.
 To improve the responsiveness of the visualization, we consider replacing the current force-simulation libary \hardcode{d3-force} by a more efficient alternative and extracting it from the UI thread into a parallel web worker.
 Finally, we believe that the 3D rendering performance could be improved significantly through several optimizations such as applying a level-of-detail strategy, optimizing the memory management of the application, or reducing the visual complexity of the scene.
