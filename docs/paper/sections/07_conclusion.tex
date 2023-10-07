@@ -8,6 +8,8 @@ We described how programmers can use our tool to explore the behavior of object-
 
 While we used program traces from Squeak/Smalltalk in our prototype, it is not limited to that environment but could be easily applied to other object-oriented languages for that instrumenting program tracers exist, such as Java (e.g., using \name{LiveRecorder}\footnote{\url{https://undo.io/}}), JavaScript (e.g., using \name{dbux}\footnote{\url{https://domiii.github.io/dbux/}}), or Python (e.g., using \name{PyTrace}\footnote{\url{https://pytrace.com/}}).
 
+Even though we already saw promising results in our experience report, a user study with a larger number of participants and program traces would be needed to thoroughly evaluate the potential and limitations of animated object maps for program comprehension.
+
 In future work, we want to scale our approach to larger program traces by experimenting with different (hierarchical) layout approaches~\cite{kuhn2008consistent,atzberger2023visualization}, heuristics for automatic configuration, and techniques for trace summarization~\cite{hamouLhadj2006summarizing,noda2017identifying} as well as by investing in technical optimizations of our prototype.
 To further improve the compactness and oversight of larger object graphs, we also consider defining state filters for hiding irrelevant fields of objects or defining conditions for aggregating similar objects into collapsed blocks.
 
@@ -16,10 +18,11 @@ For instance, particular domains such as the \code{Regex} engine or the \code{Mo
 
 To explore the full potential of animated object maps for programmers, we want to integrate it into their usual development process by embedding the visualization into an IDE such as the Squeak/Smalltalk environment.
 This would allow programmers to immediately~\cite{ungar1997debugging} switch between the program trace visualization and existing code browsing and debugging tools to take different views on the system under exploration; for example, they could open an animated object map from an omniscient debugger, select an object in the map to inspect it in an inspector tool, click on a stack frame in the flame graph to browse it in an editor, or even monitor a running program in the visualization.
-In addition, this integration could improve the performance of our prototype as data (e.g., the fields of filtered objects) could be streamed on demand into the visualization instead of serializing the complete trace in a single operation%
+In addition, this integration could improve the performance of our prototype as data (e.g., the fields of filterable objects) could be streamed on demand into the visualization instead of serializing the complete trace in a single operation%
 \footnote{In terms of our \tfd{} prototype, one implementation strategy for this would be to embed the web app in Squeak using the \name{MagicMouse} package (\url{https://github.com/cmfcmf/MagicMouse}) and exchange events and data through a WebSockets connection between the frontend and the backend.}%
 .
 
-Finally, we see another interesting research direction in including the historic state of objects into our visualization~\cite{thiede2023object,thiede2023time}.
-In the object map, we could add or remove object blocks based on their lifecycle in the program trace or highlight state changes in their fields.
-This would allow programmers to explore the evolution of the object graph by playing the animation or to navigate along state changes by selecting relevant fields of objects.
+Finally, we see another interesting research direction in encoding further information about the system under exploration into the visualization.
+For instance, we could map domain-specific information or also static or dynamic software metrics to the color, size, or texture of object blocks to improve the recognizability and information of object regions or make design quality issues or behavioral anomalies visible, resp.
+By going beyond simple blocks and mapping different objects to individual glyphs such as bridges, construction cranes, or vehicles, we could also apply several metaphors based on the design and communication patterns of systems or their underlying domain to further improve intuitive recognition and understanding~\cite{cheng2008xdiva,wurfel2015natural}.
+In particular, we could also make the evolution of the object graph visible by displaying and animating the historic state of objects~\cite{thiede2023object,thiede2023time}, adding and removing objects based on their lifecycle, and allowing programmers to navigate along the history of objects.
