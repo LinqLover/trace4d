@@ -28,10 +28,13 @@ Here we provide the raw data of our experience report in \autoref{sec:discussion
 
 Program trace: \hardcode{regexParse.json}.\\[\parskip]
 
+\onecolumn % HACKED: should be handled with \afterpage
+
 \begin{tblr}{
 	width=\linewidth-\parindent,
 	colspec = {
-		p{1.1cm}
+		%p{1.1cm}
+		l
 		X[l]
 		X[l]
 		X[-1,c]
@@ -101,7 +104,8 @@ Program trace: \hardcode{regexMatch.json}.\\[\parskip]
 \begin{tblr}{
 	width=\linewidth-\parindent,
 	colspec = {
-		p{1.1cm}
+		%p{1.1cm}
+		l
 		X[l]
 		X[l]
 		X[-1,c]
@@ -169,8 +173,6 @@ Program trace: \hardcode{regexMatch.json}.\\[\parskip]
 
 	\bottomrule
 \end{tblr}
-
-\onecolumn % HACKED: should be handled with \afterpage
 
 \subsubsection{\code{Morphic} UI framework}
 

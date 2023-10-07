@@ -2,7 +2,7 @@
 \section{Use Case: Exploring Internals of a Regular Expression Engine}
 \label{sec:use_case}
 
-In this section, we illustrate how a programmer can use the \tfd{} visualization to explore the way a regular expression engine constructs a matcher from a pattern.
+To illustrate how animated object maps can support program comprehension, we describe how a fictive programmer can use the \tfd{} visualization to explore the way a regular expression engine constructs a matcher from a pattern.
 The \code{Regex} package in Squeak provides a Smalltalk-specific flavor of regular expressions.
 To construct a matcher, the package first parses the pattern string into an abstract syntax tree (AST) and then compiles the AST into a non-deterministic finite automaton (NFA).
 In this example, our programmer visualizes the construction of the simple regular expression \hardcode{\textbackslash{}d|\textbackslash{}w+} to gain a closer understanding of the involved subsystems and their interactions.
@@ -27,13 +27,13 @@ By observing the trail of object activations and the position of the cursor in t
 \begin{enumerate}
 	\item Invoked by the pattern string, the parser dominates the first third of the program, accesses the pattern through the \code{ReadStream}, and talks to the AST nodes, presumably to initialize them.
 	\item Next, the matcher gets active and accesses the AST nodes and the NFA states simultaneously, presumably to compile the AST into the NFA.
-	\item For the remaining half of the program time, the match optimizer is active, accessing the AST again and talking to the set.
+	\item For the remaining half of the program trace, the match optimizer is active, accessing the AST again and talking to the set.
 \end{enumerate}
 
 Thus, our programmer was able to gain an initial overview of the different parts of the \code{Regex} package and their collaboration to realize the construction of the matcher.
-Besides, she also noticed that almost 50\si{\percent} of the time were spent in the match optimizer.
-Without a closer idea of the role of this object, she suspects this step to be a bottleneck of the construction and wonders whether the optimization might be optional and could be skipped for certain uses of the regular expression.
-To dive deeper into the implementation of the \code{Regex} package, she expands the flame graph of the timeline, identifies a few entry point methods of the objects that she found most interesting (e.g., \code{RxParser>>parseStream:} or \code{RxMatchOptimizer>>initialize:ignoreCase:}), and opens them in the Squeak environment to browse their source code.
+Besides, she also could notice that almost 50\si{\percent} of the time were spent in the match optimizer.
+Without a closer idea of the role of this object, she might suspect this step to be a bottleneck of the construction and wonders whether the optimization might be optional and could be skipped for certain uses of the regular expression.
+To dive deeper into the implementation of the \code{Regex} package, she can expand the flame graph of the timeline, identify a few entry point methods of the objects that she found most interesting (e.g., \code{RxParser>>parseStream:} or \code{RxMatchOptimizer>>initialize:ignoreCase:}), and open them in the Squeak environment to browse their source code.
 
 % TODO: can we do something better with timeline? should we mention configuration?
 % TODO: maybe provide link to video of the trace?

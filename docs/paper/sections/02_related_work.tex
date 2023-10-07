@@ -12,15 +12,15 @@ The term \emph{software maps} describes a family of approaches that use metaphor
 
 \paragraph{Treemaps}
 
-\emph{Treemaps} display the static structure of software systems by visualizing their hierarchical organization of packages and classes, folders and files, autc. as a nested set of shapes~\cite{limberger2019advanced,limberger2022visual}.
+\emph{Treemaps} display the static structure of software systems by visualizing their hierarchical organization of packages and classes, folders and files, autc.\footnote{aut cetera: or so on} as a nested set of shapes~\cite{limberger2019advanced,limberger2022visual}.
 They offer different visual variables such as the size, color, and position of the shapes to encode additional information about the system's size or evolution.
 Shapes are usually rectangles but can also be polygons as in Voronoi tesselation treemaps~\cite{balzer2005voronoi}.
 A popular modern type of treemaps is \emph{2.5D treemaps} that add a third dimension to the visualization by transforming each shape into a right prisma (usually cuboid) of a variable height.
 Many approaches use the \emph{software city} metaphor to style the cuboids of a 2.5D treemap as buildings of a city~\cite{dugerdil2008execution,wettel2007visualizing,ardigo2021visualizing,mortara2021visualization,hoff2022utilizing,limberger2022visual}.
 
-\paragraph{Topic maps}
+\paragraph{Thematic software maps}
 
-Unlike treemaps, \emph{topic maps} do not display the programmer-specified organization of a software system but use natural language processing techniques such as source code topic models, latent dirichlet allocation, and multidimensional scaling to arrange units of the software in a 2D or 3D graph~\cite{atzberger2023visualization}.
+Unlike treemaps that display the pro\-gram\-mer-specified organization of a software system, \emph{thematic software maps} are a kind of \emph{topic maps} that use natural language processing techniques such as source code topic models, latent dirichlet allocation, and multidimensional scaling to arrange units of the software in a 2D or 3D layout~\cite{atzberger2023visualization}.
 Different metaphors have been proposed to embody these graphs in a map, including boardgames~\cite{atzberger2022visualization} and landscapes such as forests~\cite{atzberger2021softwareforest} and galaxies~\cite{atzberger2021softwaregalaxies}.
 
 \paragraph{Animated software maps}
@@ -28,7 +28,7 @@ Different metaphors have been proposed to embody these graphs in a map, includin
 Next to using static visual variables, some approaches enrich software maps with animations to display dynamic information over time~\cite[sec. 3.4]{lemieux2006visualization}.
 Dynamic information can refer to the behavior or evolution of software:
 for instance, \name{EvoSpaces}~\cite{dugerdil2008execution} highlights classes in a software city when they are activated, while \name{DynaCity}~\cite{dashuber2022trace}, \name{ExplorViz}~\cite{krause2021live}, \name{SynchroVis}~\cite{waller2013synchrovis}, and others~\cite{ciolkowski20173d} also draw connections between modules to visualize dataflow between them;
-\Cite{langelier2008exploring} gradually constructs a software city and updates the geometries and colors of buildings to represent development activity, and \name{Gource}~\cite{caudwell2010gource} enhances the construction animation of a file tree with moving avatars representing code authors.
+Langelier et al.~\cite{langelier2008exploring} gradually construct a software city and updates the geometries and colors of buildings to represent development activity, and \name{Gource}~\cite{caudwell2010gource} enhances the construction animation of a file tree with moving avatars representing code authors.
 Some approaches allow programmers to monitor a system in real-time~\cite{fittkau2013live} while others replay a previously recorded trace of software activity~\cite{dugerdil2008execution}.
 
 \subsection{Entity-Centric Behavior Visualization}
@@ -44,24 +44,24 @@ To reduce the visual complexity of graph displays, some tools provide programmer
 
 \paragraph{Communication flow}
 
-\emph{Call graphs} and \emph{control-flow graphs} are two popular ways for displaying entities with their mutual dynamic interactions or communications~\cite{dePauw1998execution,lange1997object,walker1998visualizing,lemieux2006visualization,reiss2007visual,tramnitzke2007object,boothe2011animation,prestin2022hidden}.
-Entities can be nodes from an object graph or organizational units such as classes or modules.
+\emph{Call graphs} and \emph{control-flow graphs} are two popular ways for displaying entities with their mutual dynamic interactions or communications.
+Entities can be nodes from an object graph~\cite{tramnitzke2007object}, organizational units such as classes~\cite{reiss2007visual} or modules~\cite{prestin2022hidden}, or subject to user-selected abstraction levels~\cite{lange1997object,dePauw1998execution,walker1998visualizing}.
 \name{Avid} and \name{PathObjects}~\cite{schweizer2014pathobjects} provide animated object graphs where users can explore the control flow interactively.
-\Cite{boothe2011animation} merges the stack frames from a control-flow graph and the nodes from an object graph into a single \emph{memeograph} that can be explored through animation.
+Boothe et al. merge the stack frames from a control-flow graph and the nodes from an object graph into a single \emph{memeograph} that can be explored through animation~\cite{boothe2011animation}.
 
-In contrast to traditional call graphs, some works have proposed peripheral, hierarchical layouts of nodes such as \name{Extravis}' \emph{circular bundle views}~\cite{cornelissen2009trace} or \cite{munzner1997h3}'s 3D hyperbolic layout that provide better scaling for highly connected graphs.
+In contrast to traditional call graphs, some works have proposed peripheral, hierarchical layouts of nodes such as \name{Extravis}' \emph{circular bundle views}~\cite{cornelissen2009trace} or the \name{H3} hyperbolic 3D layout~\cite{munzner1997h3} that provide better scaling for highly connected graphs.
 Another representation of inter-entity communication is to provide full adjacency matrices of the call graph~\cite{dePauw1994modeling}. % TODO: Wrong source! Find right one or remove!
 
 \paragraph{Dataflow}
 
 Another perspective that can be taken on the object graph is how state is transferred through the system.
 The \name{Whyline} approach allows programmers to ask questions about why certain behaviors did or did not happen or where certain values came from and presents the answers in a sliced control-flow graph~\cite{ko2008debugging}.
-\Cite{lienhard2009taking} proposes an \emph{inter-unit flow view} that displays the amount of data or objects exchanged between different classes or modules in a directed weighted graph; this graph can also be embedded into a traditional call graph~\cite{lienhard2009flow}.
+Lienhard et al. propose an \emph{inter-unit flow view} that displays the amount of data or objects exchanged between different classes or modules in a directed weighted graph~\cite{lienhard2009taking}; this graph can also be embedded into a traditional call graph~\cite{lienhard2009flow}.
 
 \paragraph{State changes}
 
-\Cite{lienhard2009flow} also proposes a \emph{side-effects graph}~\cite{fierz2009compass} (also referred to as \emph{test blueprints}~\cite{lienhard2008test}) that displays connections between objects changing each other's state.
-Similarly, \emph{object traces} describe a way to slice a call graph for exploring the state evolution of single objects~\cite{thiede2023object,thiede2023time}.
+Lienhard et al. also propose a \emph{side-effects graph}~\cite{lienhard2009flow,fierz2009compass} (also referred to as \emph{test blueprints}~\cite{lienhard2008test}) that displays connections between objects changing each other's state.
+Similarly, \emph{object traces} describe a way to slice a call graph for exploring the state evolution of single objects~\cite{thiede2023object}.
 
 \subsection{Time-Centric Behavior Visualization}
 

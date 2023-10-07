@@ -2,7 +2,8 @@
 \section{Visualization Approach}
 \label{sec:visualization_approach}
 
-In this section, we describe the prerequisites and the design of our proposed visualization approach.
+To support the comprehension of object-oriented programs, we propose \emph{animated 2.5D object maps} as a novel visualization approach for program traces.
+In the following, we describe the prerequisites and the design of our approach.
 
 \subsection{Data Model}
 \label{sec:visualization_approach/data_model}
@@ -33,7 +34,7 @@ We neglect runtime changes to the state, label, or class membership of objects a
 
 We describe the design of our visualization and the mapping of parts from the program trace to elements and visual variables of our visualization~(\cref{fig:teaser}).
 At the highest level, an animated 2.5 object map is an interactive information landscape that displays objects and their interactions from the program trace.
-Users can replay the program trace and watch the activation and interaction of objects.
+Users can replay the program trace and watch the \emph{activation} of objects, i.e., the execution of any of their methods, and the their \emph{interaction}, i.e., the exchange of messages between two objects.
 They can unrestrictedly navigate through the visual scene using their keyboard and pointing devices and view the map from all sides.
 
 \paragraph{Objects}
@@ -55,9 +56,10 @@ To indicate the direction of arrows, we place between one and ten evenly distrib
 \paragraph{Object graph}
 \label{sec:visualization_approach/mapping/object_graph}
 
-To arrange object blocks in the 2.5D object map, we define a force-directed graph layout~\cite{fruchterman1991graph}.
-Between each pair of object blocks $(a, b)$, we apply several \emph{weighted attractive forces} based on the class membership, the organizational proximity of classes, and the references and communication between objects.
-In the following, $w_{\_}$ denotes the weight of a force and $\text{org}(o)$ denotes the organizational path of an object $o$'s class (e.g., a file path):
+All object blocks are placed on a plane in the 2.5D object map.
+For their arrangement, we define a force-directed graph layout~\cite{fruchterman1991graph}.
+Between each pair of object blocks $(a, b)$, we apply several \emph{weighted attractive forces} based on the class membership ($F_\text{class}$), the organizational proximity of classes ($F_\text{org}$), and the references ($F_\text{ref}$) and communication ($F_\text{comm}$) between objects.
+In the following definitions, the respective $w$ denote the weight of each force and $\text{org}(o)$ denotes the organizational path of an object $o$'s class (e.g., a file path):
 
 %\begin{equation}
 %	\begin{split}
@@ -82,7 +84,7 @@ In the following, $w_{\_}$ denotes the weight of a force and $\text{org}(o)$ den
 \begin{table}
 	\centering
 	\caption{
-		Default configuration of force weights for the object graph layout.
+		Default configuration of force weights for the object graph layout (columns represent assignments).
 		References between objects dominate the layout while organizational proximity and communication between objects are weighted lower.
 		Users can override these weights for specific program traces.
 	}
@@ -100,7 +102,7 @@ We provide an empirical base configuration for all force weights but enable user
 By default, we weight reference forces the highest and organizational forces the lowest with a distance of six orders of magnitudes and scale organizational forces logarithmically~(\cref{tab:visualization_approach/mapping/object_graph/default_configuration}).
 This configuration fosters a state-centric layout of the object graph while leaving a margin for the characteristic of particular program traces (e.g., their ratio between intrinsic and extrinsic state~\cite[p. 218ff]{gamma1994design}) towards a more dataflow-driven layout.
 Additionally, users can drag and drop blocks to customize the layout.
-To reduce response times and maintain an experience of immediacy~\cites[chap. 11]{shneiderman2005designing}{ungar1997debugging}, we render the graph continuously before the force simulation has converged.
+To reduce response times~\cite[chap. 11]{shneiderman2005designing} and maintain an experience of immediacy~\cite{ungar1997debugging}, we render the graph in regular update intervals before the force simulation has converged.
 
 \paragraph{Object selection}
 \label{sec:visualization_approach/mapping/object_selection}
@@ -113,7 +115,7 @@ Similarly to the layout configuration~(\lcnameref{sec:visualization_approach/map
 \label{sec:visualization_approach/mapping/object_behavior}
 
 \begin{figure}
-	\includegraphics[height=.25\textheight]{sections/03_visualization_approach/mapping/object_behavior}
+	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/object_behavior}
 	\caption{
 		Visual mapping of object behavior to color and trail in the object map.
 		The intensity of the red color indicates the recency of the last message received by each object.
