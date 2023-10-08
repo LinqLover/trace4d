@@ -7,7 +7,7 @@ We discuss the potential and limitations of our visualization approach by report
 \subsection{Experience Report}
 \label{sec:discussion/experience_report}
 
-\begin{table}
+\begin{table}[b!]
 	\centering
 	\caption{
 		Ratings of our experience with animated object maps for program comprehension~(\cref{sec:appendix/experience_report}).
@@ -25,6 +25,21 @@ To estimate the use of animated object maps for program comprehension, we explor
 We chose these criteria in view of short gulfs of execution and evaluation~\cite{norman1986cognitive} and a maximum of information that users can gain from the visualization.
 We provide a full protocol of the experience report in \cref{sec:appendix/experience_report}.
 
+\begin{table*}[bp]
+	\centering
+	\caption{
+		Performance evaluation of the \tfd{} prototype for different program traces with respect to frame rate, memory consumption, and the saving times and loading times.
+		We measure the frame rate both during the initial force simulation and when playing the animation afterward.
+		We find the performance to be practical for most of the considered program traces but see the need for optimization for larger program traces with respect to trace serialization, force simulation, and 3D rendering.
+	}
+	\label{tab:discussion/performance}
+	\begin{threeparttable}
+		\centering
+		{\footnotesize
+		\input{sections/06_discussion/performance}}
+	\end{threeparttable}
+\end{table*}
+
 \paragraph{Suitable traces}
 
 We made better experiences when using the visualization for smaller program traces such as different string processing examples.
@@ -36,9 +51,9 @@ Thus, it is the task of programmers to condense interesting behavior to a minimu
 \paragraph{Program comprehension}
 
 For suitable program traces, we were able to gain several kinds of insights and benefits from the visualization:
-we managed to discover characteristic regions of the object graph (e.g., the input, the AST, and the NFA for the regular expression use case, \cref{sec:use_case}) as well as significant segments of the program behavior (e.g., the parsing, compiling, and optimization stages in the regular expression use case).
+we managed to discover characteristic regions of the object graph (e.g., the input, the AST, and the NFA for the regular expression use case, \cref{sec:use_case}) as well as significant segments of the program behavior (e.g., the parsing, compiling, and optimization stages in this use case).
 Based on this overview, we could develop or refine our mental model of the explored system's functioning and connect it to particular classes and objects in their implementation.
-Further, the interactive visualization helped us explore and analyze communication patterns, reflect upon the system design, and share and discuss these mental models with other developers.
+Further, the interactive visualization helped us explore and analyze communication patterns, reflect upon the system design, and share and discuss our mental models with other developers.
 
 \paragraph{Object graph layout}
 
@@ -62,21 +77,6 @@ Another source of complexity in animated object maps is the cluttered communicat
 To address this challenge, we want to apply trace summarization techniques to eliminate implementation details from the underlying program trace~\cite{hamouLhadj2006summarizing,noda2017identifying}.
 
 \subsection{Evaluation of Performance}
-
-\begin{table*}
-	\centering
-	\caption{
-		Performance evaluation of the \tfd{} prototype for different program traces with respect to frame rate, memory consumption, and the saving times and loading times.
-		We measure the frame rate both during the initial force simulation and when playing the animation afterward.
-		We find the performance to be practical for most of the considered program traces but see the need for optimization for larger program traces with respect to trace serialization, force simulation, and 3D rendering.
-	}
-	\label{tab:discussion/performance}
-	\begin{threeparttable}
-		\centering
-		{\footnotesize
-		\input{sections/06_discussion/performance}}
-	\end{threeparttable}
-\end{table*}
 
 Another challenge is the technical performance of the visualization which affected our experience for larger program traces.
 We evaluate the performance of our prototype with regard to the speed of tracing and serializing program traces, the start-up time of the visualization, the rendering frame rates during the initial force simulation as well as when playing the animation of the program trace, and the memory consumption of the visualization~(\cref{tab:discussion/performance}).

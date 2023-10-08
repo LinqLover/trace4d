@@ -40,7 +40,7 @@ They can unrestrictedly navigate through the visual scene using their keyboard a
 \paragraph{Objects}
 \label{sec:visualization_approach/mapping/objects}
 
-\begin{figure}[b!]
+\begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/objects}
 	\caption{Visual mapping of objects, fields, and references to block entities, plates, and arrows in the object map.}
 	\Description{TODO}
@@ -114,6 +114,10 @@ Similarly to the layout configuration~(\lcnameref{sec:visualization_approach/map
 \paragraph{Object behavior}
 \label{sec:visualization_approach/mapping/object_behavior}
 
+The color of each object block displays its recent activity:
+\emph{inactive} blocks are colored in a neutral light gray while \emph{active} blocks whose objects have received a message recently are highlighted in a bright red~(\cref{fig:visualization_approach/mapping/object_behavior}).
+After the control flow passes on to other objects, blocks linearly fade back to the base color within one second, thus applying a single-hue continuous sequential color scheme by Brewer et al.\footnote{Cynthia Brewer and Mark Harrower. 2013 -- 2021. ColorBrewer: Color Advice for Cartography. Pennsylvania State University. \textsc{URL}: \url{https://colorbrewer2.org/}}
+
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/object_behavior}
 	\caption{
@@ -125,10 +129,6 @@ Similarly to the layout configuration~(\lcnameref{sec:visualization_approach/map
 	\label{fig:visualization_approach/mapping/object_behavior}
 \end{figure}
 
-The color of each object block displays its recent activity:
-\emph{inactive} blocks are colored in a neutral light gray while \emph{active} blocks whose objects have received a message recently are highlighted in a bright red~(\cref{fig:visualization_approach/mapping/object_behavior}).
-After the control flow passes on to other objects, blocks linearly fade back to the base color within one second, thus applying a single-hue continuous sequential color scheme by Brewer et al.\footnote{Cynthia Brewer and Mark Harrower. 2013 -- 2021. ColorBrewer: Color Advice for Cartography. Pennsylvania State University. \textsc{URL}: \url{https://colorbrewer2.org/}}
-
 Next to the color coding, a \emph{trail} connects the $k = 15$ most recent object activations to support the delayed observation of short activations and the recognition of exact activation order.
 The trail curve is based on a centripetal Catmull-Rom spline~\cite{catmull1974class} whose control points are placed on the top of each relevant block and are alternated with intermediate points between blocks.
 Block control points are normally randomized to make multiple activations of the same object distinguishable.
@@ -137,6 +137,15 @@ The direction of the trail is displayed by continuously moving it to the next ob
 
 \paragraph{Timeline}
 \label{sec:visualization_approach/mapping/timeline}
+
+The object map integrates a \emph{timeline} overlay at the bottom of the viewport that provides a time-centric navigational aid.
+The timeline consists of two widgets stacked on top of each other~(\cref{fig:visualization_approach/mapping/timeline}):
+a \emph{player} with a slider and a play/pause button indicates the current point in time of the program trace and allows to control the time and animation state.
+Behind the player, a collapsed \emph{flame graph} displays the course of the call stack depth.
+Users can resize the timeline to explore the full call tree hierarchy and examine single frames in the flame graph.
+
+Both the flame graph and the object map are interactively connected, i.e., users can hover an object in the map to discover all of its activations in the timeline, or vice versa, they can click on a frame to forward or rewind the trail in the map to the relevant object activation.
+Thus, object map and timeline provide two orthogonal means for navigating through the object-oriented program trace with different granularities.
 
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/timeline}
@@ -147,12 +156,3 @@ The direction of the trail is displayed by continuously moving it to the next ob
 	\Description{TODO}
 	\label{fig:visualization_approach/mapping/timeline}
 \end{figure}
-
-The object map integrates a \emph{timeline} overlay at the bottom of the viewport that provides a time-centric navigational aid.
-The timeline consists of two widgets stacked on top of each other~(\cref{fig:visualization_approach/mapping/timeline}):
-a \emph{player} with a slider and a play/pause button indicates the current point in time of the program trace and allows to control the time and animation state.
-Behind the player, a collapsed \emph{flame graph} displays the course of the call stack depth.
-Users can resize the timeline to explore the full call tree hierarchy and examine single frames in the flame graph.
-
-Both the flame graph and the object map are interactively connected, i.e., users can hover an object in the map to discover all of its activations in the timeline, or vice versa, they can click on a frame to forward or rewind the trail in the map to the relevant object activation.
-Thus, object map and timeline provide two orthogonal means for navigating through the object-oriented program trace with different granularities.

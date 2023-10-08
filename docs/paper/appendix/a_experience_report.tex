@@ -1,5 +1,9 @@
 % !TeX root = ../paper.tex
+\begin{figure*}[b!]
+\raggedright
+
 \section{Protocol of Experience Report}
+
 \label{sec:appendix/experience_report}
 
 Here we provide the raw data of our experience report in \autoref{sec:discussion/experience_report}.
@@ -14,10 +18,6 @@ Here we provide the raw data of our experience report in \autoref{sec:discussion
 	\item \emph{Program comprehension}: Is it possible and easy to identify sections of the program execution? How meaningful are the identified patterns?
 \end{enumerate}
 
-%\afterfullpage{\onecolumn}
-%\afterpage{\onecolumn}
-% use \twocolumn[{...}] instead - requires some makeatletter stuff because we want
-
 \subsection{Ratings}
 
 {\setlength{\leftmargini}{.25cm}
@@ -27,8 +27,6 @@ Here we provide the raw data of our experience report in \autoref{sec:discussion
 \paragraph{Construction}
 
 Program trace: \hardcode{regexParse.json}.\\[\parskip]
-
-\onecolumn % HACKED: should be handled with \afterpage
 
 \begin{tblr}{
 	width=\linewidth-\parindent,
@@ -96,6 +94,11 @@ Program trace: \hardcode{regexParse.json}.\\[\parskip]
 
 	\bottomrule
 \end{tblr}
+
+%\end{figure*}
+%}
+%\begin{figure*}
+%\raggedright
 
 \paragraph{Matching}
 
@@ -268,6 +271,14 @@ Program trace: \hardcode{mouseDown.json}.\\[\parskip]
 
 	\bottomrule
 \end{tblr}
+
+}
+
+\end{figure*}
+
+\onecolumn
+
+{\setlength{\leftmargini}{.25cm}
 
 \paragraph{Layouting}
 
@@ -522,5 +533,3 @@ Program trace: \hardcode{asTextFromHtml.json}.\\[\parskip]
 \end{tblr}
 
 }
-
-% TODO: improve layout: optimize column widths per page, ideally break one table, maybe make tables breakable within rows (but not supported in any kind of tables package)

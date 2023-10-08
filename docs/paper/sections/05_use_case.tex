@@ -15,25 +15,25 @@ By navigating through the scene, she discovers several meaningful objects and cl
 
 \begin{itemize}
 	\item the pattern string \code{\textquotesingle{}\textbackslash{}d|\textbackslash{}w+\textquotesingle{}};
-	\item an \code{RxParser} object accessing the string through a \code{Read\-Stream};
+	\item an \code{RxParser} accessing the string through a \code{Read\-Stream};
 	\item eight objects referencing each other whose class names start with the prefix \code{Rxs}, identifying them as nodes of the AST;
 	\item a \code{RxMatcher} object surrounded by six objects whose class names start with \code{Rxm}, identifying them as states of the matcher's NFA;
 	\item several other loosely structured objects, including an \code{Rx\-Match\-Optimizer} object, four \code{Dictionary}s, and a \code{Set}.
 \end{itemize}
 
 After she has gained a rough overview of the object graph, she starts the animation of the program trace through the player in the timeline.
-By observing the trail of object activations and the position of the cursor in the timeline (default running time: 77 seconds), she notices the following rough segments of the program execution:
+By observing the trail of object activations and the cursor position in the timeline (default running time: 77 seconds), she notices the following rough segments of the program execution:
 
 \begin{enumerate}
 	\item Invoked by the pattern string, the parser dominates the first third of the program, accesses the pattern through the \code{ReadStream}, and talks to the AST nodes, presumably to initialize them.
 	\item Next, the matcher gets active and accesses the AST nodes and the NFA states simultaneously, presumably to compile the AST into the NFA.
-	\item For the remaining half of the program trace, the match optimizer is active, accessing the AST again and talking to the set.
+	\item For the remaining half of the program, the match optimizer is active, accessing the AST again and talking to the set.
 \end{enumerate}
 
 Thus, our programmer was able to gain an initial overview of the different parts of the \code{Regex} package and their collaboration to realize the construction of the matcher.
 Besides, she also could notice that almost 50\si{\percent} of the time were spent in the match optimizer.
 Without a closer idea of the role of this object, she might suspect this step to be a bottleneck of the construction and wonders whether the optimization might be optional and could be skipped for certain uses of the regular expression.
-To dive deeper into the implementation of the \code{Regex} package, she can expand the flame graph of the timeline, identify a few entry point methods of the objects that she found most interesting (e.g., \code{RxParser>>parseStream:} or \code{RxMatchOptimizer>>initialize:ignoreCase:}), and open them in the Squeak IDE to browse their source code.
+To dive deeper into the implementation of the \code{Regex} package, she can expand the flame graph of the timeline, identify a few entry point methods of the objects that she found most interesting (e.g., \code{RxParser>>parseStream:}), and open them in the Squeak IDE to browse their source code.
 
 % TODO: can we do something better with timeline? should we mention configuration?
 % TODO: maybe provide link to video of the trace?
