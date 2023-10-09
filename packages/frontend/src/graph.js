@@ -826,10 +826,8 @@ export class OrganizationEntity extends Entity {
       .on('tick', () => {
         // Is this a beautiful control flow? Probably not. Is JavaScript a beautiful language? Absolutely not.
 
-        // Accelerate simulation.
-        // Con: Dropped nodes move too fast. TODO: reset ticks after dropping?
+        // Accelerate simulation: Do as many ticks as possible within timebox.
         // TODO: dynamic speed to maintain enough FPS. might not need animation at all for small traces.
-        // do as many ticks as possible within timebox
         const maxTicks = 100
         const maxDuration = options.maxDuration ?? 100
         const startTime = performance.now()
