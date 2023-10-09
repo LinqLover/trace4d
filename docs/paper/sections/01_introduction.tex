@@ -10,7 +10,7 @@ For this, they need to build up a mental model that links the system's visible b
 Traditionally, programmers explore software systems by reading their source code.
 An alternative approach is to explore the system's behavior by example:
 programmers can start by invoking the system with a particular input or by running a test case and then use a debugger to step through the program's execution, identifying relevant units and actors, and exploring their interactions.
-As traditional debuggers are constrained to the temporal execution order of the program, \emph{omniscient debuggers} (also referred to as \emph{time-travel debuggers} or \emph{back-in-time debuggers}) exist that record a \emph{program trace} and allow programmers to explore the program's behavior in a nonlinear fashion~\cite{lewis2003debugging,hofer2006design,pothier2009back,lienhard2008practical}.
+As traditional debuggers are constrained to the temporal execution order of the program, \emph{omniscient debuggers} (also referred to as \emph{time-travel debuggers} or \emph{back-in-time debuggers}) exist that record a \emph{program trace} and allow programmers to explore the program's behavior in a nonlinear fashion~\cite{lewis2003debugging,hofer2006design,pothier2009back,lienhard2008practical,perscheid2012test}.
 However, omniscient debuggers are unsuitable for exploring large program traces involving several subsystems and dozens of interacting objects:
 while their fine-grained display of source code and variables is useful for debugging-related activities, it impedes the exploration of the system's high-level architecture and behavior.
 
