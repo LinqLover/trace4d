@@ -8,7 +8,10 @@ To construct a matcher, the package first parses the pattern string into an abst
 In this example, our programmer visualizes the construction of the simple regular expression \hardcode{\textbackslash{}d|\textbackslash{}w+} to gain a better understanding of the subsystems involved and their interactions.
 
 To create the visualization, the programmer records and exports a trace of the program \code{\textquotesingle{}\textbackslash{}d|\textbackslash{}w+\textquotesingle{} asRegex} in Squeak and loads it into the \tfd{} web app%
-\footnote{The interactive visualization of the described program trace is available at \ifanon{\url{https://user.github.io/repo/app.html?trace=traces/regexParse.json} (blinded)}{\url{https://linqlover.github.io/trace4d/app.html?trace=traces/regexParse.json}} and in the Wayback Machine of the Internet Archive.}%
+\footnote{
+	The interactive visualization of the described trace is available at \ifanon{\url{https://user.github.io/repo/app.html?trace=traces/regexParse.json} (blinded)}{\url{https://linqlover.github.io/trace4d/app.html?trace=traces/regexParse.json}} and in the Wayback Machine of the Internet Archive.
+	We also provide a screencast at \ifanon{\url{https://user.github.io/repo/video.mp4} (blinded)}{\url{https://github.com/LinqLover/trace4d/blob/main/assets/examples.md\#program-trace-regexparsejson}}.
+}%
 .
 As the visualization loads, she can see about 25 objects moving around in the object map and arranging themselves into a semi-structured graph within a few seconds~(\cref{fig:teaser}).
 By navigating through the scene, she can discover several meaningful objects and clusters of objects:
