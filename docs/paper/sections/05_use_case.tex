@@ -37,5 +37,3 @@ Thus, our programmer was able to gain a first overview of the different parts of
 Besides, she also could notice that almost 50\si{\percent} of the time was spent in the match optimizer.
 Without a closer idea of the role of this object, she might suspect this step to be a bottleneck in the construction and wonder if the optimization is optional and could be skipped for certain uses of the regular expression.
 To dive deeper into the implementation of the \code{Regex} package, she can expand the flame graph of the timeline, identify a few entry point methods of the objects that she finds most interesting (e.g., \code{RxParser>>parseStream:}), and open them in the Squeak IDE to browse their source code.
-
-% TODO: maybe provide link to video of the trace?
