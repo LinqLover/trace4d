@@ -1,39 +1,39 @@
 % !TeX root = ../paper.tex
-\section{Use Case: Exploring Internals of a Regular Expression Engine}
+\section{Use Case: Exploring the Internals of a Regular Expression Engine}
 \label{sec:use_case}
 
-To illustrate how animated object maps can support program comprehension, we describe how a fictive programmer can use the \tfd{} visualization to explore the way a regular expression engine constructs a matcher from a pattern.
+To illustrate how animated object maps can support program comprehension, we describe how a fictional programmer can use the \tfd{} visualization to explore how a regular expression engine constructs a matcher from a pattern.
 The \code{Regex} package in Squeak provides a Smalltalk-specific flavor of regular expressions.
 To construct a matcher, the package first parses the pattern string into an abstract syntax tree (AST) and then compiles the AST into a non-deterministic finite automaton (NFA).
-In this example, our programmer visualizes the construction of the simple regular expression \hardcode{\textbackslash{}d|\textbackslash{}w+} to gain a closer understanding of the involved subsystems and their interactions.
+In this example, our programmer visualizes the construction of the simple regular expression \hardcode{\textbackslash{}d|\textbackslash{}w+} to gain a better understanding of the subsystems involved and their interactions.
 
 To create the visualization, the programmer records and exports a trace of the program \code{\textquotesingle{}\textbackslash{}d|\textbackslash{}w+\textquotesingle{} asRegex} in Squeak and loads it into the \tfd{} web app%
 \footnote{The interactive visualization of the described program trace is available at \ifanon{\url{https://user.github.io/repo/app.html?trace=traces/regexParse.json} (blinded)}{\url{https://linqlover.github.io/trace4d/app.html?trace=traces/regexParse.json}} and in the Wayback Machine of the Internet Archive.}%
 .
 As the visualization loads, she can see about 25 objects moving around in the object map and arranging themselves into a semi-structured graph within a few seconds~(\cref{fig:teaser}).
-By navigating through the scene, she discovers several meaningful objects and clusters of objects:
+By navigating through the scene, she can discover several meaningful objects and clusters of objects:
 
 \begin{itemize}
 	\item the pattern string \code{\textquotesingle{}\textbackslash{}d|\textbackslash{}w+\textquotesingle{}};
-	\item an \code{RxParser} accessing the string through a \code{Read\-Stream};
-	\item eight objects referencing each other whose class names start with the prefix \code{Rxs}, identifying them as nodes of the AST;
-	\item a \code{RxMatcher} object surrounded by six objects whose class names start with \code{Rxm}, identifying them as states of the matcher's NFA;
+	\item an \code{RxParser} object accessing the string via a \code{Read\-Stream};
+	\item eight objects referencing each other whose class names begin with the prefix \code{Rxs}, identifying them as nodes of the AST;
+	\item an \code{RxMatcher} object surrounded by six objects whose class names start with \code{Rxm}, identifying them as states of the matcher's NFA;
 	\item several other loosely structured objects, including an \code{Rx\-Match\-Optimizer} object, four \code{Dictionary}s, and a \code{Set}.
 \end{itemize}
 
-After she has gained a rough overview of the object graph, she starts the animation of the program trace through the player in the timeline.
+After getting a rough overview of the object graph, she starts the animation of the program trace through the player in the timeline.
 By observing the trail of object activations and the cursor position in the timeline (default running time: 77 seconds), she notices the following rough segments of the program execution:
 
 \begin{enumerate}
-	\item Invoked by the pattern string, the parser dominates the first third of the program, accesses the pattern through the \code{ReadStream}, and talks to the AST nodes, presumably to initialize them.
-	\item Next, the matcher gets active and accesses the AST nodes and the NFA states simultaneously, presumably to compile the AST into the NFA.
+	\item Invoked by the pattern string, the parser dominates the first third of the program, accessing the pattern through the \code{ReadStream} and talking to the AST nodes, presumably to initialize them.
+	\item Next, the matcher becomes active and accesses the AST nodes and the NFA states simultaneously, presumably to compile the AST into the NFA.
 	\item For the remaining half of the program, the match optimizer is active, accessing the AST again and talking to the set.
 \end{enumerate}
 
-Thus, our programmer was able to gain an initial overview of the different parts of the \code{Regex} package and their collaboration to realize the construction of the matcher.
-Besides, she also could notice that almost 50\si{\percent} of the time were spent in the match optimizer.
-Without a closer idea of the role of this object, she might suspect this step to be a bottleneck of the construction and wonders whether the optimization might be optional and could be skipped for certain uses of the regular expression.
-To dive deeper into the implementation of the \code{Regex} package, she can expand the flame graph of the timeline, identify a few entry point methods of the objects that she found most interesting (e.g., \code{RxParser>>parseStream:}), and open them in the Squeak IDE to browse their source code.
+Thus, our programmer was able to gain a first overview of the different parts of the \code{Regex} package and their collaboration to realize the construction of the matcher.
+Besides, she also could notice that almost 50\si{\percent} of the time was spent in the match optimizer.
+Without a closer idea of the role of this object, she might suspect this step to be a bottleneck in the construction and wonder if the optimization is optional and could be skipped for certain uses of the regular expression.
+To dive deeper into the implementation of the \code{Regex} package, she can expand the flame graph of the timeline, identify a few entry point methods of the objects that she finds most interesting (e.g., \code{RxParser>>parseStream:}), and open them in the Squeak IDE to browse their source code.
 
 % TODO: can we do something better with timeline? should we mention configuration?
 % TODO: maybe provide link to video of the trace?

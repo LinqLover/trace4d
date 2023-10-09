@@ -1,6 +1,6 @@
 # Experience Report
 
-> - **Configuration effort:** How many operations are required to reach a usable configuration in terms of filters and forces?
+> - **Configuration effort:** How many operations are required to achieve a usable configuration in terms of filters and forces?
 > - **Clarity of entities:** Is the quantity of displayed entities manageable or overwhelming?  
 > - **Structure:** Is it possible and easy to identify regions of the object graph? How meaningful are the identified patterns?
 > - **Animation:** Is it possible and easy to recognize, follow, and perceive the flow of activity?
@@ -21,7 +21,7 @@ Animation: +
   + no noise
   - long delay in hidden dictionaries of RxMatchOptimizer
 Program comprehension: +
-  + identified sections: parsing, compiling, optimizing
+  + identified sections: parsing, compilation, optimization
 ```
 
 ### Regular Expression Matching (`regexMatch.json`)

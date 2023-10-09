@@ -2,7 +2,7 @@
 \section{Discussion}
 \label{sec:discussion}
 
-We discuss the potential and limitations of our visualization approach by reporting on our experience and evaluating the performance of the \tfd{} prototype for six different use cases.
+We discuss the potential and limitations of our visualization approach by reporting on our experiences and evaluating the performance of the \tfd{} prototype for six different use cases.
 
 \subsection{Experience Report}
 \label{sec:discussion/experience_report}
@@ -21,7 +21,7 @@ We discuss the potential and limitations of our visualization approach by report
 	\end{threeparttable}
 \end{table}
 
-To estimate the use of animated object maps for program comprehension, we explored six different program traces from the domains of string processing, GUIs, and programming tools in the \tfd{} prototype and gave a reasoned rating of our experience with each example on a three-point Likert scale for five different criteria regarding the usability, clarity, and insightfulness of the visualization~(\cref{tab:discussion/experience_report}).
+To assess the use of animated object maps for program comprehension, we explored six different program traces from the domains of string processing, GUIs, and programming tools in the \tfd{} prototype and gave a reasoned rating of our experience with each example on a three-point Likert scale for five different criteria regarding the usability, clarity, and insightfulness of the visualization~(\cref{tab:discussion/experience_report}).
 We chose these criteria in view of short gulfs of execution and evaluation~\cite{norman1986cognitive} and a maximum of information that users can gain from the visualization.
 We provide a full protocol of the experience report in \cref{sec:appendix/experience_report}.
 
@@ -42,53 +42,53 @@ We provide a full protocol of the experience report in \cref{sec:appendix/experi
 
 \paragraph{Suitable traces}
 
-We made better experiences when using the visualization for smaller program traces such as different string processing examples.
-On the contrary, we were more challenged trying to understand the behavior of larger program traces such as operations in a GUI system or in a programming tool.
-In general, we found animated object maps most practical for systems that thoroughly adhere to the principles of object-oriented design by defining many fine-grained, highly coherent objects and describing behavior through extensive communication between these objects.
-On the other hand, program traces involving many homogenous objects or unrelated subsystems contain more repetitive or irrelevant elements and are typically less suited for exploration through animated object maps.
-Thus, it is the task of programmers to condense interesting behavior to a minimum program by reducing inputs and eliminating dependencies, as they already use to do when preparing a minimal reproducible example to locate the defect in a program.
+We had better experiences when using the visualization for smaller program traces such as various string processing examples.
+On the contrary, we were more challenged when trying to understand the behavior of larger program traces such as operations in a GUI system or in a programming tool.
+In general, we found animated object maps to be most practical for systems that thoroughly adhere to the principles of object-oriented design by defining many fine-grained, highly coherent objects and describing behavior through extensive communication between these objects.
+On the other hand, program traces involving many homogeneous objects or unrelated subsystems contain more repetitive or irrelevant elements and are typically less amenable to exploration through animated object maps.
+Thus, it is the task of programmers to condense interesting behavior into a minimal program by reducing inputs and eliminating dependencies, as they already use to do when preparing a minimal reproducible example to locate the defect in a program.
 
 \paragraph{Program comprehension}
 
 For suitable program traces, we were able to gain several kinds of insights and benefits from the visualization:
-we managed to discover characteristic regions of the object graph (e.g., the input, the AST, and the NFA for the regular expression use case, \cref{sec:use_case}) as well as significant segments of the program behavior (e.g., the parsing, compiling, and optimization stages in this use case).
-Based on this overview, we could develop or refine our mental model of the explored system's functioning and connect it to particular classes and objects in their implementation.
-Further, the interactive visualization helped us explore and analyze communication patterns, reflect upon the system design, and share and discuss our mental models with other developers.
+we were able to discover characteristic regions of the object graph (e.g., the input, the AST, and the NFA for the regular expression use case, \cref{sec:use_case}) as well as significant segments of the program behavior (e.g., the parsing, compilation, and optimization stages in this use case).
+Based on this overview, we could develop and refine our mental model of the explored system's functioning and connect it to particular classes and objects in their implementation.
+Furthermore, the interactive visualization helped us to explore and analyze communication patterns, reflect on the system design, and share and discuss our mental models with other developers.
 
 \paragraph{Object graph layout}
 
-The structure of the object graph layout is determinant for the comprehension of the program state.
-Our force-directed graph approach provides a simple yet effective way to describe a layout based on different static and behavioral relations between objects and allows different kinds of relations to dominate the layout depending on the characteristics of the program trace.
+The structure of the object graph layout is critical for the comprehension of the program state.
+Our force-directed graph approach provides a simple yet effective way to describe a layout based on different static and behavioral relations between objects and allows different types of relations to dominate the layout depending on the characteristics of the program trace.
 Especially for smaller program traces, the resulting layout allowed us to distinguish between essential regions of the object graph.
 Still, the overall structure of the force-directed layout could be considered too weak for an optimal visual intuition.
 
 As an alternative to the force-directed layout, we consider clustering objects into groups that could be displayed in a clearer structure through color coding or a hierarchical layout of objects.
-Clusters could either be derived from the existing force-directed layout or based on other distance metrics for objects such as their class organization, their communication patterns, or embedding representations derived from their source code or documentation.
+Clusters could be derived either from the existing force-directed layout or based on other distance metrics for objects such as their class organization, their communication patterns, or from embedding representations based on their source code or documentation.
 
 \paragraph{Limitations}
 
-A general challenge of information visualization is to reduce the complexity of the underlying data to a comprehensible but meaningful level~\cite{robertson2009scale}.
+A general challenge in information visualization is to reduce the complexity of the underlying data to a comprehensible yet meaningful level~\cite{robertson2009scale}.
 For animated object maps, this challenge manifests as ourselves being overwhelmed by the amount of objects and messages in the visualization of larger program traces.
 To address this challenge, our approach already provides a configuration interface that allows users to reduce the complexity of the visualization by filtering objects or improving the structure of the object graph.
-Still, the configuration requires manual effort and is thus a barrier for users to overcome.
-To lower this barrier, we aim to improve the convenience of the configuration interface in our prototype by allowing users to refine the configuration directly in the running visualization; however, we see more potential in further research on automatic configuration techniques that can generate a suitable configuration for individual program traces.
+Still, configuration requires manual effort and is therefore a barrier for users to overcome.
+To reduce this barrier, we aim to improve the convenience of the configuration interface in our prototype by allowing users to refine the configuration directly in the running visualization; however, we see more potential in further research on automatic configuration techniques that can generate an appropriate configuration for individual program traces.
 
-Another source of complexity in animated object maps is the cluttered communication between different objects, e.g., lengthy handshakes between objects or messages that are irrelevant for the high-level program behavior.
-To address this challenge, we want to apply trace summarization techniques to eliminate implementation details from the underlying program trace~\cite{hamouLhadj2006summarizing,noda2017identifying}.
+Another source of complexity in animated object maps is the cluttered communication between different objects, such as lengthy handshakes between objects or messages that are irrelevant to the high-level program behavior.
+To address this challenge, we aim to apply trace summarization techniques to eliminate implementation details from the underlying program trace~\cite{hamouLhadj2006summarizing,noda2017identifying}.
 
 \subsection{Evaluation of Performance}
 
 Another challenge is the technical performance of the visualization which affected our experience for larger program traces.
-We evaluate the performance of our prototype with regard to the speed of tracing and serializing program traces, the start-up time of the visualization, the rendering frame rates during the initial force simulation as well as when playing the animation of the program trace, and the memory consumption of the visualization~(\cref{tab:discussion/performance}).
+We evaluate the performance of our prototype in terms of the speed of tracing and serializing program traces, the start-up time of the visualization, the rendering frame rates during the initial force simulation as well as when playing the animation of the program trace, and the memory consumption of the visualization~(\cref{tab:discussion/performance}).
 
 To avoid network latency, we host the \tfd{} frontend locally using Node.js' built-in \hardcode{http-server} module\footnote{\hardcode{http-server} v14.1.1, node v16.8.0.} and view the visualization in a Google Chrome browser on the same machine.
 To measure the frame rate, we modify the \hardcode{stats.js} library\footnote{\url{https://mrdoob.github.io/stats.js/}} to record the number of frames per second (FPS) and report the average frame rate after rendering the scene for 30 seconds.
 We retrieve the memory consumption from the Chrome Task Manager for the tab of the \tfd{} prototype and for the GPU process; to estimate the effective GPU consumption of the visualization, we subtract the GPU consumption before starting the visualization from the later GPU consumption.
-To avoid distortions from the garbage collector, we invoke the visualization of each trace from an empty browser tab, exclude the first two seconds from the frame rate measurements, log the minimum memory consumption from a 30-second interval for each measurement, and report the best frame rate average and memory consumption of three runs for each trace.
+To avoid distortions from the garbage collector, we launch the visualization of each trace from an empty browser tab, exclude the first two seconds from the frame rate measurements, log the minimum memory consumption from a 30-second interval for each measurement, and report the best average frame rate and memory consumption of three runs for each trace.
 
-While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need for optimizing the frame rate, graphic memory consumption, and saving times and loading times of program traces.
+While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need to optimize the frame rate, graphics memory consumption, and saving times and loading times of program traces.
 Note that the limited frame rate during the force simulation is a deliberate trade-off to reduce the time until the layout stabilizes and the animation can be played.
 
-To speed up the saving times and loading times, we see great optimization potential in applying object filters in the backend prior to serializing the program trace.
-To improve the responsiveness of the visualization, we consider replacing the current force-simulation libary \hardcode{d3-force} by a more efficient alternative and extracting it from the UI thread into a parallel web worker.
-Finally, we believe that the 3D rendering performance could be improved significantly through several optimizations such as applying a level-of-detail strategy, optimizing the memory management of the application, or reducing the visual complexity of the scene.
+To speed up the saving times and loading times, we see great potential for optimization in applying object filters in the backend before serializing the program trace.
+To improve the responsiveness of the visualization, we consider replacing the current force-simulation library \hardcode{d3-force} with a more efficient alternative and extracting it from the UI thread into a parallel web worker.
+Finally, we believe that the 3D rendering performance could be improved significantly by several optimizations such as applying a level-of-detail strategy, optimizing the memory management of the application, or reducing the visual complexity of the scene.

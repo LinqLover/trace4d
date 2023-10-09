@@ -2,32 +2,33 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Exploring and understanding software systems play a central role in software development.
-Programmers frequently encounter unknown systems that they want to fix, change, or extend.
-For this, they need to build up a mental model that connects the system's visible behavior to its high-level architecture and low-level implementation artifacts.
+Exploring and understanding software systems plays a crucial role in software development.
+Programmers often come across unfamiliar systems that they want to fix, change, or extend.
+For this, they need to build up a mental model that links the system's visible behavior to its high-level architecture and low-level implementation artifacts.
 %Research has shown that programmers spend 58\% of their time understanding code bases~\cite{xia2017measuring}.
 
 Traditionally, programmers explore software systems by reading their source code.
 An alternative approach is to explore the system's behavior by example:
-programmers can start by invoking the system with a particular input or by running a test case and then use a debugger to step through the program's execution, identify relevant units and actors, and explore their interactions.
-As traditional debuggers are constrained to the temporal execution order of the program, \emph{omniscient debuggers} (also referred to as \emph{time-travel debuggers} or \emph{back-in-time debuggers}) exist that record a \emph{program trace} and allow programmers to explore the program's behavior in a non-linear fashion~\cite{lewis2003debugging,hofer2006design,pothier2009back,lienhard2008practical}.
-However, omniscient debuggers are insuitable for exploring large program traces involving several subsystems and dozens of interacting objects:
+programmers can start by invoking the system with a particular input or by running a test case and then use a debugger to step through the program's execution, identifying relevant units and actors, and exploring their interactions.
+As traditional debuggers are constrained to the temporal execution order of the program, \emph{omniscient debuggers} (also referred to as \emph{time-travel debuggers} or \emph{back-in-time debuggers}) exist that record a \emph{program trace} and allow programmers to explore the program's behavior in a nonlinear fashion~\cite{lewis2003debugging,hofer2006design,pothier2009back,lienhard2008practical}.
+However, omniscient debuggers are unsuitable for exploring large program traces involving several subsystems and dozens of interacting objects:
 while their fine-grained display of source code and variables is useful for debugging-related activities, it impedes the exploration of the system's high-level architecture and behavior.
 
 On the other hand, several visualization approaches have been proposed to support programmers in exploring the architecture of software systems.
-In particular, \emph{software maps} that display the static structure of systems using several metaphors such as cities or forests were found to be useful for program comprehension tasks~\cite{wettel2007visualizing,atzberger2021softwareforest,limberger2022visual}.
-Yet, most approaches neglect the dynamic behavior of systems and take a coarse-grained view of their structure, which makes them unsuitable for developing a mental model of the system's behavior that situates particular interacting objects and connects them to the overall functioning of the system~\cite{vonMayrhauser1995program}.
+In particular, \emph{software maps} that display the static structure of systems using various metaphors such as cities or forests have been found to be useful for program comprehension tasks~\cite{wettel2007visualizing,atzberger2021softwareforest,limberger2022visual}.
+Yet, most approaches neglect the dynamic behavior of systems and take a coarse-grained view of their structure.
+As a result, these maps are inadequate for developing a mental model of the system's behavior that situates particular interacting objects and connects them to the overall functioning of the system~\cite{vonMayrhauser1995program}.
 
-To bridge this gap between coarse-grained static software maps and fine-grained omniscient debugging views, we propose a novel approach for visualizing the behavior of object-oriented software systems through \emph{animated 2.5D object maps} (or for short \emph{(animated) object maps}) depicting particular objects and their interactions from a program trace.
+To bridge this gap between coarse-grained static software maps and fine-grained omniscient debugging views, we propose a novel approach for visualizing the behavior of object-oriented software systems through \emph{animated 2.5D object maps} (or \emph{(animated) object maps} for short), which depict particular objects and their interactions from a program trace.
 In particular, we make the following contributions:
 
 \begin{enumerate}
-	\item We present a novel visualization approach for ob\-ject-ori\-ent\-ed program behavior through animated 2.5D object maps.
+	\item We present a novel visualization approach for ob\-ject-ori\-ent\-ed program behavior using animated 2.5D object maps.
 	\item We describe the implementation of our prototype \tfd{} that applies this approach using program traces from a Squeak/\?Smalltalk environment and the \name{three.js} 3D library.
 	\item We discuss the potential and limitations of our approach by reporting on our experience with it and by evaluating the performance of our implementation, encompassing responsiveness, frame rates, and memory consumption, for different program traces.
 \end{enumerate}
 
-We make all artifacts of this work available at a public repository\footnote{\ifanon{\url{https://github.com/user/repo} (blinded)}{\url{https://github.com/LinqLover/trace4d}}}.
+We make all artifacts of this work available in a public repository\footnote{\ifanon{\url{https://github.com/user/repo} (blinded)}{\url{https://github.com/LinqLover/trace4d}}}.
 
 The remainder of this paper is structured as follows:
 in \cref{sec:related_work}, we discuss related work on software maps, object-oriented programs, and program traces.
