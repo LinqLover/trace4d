@@ -8,10 +8,14 @@ Program traces are created in [Squeak](https://squeak.org) using the [TraceDebug
 
 ![Screenshot of trace4d](./assets/trace4d.png)
 
+[View more examples here.](./assets/examples.md)
+
 ## Repository Structure
 
 - [`.github/workflows/`](./.github/workflows/): GitHub Actions workflows for CI
-- [`assets/traces/`](./assets/traces/): Prepared serialized program traces of different Squeak programs (see [`docs/traces.md`](./docs/traces.md))
+- [`assets/`](./assets/traces/):
+  - [`assets/examples.md`](./assets/examples.md): Screenshots and screencasts of visualizing example program traces
+  - [`assets/traces/`](./assets/traces/): Prepared serialized program traces of different Squeak programs (see [`docs/traces.md`](./docs/traces.md))
 - [`docs/`](./docs/): Documentational artifacts
   - [`docs/paper/`](./docs/paper/): LaTeX sources of our paper preprint
   - [`docs/exposé/`](./docs/exposé/): LaTeX sources of our original exposé
