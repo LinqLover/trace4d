@@ -16,8 +16,9 @@ jobs:
         with:
           run: |
             # Install dependencies
-            apk add "pandoc<3.0" python3 py3-pip python3-dev build-base gcc linux-headers
+            apk add python3 py3-pip python3-dev build-base gcc linux-headers
             # https://github.com/tomduck/pandoc-fignos/issues/105
+            wget https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-linux-amd64.tar.gz && tar -xzvf pandoc-2.19.2-linux-amd64.tar.gz && mv pandoc-2.19.2/bin/* /usr/local/bin/ && rm -rf pandoc-2.19.2-linux-amd64.tar.gz pandoc-2.19.2
 
             cd docs/exposé
 
