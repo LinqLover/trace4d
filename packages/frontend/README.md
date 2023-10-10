@@ -4,6 +4,8 @@
 
 ### Setup
 
+Get node and yarn (tested on node v16.8.0 and yarn 1.22.10).
+
 ```bash
 yarn install
 ```
