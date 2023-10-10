@@ -2,7 +2,7 @@
 \section{Use Case: Exploring the Internals of a Regular Expression Engine}
 \label{sec:use_case}
 
-To illustrate how animated object maps can support program comprehension, we describe how a fictional programmer can use the \tfd{} visualization to explore how a regular expression engine constructs a matcher from a pattern.
+To illustrate how animated object maps can support program comprehension, we describe how a fictional programmer could use the \tfd{} visualization to explore the way a regular expression engine constructs a matcher from a pattern.
 The \code{Regex} package in Squeak provides a Smalltalk-specific flavor of regular expressions.
 To construct a matcher, the package first parses the pattern string into an abstract syntax tree (AST) and then compiles the AST into a non-deterministic finite automaton (NFA).
 In this example, our programmer visualizes the construction of the simple regular expression \hardcode{\textbackslash{}d|\textbackslash{}w+} to gain a better understanding of the subsystems involved and their interactions.

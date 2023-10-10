@@ -38,7 +38,7 @@ Entities can be organizational units such as modules or classes but also individ
 
 \paragraph{Object graphs}
 
-Several tools allow programmers to explore relevant patrs of a program's object graph~\cite{moreno2004visualizing,gestwicki2005methodology}.
+Several tools allow programmers to explore relevant parts of a program's object graph~\cite{moreno2004visualizing,gestwicki2005methodology}.
 Some graphs mimic the look of UML object diagrams and provide details about objects's internal state while others choose more compact representations.
 To reduce the visual complexity of graph displays, some tools provide programmers with means for filtering objects based on their organization or relation to program slices~\cite{lange1997object,hamouLhadj2004survey}.
 
@@ -46,7 +46,7 @@ To reduce the visual complexity of graph displays, some tools provide programmer
 
 \emph{Call graphs} and \emph{control-flow graphs} are two popular ways of displaying entities with their mutual dynamic interactions or communications.
 Entities can be nodes from an object graph~\cite{tramnitzke2007object}, organizational units such as classes~\cite{reiss2007visual} or modules~\cite{prestin2022hidden}, or subject to user-selected abstraction levels~\cite{lange1997object,dePauw1998execution,walker1998visualizing}.
-\name{Avid} and \name{PathObjects}~\cite{schweizer2014pathobjects} provide animated object graphs where users can explore the control flow interactively.
+\name{Avid}~\cite{walker1998visualizing} and \name{PathObjects}~\cite{schweizer2014pathobjects} provide animated object graphs where users can explore the control flow interactively.
 Boothe et al. merge the stack frames from a control-flow graph and the nodes from an object graph into a single \emph{memeograph} that can be explored through animation~\cite{boothe2011animation}.
 
 In contrast to traditional call graphs, some works have proposed peripheral, hierarchical layouts of nodes such as \name{Extravis}' \emph{circular bundle views}~\cite{cornelissen2009trace} or the \name{H3} hyperbolic 3D layout~\cite{munzner1997h3}, which provide better scaling for highly connected graphs.
@@ -61,18 +61,19 @@ Lienhard et al. propose an \emph{inter-unit flow view} that displays the amount 
 \paragraph{State changes}
 
 Lienhard et al. also propose a \emph{side-effects graph}~\cite{lienhard2009flow,fierz2009compass} (also referred to as \emph{test blueprints}~\cite{lienhard2008test}), which shows connections between objects changing each other's state.
-Similarly, \emph{object traces} describe a way to slice a call graph for exploring the state evolution of individual objects~\cite{thiede2023object}.
+Similarly, \emph{object traces} describe a way to slice a call tree~(\cref{sec:related_work/time_centric}) for exploring the state evolution of individual objects~\cite{thiede2023object}.
 \emph{Memory cities} support the heap memory analysis of programs by displaying objects and their memory consumption in a 2.5D treemap and animating the allocation and deallocation of objects~\cite{weninger2020memory}.
 
 \subsection{Time-Centric Behavior Visualization}
+\label{sec:related_work/time_centric}
 
 Besides the communication or evolution of entities, another perspective that visualizations often take on software behavior is the temporal order of program execution.
 
 \paragraph{Call trees}
 
-A call tree is a hierarchy of stack frames or message sends that can be obtained from a program trace.
-Besides naive graph representations of this data structure, several approaches display call trees using hierarchical layouts such as treemaps, sunbursts, or \emph{icicle plots}~\cite{kruskal1983icicle,trumper2012viewfusion,woodburn2019interactive}.
-Similarly to icicle plots, \emph{flame graphs} show the historical call stack over time, but they also assign colors to stack frames to display additional performance data from profiling tools~\cite{gregg2016flame}.
+A call tree is a hierarchy of stack frames or method invocations that can be obtained from a program trace.
+Besides naive graph representations of this data structure, several approaches display call trees using hierarchical layouts such as treemaps, \emph{sunbursts}, or \emph{icicle plots}~\cite{kruskal1983icicle,trumper2012viewfusion,woodburn2019interactive}.
+Similarly to icicle plots, \emph{flame graphs} show the historical call stack over time but also assign colors to stack frames to display additional performance data from profiling tools~\cite{gregg2016flame}.
 
 \paragraph{Sequential displays}
 

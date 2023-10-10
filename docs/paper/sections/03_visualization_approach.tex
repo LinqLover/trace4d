@@ -10,7 +10,10 @@ In the following, we describe the prerequisites and the design of our approach.
 
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/data_model.tikz}
-	\caption{UML class diagram showing the data model of an object-oriented program trace for the visualization.}
+	\caption{
+		UML class diagram showing the data model of an object-oriented program trace for the visualization.
+		%Omitted cardinalities are $1$.
+	}
 	\Description{TODO}
 	\label{fig:visualization_approach/data_model}
 \end{figure}
@@ -32,8 +35,8 @@ We neglect runtime changes to the state, label, or class membership of objects a
 \label{sec:visualization_approach/mapping}
 
 We describe the design of our visualization and the mapping of parts from the program trace to elements and visual variables of our visualization~(\cref{fig:teaser}).
-At the highest level, an animated 2.5 object map is an interactive information landscape that displays objects and their interactions from the program trace.
-Users can replay the program trace and watch the \emph{activation} of objects, i.e., the execution of any of their methods, and their \emph{interaction}, i.e., the exchange of messages between two objects.
+At the highest level, an animated 2.5D object map is an interactive information landscape that displays objects and their interactions from the program trace.
+Users can replay the program trace and watch the \emph{activation} of objects, i.e., the invocation of any of their methods, and their \emph{interaction}, i.e., the exchange of messages between two objects.
 They can navigate freely through the visual scene using their keyboard and pointing devices and view the map from all sides.
 
 \paragraph{Objects}
@@ -101,7 +104,7 @@ We provide an empirical base configuration for all force weights but allow users
 By default, we give the highest weight to reference forces and the lowest weight to organizational forces with a six-order-of-magnitude difference and scale organizational forces logarithmically~(\cref{tab:visualization_approach/mapping/object_graph/default_configuration}).
 This configuration encourages a state-centric layout of the object graph while leaving a margin for the characteristics of particular program traces (e.g., their ratio between intrinsic and extrinsic state~\cite[p. 218ff]{gamma1994design}) towards a more dataflow-driven layout.
 In addition, users can drag and drop blocks to customize the layout.
-To reduce response time~\cite[chap. 11]{shneiderman2005designing} and maintain an experience of immediacy~\cite{ungar1997debugging}, we render the graph at regular update intervals before the force simulation has converged.
+To reduce response time~\cite[chap. 11]{shneiderman2005designing} and maintain an experience of immediacy~\cite{ungar1997debugging}, we render the graph at regular update intervals even before the force simulation has converged.
 
 \paragraph{Object selection}
 \label{sec:visualization_approach/mapping/object_selection}
@@ -120,16 +123,16 @@ After the control flow passes on to other objects, blocks fade linearly back to 
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/object_behavior}
 	\caption{
-		Visual mapping of object behavior to color and trail in the object map.
-		The intensity of the red color indicates the recency of the last message received by each object.
-		The gradient trail curve connects the most recent object activations (control points of the curve are marked with a \protect\texticon{sections/03_visualization_approach/mapping/object_behavior_cross} cross).
+		Visual mapping of object behavior to block colors and trail in the object map.
+		The intensity of the red color indicates the recency of the last message received the corresponding object.
+		The gradient trail curve connects the most recent object activations (control points of the curve are marked with a cross (\protect\texticonx{sections/03_visualization_approach/mapping/object_behavior_cross})).
 	}
 	\Description{TODO}
 	\label{fig:visualization_approach/mapping/object_behavior}
 \end{figure}
 
 In addition to the color coding, a \emph{trail} connects the $k = 15$ most recent object activations to support the delayed observation of short activations and the recognition of the exact activation order.
-The trail curve is based on a centripetal Catmull-Rom spline~\cite{catmull1974class} with control points are placed on the top of each relevant block and alternating with intermediate points between blocks.
+The trail curve is based on a centripetal Catmull-Rom spline~\cite{catmull1974class} with control points are placed on the top of each relevant block and alternated with intermediate points between blocks.
 Block control points are randomized using a normal distribution to distinguish multiple activations of the same object.
 Intermediate control points are raised vertically to give the curve a wave-like shape that makes activated objects identifiable.
 The direction of the trail is displayed by continuously moving it to the next object during the animation and applying a linear translucency gradient to fade out the tail of the curve.
@@ -149,7 +152,7 @@ Thus, object map and timeline provide two orthogonal means of navigating through
 \begin{figure}
 	\includegraphics[width=\linewidth]{sections/03_visualization_approach/mapping/timeline}
 	\caption{
-		Timeline overlay with widgets for controlling the playback of the program trace and a flame graph with a variable level of detail for navigating the call tree.
+		Timeline overlay consisting of widgets for controlling the playback of the program trace and a flame graph with a variable level of detail for navigating the call tree.
 		The flame graph and the object map are interactively linked, e.g., the user can hover over a frame to highlight the corresponding object in the map.
 	}
 	\Description{TODO}

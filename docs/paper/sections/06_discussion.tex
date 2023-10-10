@@ -28,7 +28,7 @@ We provide a full protocol of the experience report in \cref{sec:appendix/experi
 \begin{table*}[bp]
 	\centering
 	\caption{
-		Performance evaluation of the \tfd{} prototype for different program traces with respect to frame rate, memory consumption, and the saving times and loading times.
+		Performance measurements of the \tfd{} prototype for different program traces with respect to frame rate, memory consumption, and the saving times and loading times.
 		We measure the frame rate both during the initial force simulation and when playing the animation afterward.
 		We find the performance to be practical for most of the considered program traces but see the need for optimization for larger program traces with respect to trace serialization, force simulation, and 3D rendering.
 	}
@@ -51,7 +51,7 @@ Thus, it is the task of programmers to condense interesting behavior into a mini
 \paragraph{Program comprehension}
 
 For suitable program traces, we were able to gain several kinds of insights and benefits from the visualization:
-we were able to discover characteristic regions of the object graph (e.g., the input, the AST, and the NFA for the regular expression use case, \cref{sec:use_case}) as well as significant segments of the program behavior (e.g., the parsing, compilation, and optimization stages in this use case).
+we were able to discover characteristic regions of the object graph (e.g., the input, the AST, and the NFA for the regular expression use case, \cref{sec:use_case}) as well as significant segments of the program behavior (e.g., the parsing, compilation, and optimization stages in the same use case).
 Based on this overview, we could develop and refine our mental model of the explored system's functioning and connect it to particular classes and objects in their implementation.
 Furthermore, the interactive visualization helped us to explore and analyze communication patterns, reflect on the system design, and share and discuss our mental models with other developers.
 
@@ -62,7 +62,7 @@ Our force-directed graph approach provides a simple yet effective way to describ
 Especially for smaller program traces, the resulting layout allowed us to distinguish between essential regions of the object graph.
 Still, the overall structure of the force-directed layout could be considered too weak for an optimal visual intuition.
 
-As an alternative to the force-directed layout, we consider clustering objects into groups that could be displayed in a clearer structure through color coding or a hierarchical layout of objects.
+As an alternative to the force-directed layout, we envision a clustering of objects into groups that could be displayed in a clearer structure through color coding or a hierarchical layout of objects.
 Clusters could be derived either from the existing force-directed layout or based on other distance metrics for objects such as their class organization, their communication patterns, or from embedding representations based on their source code or documentation.
 
 \paragraph{Limitations}
@@ -73,7 +73,7 @@ To address this challenge, our approach already provides a configuration interfa
 Still, configuration requires manual effort and is therefore a barrier for users to overcome.
 To reduce this barrier, we aim to improve the convenience of the configuration interface in our prototype by allowing users to refine the configuration directly in the running visualization; however, we see more potential in further research on automatic configuration techniques that can generate an appropriate configuration for individual program traces.
 
-Another source of complexity in animated object maps is the cluttered communication between different objects, such as lengthy handshakes between objects or messages that are irrelevant to the high-level program behavior.
+Another source of complexity in animated object maps is the cluttered communication between different objects that is caused by lengthy handshakes between objects, messages that are irrelevant to the high-level program behavior, etc.
 To address this challenge, we aim to apply trace summarization techniques to eliminate implementation details from the underlying program trace~\cite{hamouLhadj2006summarizing,noda2017identifying}.
 
 \subsection{Evaluation of Performance}
@@ -86,7 +86,7 @@ To measure the frame rate, we modify the \hardcode{stats.js} library\footnote{\u
 We retrieve the memory consumption from the Chrome Task Manager for the tab of the \tfd{} prototype and for the GPU process; to estimate the effective GPU consumption of the visualization, we subtract the GPU consumption before starting the visualization from the later GPU consumption.
 To avoid distortions from the garbage collector, we launch the visualization of each trace from an empty browser tab, exclude the first two seconds from the frame rate measurements, log the minimum memory consumption from a 30-second interval for each measurement, and report the best average frame rate and memory consumption of three runs for each trace.
 
-While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need to optimize the frame rate, graphics memory consumption, and saving times and loading times of program traces.
+While computational efficiency was not a design goal for our current implementation of the \tfd{} prototype, it already delivers practical performance for most of our considered program traces; still, there is a need to optimize the frame rate, graphics memory consumption, and saving and loading times of traces to improve user experience and scalability.
 Note that the limited frame rate during the force simulation is a deliberate trade-off to reduce the time until the layout stabilizes and the animation can be played.
 
 To speed up the saving times and loading times, we see great potential for optimization in applying object filters in the backend before serializing the program trace.
