@@ -16,7 +16,8 @@ jobs:
         with:
           run: |
             # Install dependencies
-            apk add pandoc python3 py3-pip python3-dev build-base gcc linux-headers
+            apk add pandoc<3.0 python3 py3-pip python3-dev build-base gcc linux-headers
+            # https://github.com/tomduck/pandoc-fignos/issues/105
 
             cd docs/exposé
 

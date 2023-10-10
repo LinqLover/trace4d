@@ -1,2 +1,1 @@
-# pandoc-fignos
-git+https://github.com/nandokawka/pandoc-xnos@284474574f51888be75603e7d1df667a0890504d#egg=pandoc-xnos  # https://github.com/tomduck/pandoc-fignos/issues/105
+pandoc-fignos
