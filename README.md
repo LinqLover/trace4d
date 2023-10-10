@@ -122,5 +122,5 @@ See [IDEAS.md](./IDEAS.md).
 
 ## Acknowledgments
 
-This project was conducted in the [*Methods & Techniques for Visual Analytics* seminar](https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma/lehrveranstaltung/sose-23-3778-methods--techniques-for-visual-analytics.html) offered by the [Visual Analytics Research Group](https://varg.dev/) ([@varg-dev](https://github.com/varg-dev)) of the [department for Computer Graphics Systems](https://hpi3d.de) at the Hasso Plattner Institute.
+This project was conducted in the [*Methods & Techniques for Visual Analytics* seminar](https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma/lehrveranstaltung/sose-23-3778-methods--techniques-for-visual-analytics.html) offered by the [Computer Graphics Systems Group](https://hpi3d.de) at the Hasso Plattner Institute.
 Thanks to Willy Scheibel ([@scheibel](https://github.com/scheibel)) for supervising this project and providing countless ideas and feedback!
