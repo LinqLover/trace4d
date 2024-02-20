@@ -124,3 +124,28 @@ See [IDEAS.md](./IDEAS.md).
 
 This project was conducted in the [*Methods & Techniques for Visual Analytics* seminar](https://hpi.de/studium/im-studium/lehrveranstaltungen/it-systems-engineering-ma/lehrveranstaltung/sose-23-3778-methods--techniques-for-visual-analytics.html) offered by the [Computer Graphics Systems Group](https://hpi3d.de) at the Hasso Plattner Institute.
 Thanks to Willy Scheibel ([@scheibel](https://github.com/scheibel)) for supervising this project and providing countless ideas and feedback!
+
+## Citing
+
+If you would like to cite this project or learn more about the research behind it, please refer to the following publication:
+
+Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces.](https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces) In *15th International Conference on Information Visualization Theory and Applications (IVAPP 2024)*, February 27–29, Rome, Italy. SciTePress, 9 pages. In press. [🔗 Preprint](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [🔗 Poster](https://linqlover.github.io/trace4d/poster-ivapp.pdf)
+
+<details>
+<summary>BibTeX</summary>
+<pre><code>@inproceedings{thiede2024bringing,
+  author = {Thiede, Christoph and Scheibel, Willy and D{\"o}llner, J{\"u}rgen}},
+  title = {Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces},
+  booktitle = {Proceedings of the 19th International Conference on Information Visualization Theory and Applications (IVAPP 2024)},
+  series = {IVAPP '24},
+  volume = {3},
+  year = {2024},
+  month = {2},
+  days = {27--29},
+  publisher = {SciTePress},
+  organization = {INSTICC},
+  numpages = {9},
+  location = {Rome, Italy},
+  note = {in press}
+}</code></pre>
+</details>

@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software/work in your research, please cite it as follows:"
+title: "Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces"
+authors:
+  - family-names: "Thiede"
+    given-names: "Christoph"
+    orcid: https://orcid.org/0000-0002-7442-8216
+  - family-names: "Scheibel"
+    given-names: "Willy"
+    orcid: https://orcid.org/0000-0002-7885-9857
+  - family-names: "Döllner"
+    given-names: "Jürgen"
+    orcid: https://orcid.org/0000-0002-8981-8583
+version: "To appear"
+abstract: |
+  Program comprehension is a key activity in software development.
+  Several visualization approaches such as software maps have been proposed to support programmers in exploring the architecture of software systems.
+  However, for the exploration of program behavior, programmers still rely on traditional code browsing and debugging tools to build a mental model of a system’s behavior.
+  We propose a novel approach to visualizing program behavior through animated 2.5D object maps that depict particular objects and their interactions from a program trace.
+  We describe our implementation and evaluate it for different program traces through an experience report and performance measurements.
+  Our results indicate that our approach can benefit program comprehension tasks, but further research is needed to improve scalability and usability.
+keywords:
+  - software visualization
+  - software maps
+  - program comprehension
+  - omniscient debugging
+conference:
+  name: "19th International Conference on Information Visualization Theory and Applications (IVAPP 2024)"
+  location: "Rome, Italy"
+  date-start: "2024-02-27"
+  date-end: "2024-02-29"
+publisher: "SciTePress"
+url: "https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces"
