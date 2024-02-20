@@ -3,7 +3,7 @@
 This project aims to improve program comprehension by visualizing traces of object-oriented programs through animated 2.5D object maps.
 Program traces are created in [Squeak](https://squeak.org) using the [TraceDebugger](https://github.com/hpi-swa-lab/squeak-tracedebugger) and visualized in the browser using [three.js](https://threejs.org).
 
-- **[Read the paper (preprint)](https://linqlover.github.io/trace4d/paper.pdf)** [![PDF](https://img.shields.io/badge/PDF-blue)](https://linqlover.github.io/trace4d/paper.pdf) [![HTML](https://img.shields.io/badge/HTML-blue)](https://linqlover.github.io/trace4d/paper.html)
+- **[Read the paper (preprint)](https://linqlover.github.io/trace4d/paper-ivapp.pdf)** [![PDF](https://img.shields.io/badge/PDF-blue)](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [![HTML](https://img.shields.io/badge/HTML-blue)](https://linqlover.github.io/trace4d/paper-ivapp.html)
 - **[Try the demo](https://linqlover.github.io/trace4d/)**
 
 ![Screenshot of trace4d](./assets/trace4d.png)
