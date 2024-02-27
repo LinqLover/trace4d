@@ -4,6 +4,8 @@ This project aims to improve program comprehension by visualizing traces of obje
 Program traces are created in [Squeak](https://squeak.org) using the [TraceDebugger](https://github.com/hpi-swa-lab/squeak-tracedebugger) and visualized in the browser using [three.js](https://threejs.org).
 
 - **[Read the paper (preprint)](https://linqlover.github.io/trace4d/paper-ivapp.pdf)** [![PDF](https://img.shields.io/badge/PDF-blue)](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [![HTML](https://img.shields.io/badge/HTML-blue)](https://linqlover.github.io/trace4d/paper-ivapp.html)
+- **[Read the poster](https://linqlover.github.io/trace4d/poster-ivapp.pdf)** [![PDF](https://img.shields.io/badge/PDF-blue)](https://linqlover.github.io/trace4d/poster-ivapp.pdf) [![HTML](https://img.shields.io/badge/HTML-blue)](https://linqlover.github.io/trace4d/poster-ivapp.html)
+- **[Read the presentation slides](https://linqlover.github.io/trace4d/slides-ivapp.pdf)** [![PDF](https://img.shields.io/badge/PDF-blue)](https://linqlover.github.io/trace4d/slides-ivapp.pdf) [![HTML](https://img.shields.io/badge/HTML-blue)](https://linqlover.github.io/trace4d/slides-ivapp.html)
 - **[Try the demo](https://linqlover.github.io/trace4d/)**
 
 ![Screenshot of trace4d](./assets/trace4d.png)
@@ -129,7 +131,7 @@ Thanks to Willy Scheibel ([@scheibel](https://github.com/scheibel)) for supervis
 
 If you would like to cite this project or learn more about the research behind it, please refer to the following publication:
 
-Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces.](https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces) In *Proceedings of the 15th International Conference on Information Visualization Theory and Applications (IVAPP 2024)*, February 27–29, Rome, Italy. SciTePress, 9 pages. In press. [🔗 Preprint](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [🔗 Poster](https://linqlover.github.io/trace4d/poster-ivapp.pdf)
+Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces.](https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces) In *Proceedings of the 15th International Conference on Information Visualization Theory and Applications (IVAPP 2024)*, February 27–29, Rome, Italy. SciTePress, 9 pages. In press. [🔗 Preprint](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [🔗 Poster](https://linqlover.github.io/trace4d/poster-ivapp.pdf) [🔗 Slides](https://linqlover.github.io/trace4d/slides-ivapp.pdf)
 
 <details>
 <summary>BibTeX</summary>
