@@ -19,7 +19,7 @@ Program traces are created in [Squeak](https://squeak.org) using the [TraceDebug
   - [`assets/examples.md`](./assets/examples.md): Screenshots and screencasts of visualizing example program traces
   - [`assets/traces/`](./assets/traces/): Prepared serialized program traces of different Squeak programs (see [`docs/traces.md`](./docs/traces.md))
 - [`docs/`](./docs/): Documentational artifacts
-  - [`docs/paper/`](./docs/paper/): LaTeX sources of our paper preprint
+  - [`docs/paper/`](./docs/paper/): LaTeX sources of our paper preprint (older version)
   - [`docs/exposé/`](./docs/exposé/): LaTeX sources of our original exposé
   - [`docs/benchmarking.md`](./docs/benchmarking.md): Instructions for reproducing our benchmarking results
   - [`docs/experience-report.md`](./docs/experience-report.md): Instructions and results of our experience report
