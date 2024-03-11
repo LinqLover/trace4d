@@ -131,7 +131,7 @@ Thanks to Willy Scheibel ([@scheibel](https://github.com/scheibel)) for supervis
 
 If you would like to cite this project or learn more about the research behind it, please refer to the following publication:
 
-Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces.](https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces) In *Proceedings of the 15th International Conference on Information Visualization Theory and Applications (IVAPP 2024)*, February 27–29, Rome, Italy. SciTePress, 9 pages. In press. [🔗 Preprint](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [🔗 Poster](https://linqlover.github.io/trace4d/poster-ivapp.pdf) [🔗 Slides](https://linqlover.github.io/trace4d/slides-ivapp.pdf)
+Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces.](https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces) In *Proceedings of the 15th International Conference on Information Visualization Theory and Applications (IVAPP 2024)*, February 27–29, Rome, Italy. SciTePress, 9 pages. DOI: [10.5220/0012393900003660](https://doi.org/10.5220/0012393900003660). [🔗 Preprint](https://linqlover.github.io/trace4d/paper-ivapp.pdf) [🔗 Poster](https://linqlover.github.io/trace4d/poster-ivapp.pdf) [🔗 Slides](https://linqlover.github.io/trace4d/slides-ivapp.pdf)
 
 <details>
 <summary>BibTeX</summary>
@@ -147,8 +147,8 @@ Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Lif
   organization = {INSTICC},
   isbn = {978-989-758-679-8},
   issn = {2184-4321},
+  doi = {10.5220/0012393900003660},
   pages = {661--669},
-  location = {Rome, Italy},
-  note = {in press}
+  location = {Rome, Italy}
 }</code></pre>
 </details>
