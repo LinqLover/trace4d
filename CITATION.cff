@@ -34,10 +34,7 @@ preferred-citation:
   location: "Rome, Italy"
   publisher: "SciTePress"
   organization: "INSTICC"
-  url: "https://www.researchgate.net/publication/376650904_Bringing_Objects_to_Life_Supporting_Program_Comprehension_through_Animated_25D_Object_Maps_from_Program_Traces"
-  identifiers:
-  - type: doi
-    value: 10.5220/0012393900003660
+  doi: 10.5220/0012393900003660
   keywords:
     - software visualization
     - software maps
