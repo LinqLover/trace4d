@@ -136,7 +136,7 @@ Christoph Thiede, Willy Scheibel, and Jürgen Döllner: [Bringing Objects to Lif
 <details>
 <summary>BibTeX</summary>
 <pre><code>@inproceedings{thiede2024bringing,
-  author = {Thiede, Christoph and Scheibel, Willy and D{\"o}llner, J{\"u}rgen}},
+  author = {Thiede, Christoph and Scheibel, Willy and D{\"o}llner, J{\"u}rgen},
   title = {Bringing Objects to Life: Supporting Program Comprehension through Animated 2.5D Object Maps from Program Traces},
   booktitle = {Proceedings of the 19th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications -- Volume 1: GRAPP, HUCAPP and IVAPP},
   year = {2024},
